@@ -4,6 +4,43 @@
   
     
     <entry>
+      <title>我的电商网站修bug日常①——登陆失败</title>
+      <link href="/2024/01/08/%E6%88%91%E7%9A%84%E7%94%B5%E5%95%86%E7%BD%91%E7%AB%99%E4%BF%AEbug%E6%97%A5%E5%B8%B8%E2%91%A0%E2%80%94%E2%80%94%E7%99%BB%E9%99%86%E5%A4%B1%E8%B4%A5/"/>
+      <url>/2024/01/08/%E6%88%91%E7%9A%84%E7%94%B5%E5%95%86%E7%BD%91%E7%AB%99%E4%BF%AEbug%E6%97%A5%E5%B8%B8%E2%91%A0%E2%80%94%E2%80%94%E7%99%BB%E9%99%86%E5%A4%B1%E8%B4%A5/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\css\APlayer.min.css"><script src="\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="\js\Meting.min.js"></script><h1 id="缘起"><a href="#缘起" class="headerlink" title="缘起"></a>缘起</h1><p>我无聊想试试如果登陆的时候填一些奇怪的东西进去，我的后端会不会爆炸。<del>（别问我为什么现在才想起来测这个）</del></p><p>结果后端没爆炸（后面才知道），前端爆炸了。</p><p><img src="/2024/01/08/%E6%88%91%E7%9A%84%E7%94%B5%E5%95%86%E7%BD%91%E7%AB%99%E4%BF%AEbug%E6%97%A5%E5%B8%B8%E2%91%A0%E2%80%94%E2%80%94%E7%99%BB%E9%99%86%E5%A4%B1%E8%B4%A5/image-20240108224555234.png" alt="image-20240108224555234"></p><p>而且登陆失败的时候没有提示错误信息，因为想的是前端有一个统一的响应式拦截，应该会提示的，然而实际上并没有。</p><h1 id="排查"><a href="#排查" class="headerlink" title="排查"></a>排查</h1><p>查看请求，响应正常。</p><p><img src="/2024/01/08/%E6%88%91%E7%9A%84%E7%94%B5%E5%95%86%E7%BD%91%E7%AB%99%E4%BF%AEbug%E6%97%A5%E5%B8%B8%E2%91%A0%E2%80%94%E2%80%94%E7%99%BB%E9%99%86%E5%A4%B1%E8%B4%A5/image-20240108231552374.png" alt="image-20240108231552374"></p><p>使用无痕模式，正常访问（未登录）。</p><p><img src="/2024/01/08/%E6%88%91%E7%9A%84%E7%94%B5%E5%95%86%E7%BD%91%E7%AB%99%E4%BF%AEbug%E6%97%A5%E5%B8%B8%E2%91%A0%E2%80%94%E2%80%94%E7%99%BB%E9%99%86%E5%A4%B1%E8%B4%A5/image-20240108231711382.png" alt="image-20240108231711382"></p><p>使用Apifox测试后端，也正常响应。</p><p>那么可以肯定的是，后端没有问题。</p><p>那么肯定是前端的代码中存在问题。</p><p>于是大概猜到了（并且看了一下），响应中的为<code>null</code>的<code>result</code>赋给了<code>userInfo</code>，并存到local storage中，然后发送请求，然后就寄了。</p><p><img src="/2024/01/08/%E6%88%91%E7%9A%84%E7%94%B5%E5%95%86%E7%BD%91%E7%AB%99%E4%BF%AEbug%E6%97%A5%E5%B8%B8%E2%91%A0%E2%80%94%E2%80%94%E7%99%BB%E9%99%86%E5%A4%B1%E8%B4%A5/image-20240108233413398.png" alt="image-20240108233413398"></p><p>还记得前面说过的前端有一个统一的响应式拦截吗？理论上如果有问题，拦截了，那么<code>null</code>的<code>result</code>是不会赋给<code>userInfo</code>的。这个拦截是有用的嗷，之前后端返回401的响应是能够拦截并弹出错误信息的。<del>《理论上》</del></p><p>然后我一看这个状态代码</p><p><img src="/2024/01/08/%E6%88%91%E7%9A%84%E7%94%B5%E5%95%86%E7%BD%91%E7%AB%99%E4%BF%AEbug%E6%97%A5%E5%B8%B8%E2%91%A0%E2%80%94%E2%80%94%E7%99%BB%E9%99%86%E5%A4%B1%E8%B4%A5/image-20240108231420735.png" alt="image-20240108231420735"></p><p><font color="#198639" size="5">《200 OK》</font></p><p>噔 噔 咚</p><p>哈哈，怪不得不会被拦截呢</p><h1 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h1><p>原因找到了，那就很好解决了。这里选择的是改前端的代码，因为后端都是统一用一个<code>Result</code>类去封装响应信息的，然后所有的<code>Controller</code>都是用<code>Result</code>类中的<code>success</code>或者<code>error</code>方法封装信息，改后端不太现实，牵一发而动全身了属于是。</p><h3 id="修改-userStore"><a href="#修改-userStore" class="headerlink" title="修改 userStore"></a>修改 userStore</h3><p>修改登陆用到的<code>getUserInfo</code>方法，根据<code>res.result</code>是否为空判断登录是否成功（用<code>res.code</code>效果一样）：</p><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span>(res.<span class="property">result</span>!=<span class="literal">null</span>)&#123;</span><br><span class="line">            userInfo.<span class="property">value</span>=res.<span class="property">result</span></span><br><span class="line">            <span class="comment">// 合并购物车</span></span><br><span class="line">            <span class="keyword">await</span> <span class="title function_">mergeCartAPI</span>(cartStore.<span class="property">cartList</span>.<span class="title function_">map</span>(<span class="function"><span class="params">item</span>=&gt;</span>&#123;</span><br><span class="line">                <span class="keyword">return</span>&#123;</span><br><span class="line">                    <span class="attr">skuId</span>:item.<span class="property">skuId</span>,</span><br><span class="line">                    <span class="attr">selected</span>:item.<span class="property">selected</span>,</span><br><span class="line">                    <span class="attr">count</span>:item.<span class="property">count</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;))</span><br><span class="line">            <span class="keyword">await</span> cartStore.<span class="title function_">updateNewList</span>()</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="title class_">ElMessage</span>(&#123;</span><br><span class="line">                <span class="attr">type</span>:<span class="string">&#x27;warning&#x27;</span>,</span><br><span class="line">                <span class="attr">message</span>:res.<span class="property">message</span></span><br><span class="line">            &#125;)</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure><h3 id="修改登录页面的script"><a href="#修改登录页面的script" class="headerlink" title="修改登录页面的script"></a>修改登录页面的script</h3><p>还有登录页面的<code>doLogin</code>方法：</p><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (userStore.<span class="property">userInfo</span>.<span class="property">value</span>!=<span class="literal">null</span>)&#123;</span><br><span class="line">        <span class="title class_">ElMessage</span>(&#123; <span class="attr">type</span>: <span class="string">&#x27;success&#x27;</span>, <span class="attr">message</span>: <span class="string">&#x27;登录成功&#x27;</span> &#125;)</span><br><span class="line">        <span class="keyword">await</span> router.<span class="title function_">replace</span>(&#123;<span class="attr">path</span>: <span class="string">&#x27;/&#x27;</span>&#125;)</span><br><span class="line">      &#125;</span><br></pre></td></tr></table></figure><p>完成！</p><p><img src="/2024/01/08/%E6%88%91%E7%9A%84%E7%94%B5%E5%95%86%E7%BD%91%E7%AB%99%E4%BF%AEbug%E6%97%A5%E5%B8%B8%E2%91%A0%E2%80%94%E2%80%94%E7%99%BB%E9%99%86%E5%A4%B1%E8%B4%A5/image-20240108233322607.png" alt="image-20240108233322607"></p><p>userInfo也是正常存储。</p><p><img src="/2024/01/08/%E6%88%91%E7%9A%84%E7%94%B5%E5%95%86%E7%BD%91%E7%AB%99%E4%BF%AEbug%E6%97%A5%E5%B8%B8%E2%91%A0%E2%80%94%E2%80%94%E7%99%BB%E9%99%86%E5%A4%B1%E8%B4%A5/image-20240108233455050.png" alt="image-20240108233455050"></p><h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><p>无</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 修bug日常 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 前端 </tag>
+            
+            <tag> Vue </tag>
+            
+            <tag> Java </tag>
+            
+            <tag> 网站 </tag>
+            
+            <tag> Bug </tag>
+            
+            <tag> 登陆 </tag>
+            
+            <tag> Apifox </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Butterfly主题下标签外挂的使用</title>
       <link href="/2024/01/07/Butterfly%E4%B8%BB%E9%A2%98%E4%B8%8B%E6%A0%87%E7%AD%BE%E5%A4%96%E6%8C%82%E7%9A%84%E4%BD%BF%E7%94%A8/"/>
       <url>/2024/01/07/Butterfly%E4%B8%BB%E9%A2%98%E4%B8%8B%E6%A0%87%E7%AD%BE%E5%A4%96%E6%8C%82%E7%9A%84%E4%BD%BF%E7%94%A8/</url>
@@ -20,9 +57,9 @@
       
         <tags>
             
-            <tag> Butterfly </tag>
-            
             <tag> Markdown </tag>
+            
+            <tag> Butterfly </tag>
             
             <tag> Tag Plugins </tag>
             
@@ -49,11 +86,11 @@
       
         <tags>
             
+            <tag> Butterfly </tag>
+            
             <tag> Hexo </tag>
             
             <tag> APlayer </tag>
-            
-            <tag> Butterfly </tag>
             
             <tag> MeingJS </tag>
             
