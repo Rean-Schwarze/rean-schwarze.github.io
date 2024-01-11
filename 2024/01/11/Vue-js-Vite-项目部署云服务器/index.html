@@ -1,0 +1,368 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Vue.js(Vite)项目部署云服务器 | Rean's Blog</title><meta name="author" content="Rean"><meta name="copyright" content="Rean"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="（不是从0开始的）Vue.js(Vite)项目部署到云服务器的教程！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue.js(Vite)项目部署云服务器">
+<meta property="og:url" content="https://rean-schwarze.github.io/2024/01/11/Vue-js-Vite-%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8/index.html">
+<meta property="og:site_name" content="Rean&#39;s Blog">
+<meta property="og:description" content="（不是从0开始的）Vue.js(Vite)项目部署到云服务器的教程！">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover1.JPG">
+<meta property="article:published_time" content="2024-01-11T14:36:26.000Z">
+<meta property="article:modified_time" content="2024-01-11T15:20:02.927Z">
+<meta property="article:author" content="Rean">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="Vue">
+<meta property="article:tag" content="Vite">
+<meta property="article:tag" content="部署">
+<meta property="article:tag" content="云服务器">
+<meta property="article:tag" content="宝塔">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover1.JPG"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://rean-schwarze.github.io/2024/01/11/Vue-js-Vite-%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Vue.js(Vite)项目部署云服务器',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-01-11 23:20:02'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/custom.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css"><div id="aplayer"></div><script src="https://cdn.jsdelivr.net/gh/radium-bit/res@master/live2d/autoload.js" async></script><script src="https://rean-shop-bucket.oss-cn-guangzhou.aliyuncs.com/assets/js/Meting.min.js" async></script><script src="https://rean-shop-bucket.oss-cn-guangzhou.aliyuncs.com/assets/js/busuanzi.pure.mini.js" async></script><meta name="generator" content="Hexo 7.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/spin.svg" data-original="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">25</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 文章</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover1.JPG')"><nav id="nav"><span id="blog-info"><a href="/" title="Rean's Blog"><span class="site-name">Rean's Blog</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 文章</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Vue.js(Vite)项目部署云服务器</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-01-11T14:36:26.000Z" title="发表于 2024-01-11 22:36:26">2024-01-11</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-01-11T15:20:02.927Z" title="更新于 2024-01-11 23:20:02">2024-01-11</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%95%99%E7%A8%8B/">教程</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">751</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>2分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Vue.js(Vite)项目部署云服务器"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="项目打包"><a href="#项目打包" class="headerlink" title="项目打包"></a>项目打包</h1><p>这一步可以解决配置后访问出现404、空白页的问题（</p>
+<h2 id="1-修改vite-config-js"><a href="#1-修改vite-config-js" class="headerlink" title="1. 修改vite.config.js"></a>1. 修改<code>vite.config.js</code></h2><p>添加 base，意思是 build 之后的外部资源都从当前目录的相对路径获取。<br>比如 <code>main.js</code> 不是 <code>/main.js</code> 而是 <code>./main.js</code>。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="title function_">defineConfig</span>(&#123;</span><br><span class="line">    <span class="attr">base</span>: <span class="string">&#x27;./&#x27;</span>,</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-修改router-index-js"><a href="#2-修改router-index-js" class="headerlink" title="2. 修改router/index.js"></a>2. 修改<code>router/index.js</code></h2><p>默认的<code>createWebHistory</code>路由模式路径不带#号（生产环境下不能直接访问项目，需要nginx转发）</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="http://localhost:8080/#/">http://localhost:8080/#/</a></p>
+</blockquote>
+<p>所以我们需要改为<code>createWebHashHistory</code>路由模式。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; createRouter, createWebHashHistory &#125; <span class="keyword">from</span> <span class="string">&#x27;vue-router&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> router = <span class="title function_">createRouter</span>(&#123;</span><br><span class="line">  <span class="attr">history</span>: <span class="title function_">createWebHashHistory</span>(),</span><br><span class="line">  <span class="comment">// 它本来默认是  createWebHistory()</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-修改baseURL"><a href="#3-修改baseURL" class="headerlink" title="3. 修改baseURL"></a>3. 修改<code>baseURL</code></h2><p>修改<code>http.js</code>：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> http = axios.<span class="title function_">create</span>(&#123;</span><br><span class="line">    <span class="attr">baseURL</span>:<span class="string">&#x27;/api&#x27;</span>,</span><br><span class="line">    <span class="attr">timeout</span>: <span class="number">5000</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>修改<code>vite.config.js</code>：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="attr">server</span>: &#123;</span><br><span class="line">    <span class="attr">proxy</span>: &#123;</span><br><span class="line">      <span class="string">&#x27;/api&#x27;</span>: &#123;</span><br><span class="line">        <span class="attr">target</span>: <span class="string">&#x27;&#x27;</span>, <span class="comment">// 实际后端地址</span></span><br><span class="line">        <span class="attr">changeOrigin</span>: <span class="literal">true</span>,</span><br><span class="line">        <span class="attr">rewrite</span>: <span class="function">(<span class="params">path</span>) =&gt;</span> path.<span class="title function_">replace</span>(<span class="regexp">/^\/api/</span>, <span class="string">&#x27;&#x27;</span>) <span class="comment">// 不可以省略rewrite</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>原理是通过代理，将原本以<code>/api</code>开头的请求地址替换为实际的地址。</p>
+<h2 id="4-打包"><a href="#4-打包" class="headerlink" title="4. 打包"></a>4. 打包</h2><p>运行</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm run build</span><br></pre></td></tr></table></figure>
+
+<p>结束后可以在项目的目录下看到生成的<code>dist</code>目录。</p>
+<h1 id="云服务器配置"><a href="#云服务器配置" class="headerlink" title="云服务器配置"></a>云服务器配置</h1><p>如何购买云服务器、初始化云服务器这里就不介绍了~（因为已经配完了（（</p>
+<p>这里以阿里云为例，通过宝塔去完成网站的上线。</p>
+<h1 id="0-检查宝塔各软件是否完成安装"><a href="#0-检查宝塔各软件是否完成安装" class="headerlink" title="0. 检查宝塔各软件是否完成安装"></a>0. 检查宝塔各软件是否完成安装</h1><p><img src="/img/spin.svg" data-original="/2024/01/11/Vue-js-Vite-%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8/image-20240111231628656.png" alt="image-20240111231628656"></p>
+<p>其中<code>Nginx</code>是本教程重点使用的软件（还有PHP也会用到，其他的这里暂时用不着），如果没安装上记得安装好（一开始的一键安装可能会安装失败）</p>
+<h2 id="1-开放ECS端口"><a href="#1-开放ECS端口" class="headerlink" title="1. 开放ECS端口"></a>1. 开放ECS端口</h2><p><img src="/img/spin.svg" data-original="/2024/01/11/Vue-js-Vite-%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8/image-20240111225142537.png" alt="image-20240111225142537"></p>
+<p>手动添加一条入站规则，端口为你想要配置网站所用的端口，源IP设为<code>0.0.0.0/0</code></p>
+<p><img src="/img/spin.svg" data-original="/2024/01/11/Vue-js-Vite-%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8/image-20240111225210955.png" alt="image-20240111225210955"></p>
+<h2 id="2-添加宝塔内的防火墙端口规则"><a href="#2-添加宝塔内的防火墙端口规则" class="headerlink" title="2. 添加宝塔内的防火墙端口规则"></a>2. 添加宝塔内的防火墙端口规则</h2><p><img src="/img/spin.svg" data-original="/2024/01/11/Vue-js-Vite-%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8/image-20240111225510895.png" alt="image-20240111225510895"></p>
+<p>端口填上一步同一个端口即可。</p>
+<h2 id="3-添加PHP项目站点"><a href="#3-添加PHP项目站点" class="headerlink" title="3. 添加PHP项目站点"></a>3. 添加PHP项目站点</h2><p>点击左侧栏中的网站，添加站点。</p>
+<p>其中第一行随便写一个方便自己辨别的域名（要是有真的域名那也可以直接用），第二行写</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ECS公网IP地址:你想设置的端口（和前面开放的一致）</span><br></pre></td></tr></table></figure>
+
+<p>其中如果设置1025端口，我这边最后会出现访问超时的情况，服务器也没有日志记录，原因未知。</p>
+<p><img src="/img/spin.svg" data-original="/2024/01/11/Vue-js-Vite-%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8/image-20240111230146413.png" alt="image-20240111230146413"></p>
+<h2 id="4-站点设置"><a href="#4-站点设置" class="headerlink" title="4. 站点设置"></a>4. 站点设置</h2><h3 id="4-1-域名管理"><a href="#4-1-域名管理" class="headerlink" title="4.1 域名管理"></a>4.1 域名管理</h3><p>删除刚刚第一行的域名，留下IP:端口那条即可。</p>
+<h3 id="4-2-网站目录"><a href="#4-2-网站目录" class="headerlink" title="4.2 网站目录"></a>4.2 网站目录</h3><p>运行目录设为<code>/</code>（有时候删了文件再重新传这里会变成别的，要改回来）</p>
+<p><img src="/img/spin.svg" data-original="/2024/01/11/Vue-js-Vite-%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8/image-20240111230821831.png" alt="image-20240111230821831"></p>
+<h3 id="4-3-默认文档"><a href="#4-3-默认文档" class="headerlink" title="4.3 默认文档"></a>4.3 默认文档</h3><p>在最上面加上<code>dist</code></p>
+<p><img src="/img/spin.svg" data-original="/2024/01/11/Vue-js-Vite-%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8/image-20240111230921696.png" alt="image-20240111230921696"></p>
+<h3 id="4-4-配置文件（重要）"><a href="#4-4-配置文件（重要）" class="headerlink" title="4.4 配置文件（重要）"></a>4.4 配置文件（重要）</h3><p>添加（记得换成自己的后端地址）</p>
+<figure class="highlight ini"><table><tr><td class="code"><pre><span class="line"><span class="comment">## 添加上这个配置</span></span><br><span class="line">        </span><br><span class="line">    location /api&#123;</span><br><span class="line">        rewrite  ^/api/(.*)$ /$1 break<span class="comment">;</span></span><br><span class="line">        proxy_pass http://后端IP:后端端口<span class="comment">;</span></span><br><span class="line">        index index.html<span class="comment">;</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-上传文件"><a href="#5-上传文件" class="headerlink" title="5. 上传文件"></a>5. 上传文件</h2><p>打开第3步创建的根目录，将打包好的<code>dist</code>文件夹传进去即可。</p>
+<img src="/img/spin.svg" data-original="/2024/01/11/Vue-js-Vite-%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8/image-20240111231335047.png" alt="image-20240111231335047" style="zoom:200%;">
+
+<h2 id="6-完成"><a href="#6-完成" class="headerlink" title="6. 完成"></a>6. 完成</h2><p>访问<code>ECS公网IP地址:设置的端口</code>，大功告成！</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://rean-schwarze.github.io">Rean</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://rean-schwarze.github.io/2024/01/11/Vue-js-Vite-%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8/">https://rean-schwarze.github.io/2024/01/11/Vue-js-Vite-项目部署云服务器/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://rean-schwarze.github.io" target="_blank">Rean's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/JavaScript/">JavaScript</a><a class="post-meta__tags" href="/tags/Vue/">Vue</a><a class="post-meta__tags" href="/tags/Vite/">Vite</a><a class="post-meta__tags" href="/tags/%E9%83%A8%E7%BD%B2/">部署</a><a class="post-meta__tags" href="/tags/%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8/">云服务器</a><a class="post-meta__tags" href="/tags/%E5%AE%9D%E5%A1%94/">宝塔</a></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover1.JPG" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2024/01/10/vocalremover%E7%BD%91%E7%AB%99%E6%B5%8BBPM%E7%9A%84%E7%AE%97%E6%B3%95%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F/" title="vocalremover网站测BPM的算法是什么？"><img class="cover" src="/img/spin.svg" data-original="/vocalremover%E7%BD%91%E7%AB%99%E6%B5%8BBPM%E7%9A%84%E7%AE%97%E6%B3%95%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F/image-20240110221734848.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">vocalremover网站测BPM的算法是什么？</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2024/01/10/vocalremover%E7%BD%91%E7%AB%99%E6%B5%8BBPM%E7%9A%84%E7%AE%97%E6%B3%95%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F/" title="vocalremover网站测BPM的算法是什么？"><img class="cover" src="/img/spin.svg" data-original="/vocalremover%E7%BD%91%E7%AB%99%E6%B5%8BBPM%E7%9A%84%E7%AE%97%E6%B3%95%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F/image-20240110221734848.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-10</div><div class="title">vocalremover网站测BPM的算法是什么？</div></div></a></div><div><a href="/2024/01/09/Vue-js%E9%A1%B9%E7%9B%AE%E8%B5%B7%E6%AD%A5/" title="Vue.js项目起步"><img class="cover" src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover7.JPG" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-09</div><div class="title">Vue.js项目起步</div></div></a></div><div><a href="/2024/01/08/%E6%88%91%E7%9A%84%E7%94%B5%E5%95%86%E7%BD%91%E7%AB%99%E4%BF%AEbug%E6%97%A5%E5%B8%B8%E2%91%A0%E2%80%94%E2%80%94%E7%99%BB%E9%99%86%E5%A4%B1%E8%B4%A5/" title="我的电商网站修bug日常①——登陆失败"><img class="cover" src="/img/spin.svg" data-original="/img/image-20240108224555234.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-08</div><div class="title">我的电商网站修bug日常①——登陆失败</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div><div class="comment-switch"><span class="first-comment">Giscus</span><span id="switch-btn"></span><span class="second-comment">Valine</span></div></div><div class="comment-wrap"><div><div id="giscus-wrap"></div></div><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/spin.svg" data-original="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Rean</div><div class="author-info__description">日常写bug 偶尔调调歌</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">25</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/Rean-Schwarze" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="https://space.bilibili.com/6531436" target="_blank" title="bilibili"><i class="fab fa-bilibili"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">随缘更新~（ps：如果加载不完全可以等等或者刷新）</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E6%89%93%E5%8C%85"><span class="toc-text">项目打包</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%BF%AE%E6%94%B9vite-config-js"><span class="toc-text">1. 修改vite.config.js</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BF%AE%E6%94%B9router-index-js"><span class="toc-text">2. 修改router&#x2F;index.js</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%BF%AE%E6%94%B9baseURL"><span class="toc-text">3. 修改baseURL</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E6%89%93%E5%8C%85"><span class="toc-text">4. 打包</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE"><span class="toc-text">云服务器配置</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#0-%E6%A3%80%E6%9F%A5%E5%AE%9D%E5%A1%94%E5%90%84%E8%BD%AF%E4%BB%B6%E6%98%AF%E5%90%A6%E5%AE%8C%E6%88%90%E5%AE%89%E8%A3%85"><span class="toc-text">0. 检查宝塔各软件是否完成安装</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%BC%80%E6%94%BEECS%E7%AB%AF%E5%8F%A3"><span class="toc-text">1. 开放ECS端口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%B7%BB%E5%8A%A0%E5%AE%9D%E5%A1%94%E5%86%85%E7%9A%84%E9%98%B2%E7%81%AB%E5%A2%99%E7%AB%AF%E5%8F%A3%E8%A7%84%E5%88%99"><span class="toc-text">2. 添加宝塔内的防火墙端口规则</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%B7%BB%E5%8A%A0PHP%E9%A1%B9%E7%9B%AE%E7%AB%99%E7%82%B9"><span class="toc-text">3. 添加PHP项目站点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E7%AB%99%E7%82%B9%E8%AE%BE%E7%BD%AE"><span class="toc-text">4. 站点设置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E5%9F%9F%E5%90%8D%E7%AE%A1%E7%90%86"><span class="toc-text">4.1 域名管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E7%BD%91%E7%AB%99%E7%9B%AE%E5%BD%95"><span class="toc-text">4.2 网站目录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-%E9%BB%98%E8%AE%A4%E6%96%87%E6%A1%A3"><span class="toc-text">4.3 默认文档</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%EF%BC%88%E9%87%8D%E8%A6%81%EF%BC%89"><span class="toc-text">4.4 配置文件（重要）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E4%B8%8A%E4%BC%A0%E6%96%87%E4%BB%B6"><span class="toc-text">5. 上传文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E5%AE%8C%E6%88%90"><span class="toc-text">6. 完成</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2024/01/11/Vue-js-Vite-%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8/" title="Vue.js(Vite)项目部署云服务器"><img src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover1.JPG" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vue.js(Vite)项目部署云服务器"/></a><div class="content"><a class="title" href="/2024/01/11/Vue-js-Vite-%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8/" title="Vue.js(Vite)项目部署云服务器">Vue.js(Vite)项目部署云服务器</a><time datetime="2024-01-11T14:36:26.000Z" title="发表于 2024-01-11 22:36:26">2024-01-11</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/10/vocalremover%E7%BD%91%E7%AB%99%E6%B5%8BBPM%E7%9A%84%E7%AE%97%E6%B3%95%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F/" title="vocalremover网站测BPM的算法是什么？"><img src="/img/spin.svg" data-original="/vocalremover%E7%BD%91%E7%AB%99%E6%B5%8BBPM%E7%9A%84%E7%AE%97%E6%B3%95%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F/image-20240110221734848.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="vocalremover网站测BPM的算法是什么？"/></a><div class="content"><a class="title" href="/2024/01/10/vocalremover%E7%BD%91%E7%AB%99%E6%B5%8BBPM%E7%9A%84%E7%AE%97%E6%B3%95%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F/" title="vocalremover网站测BPM的算法是什么？">vocalremover网站测BPM的算法是什么？</a><time datetime="2024-01-10T14:16:58.000Z" title="发表于 2024-01-10 22:16:58">2024-01-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/09/Vue-js%E9%A1%B9%E7%9B%AE%E8%B5%B7%E6%AD%A5/" title="Vue.js项目起步"><img src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover7.JPG" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vue.js项目起步"/></a><div class="content"><a class="title" href="/2024/01/09/Vue-js%E9%A1%B9%E7%9B%AE%E8%B5%B7%E6%AD%A5/" title="Vue.js项目起步">Vue.js项目起步</a><time datetime="2024-01-09T14:51:06.000Z" title="发表于 2024-01-09 22:51:06">2024-01-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/08/%E6%88%91%E7%9A%84%E7%94%B5%E5%95%86%E7%BD%91%E7%AB%99%E4%BF%AEbug%E6%97%A5%E5%B8%B8%E2%91%A0%E2%80%94%E2%80%94%E7%99%BB%E9%99%86%E5%A4%B1%E8%B4%A5/" title="我的电商网站修bug日常①——登陆失败"><img src="/img/spin.svg" data-original="/img/image-20240108224555234.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="我的电商网站修bug日常①——登陆失败"/></a><div class="content"><a class="title" href="/2024/01/08/%E6%88%91%E7%9A%84%E7%94%B5%E5%95%86%E7%BD%91%E7%AB%99%E4%BF%AEbug%E6%97%A5%E5%B8%B8%E2%91%A0%E2%80%94%E2%80%94%E7%99%BB%E9%99%86%E5%A4%B1%E8%B4%A5/" title="我的电商网站修bug日常①——登陆失败">我的电商网站修bug日常①——登陆失败</a><time datetime="2024-01-08T13:28:41.000Z" title="发表于 2024-01-08 21:28:41">2024-01-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/07/Butterfly%E4%B8%BB%E9%A2%98%E4%B8%8B%E6%A0%87%E7%AD%BE%E5%A4%96%E6%8C%82%E7%9A%84%E4%BD%BF%E7%94%A8/" title="Butterfly主题下标签外挂的使用"><img src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover8.JPG" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Butterfly主题下标签外挂的使用"/></a><div class="content"><a class="title" href="/2024/01/07/Butterfly%E4%B8%BB%E9%A2%98%E4%B8%8B%E6%A0%87%E7%AD%BE%E5%A4%96%E6%8C%82%E7%9A%84%E4%BD%BF%E7%94%A8/" title="Butterfly主题下标签外挂的使用">Butterfly主题下标签外挂的使用</a><time datetime="2024-01-07T14:32:31.000Z" title="发表于 2024-01-07 22:32:31">2024-01-07</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover1.JPG')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Rean</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(()=>{
+  const getGiscusTheme = theme => {
+    return theme === 'dark' ? 'dark' : 'light'
+  }
+
+  const loadGiscus = () => {
+    const config = Object.assign({
+      src: 'https://giscus.app/client.js',
+      'data-repo': 'Rean-Schwarze/rean-schwarze.github.io',
+      'data-repo-id': 'R_kgDOLBrDcw',
+      'data-category-id': 'DIC_kwDOLBrDc84CcRNZ',
+      'data-mapping': 'pathname',
+      'data-theme': getGiscusTheme(document.documentElement.getAttribute('data-theme')),
+      'data-reactions-enabled': '1',
+      crossorigin: 'anonymous',
+      async: true
+    },null)
+
+    const ele = document.createElement('script')
+    for (let key in config) {
+      ele.setAttribute(key, config[key])
+    }
+    document.getElementById('giscus-wrap').appendChild(ele)
+  }
+
+  const changeGiscusTheme = theme => {
+    const sendMessage = message => {
+      const iframe = document.querySelector('iframe.giscus-frame')
+      if (!iframe) return
+      iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app')
+    }
+
+    sendMessage({
+      setConfig: {
+        theme: getGiscusTheme(theme)
+      }
+    });
+  }
+
+  btf.addGlobalFn('themeChange', changeGiscusTheme, 'giscus')
+
+  if ('Giscus' === 'Giscus' || !true) {
+    if (true) btf.loadComment(document.getElementById('giscus-wrap'), loadGiscus)
+    else loadGiscus()
+  } else {
+    window.loadOtherComment= loadGiscus
+  }
+})()</script><script>(() => {
+  const initValine = () => {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'QnAsdrfTiQIDoi3lzCxrt49u-gzGzoHsz',
+      appKey: 'KKrkQZ3iUk9DIotqfHwARyAq',
+      avatar: 'monsterid',
+      serverURLs: 'https://qnasdrft.lc-cn-n1-shared.com',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: false
+    }, null))
+  }
+
+  const loadValine = async () => {
+    if (typeof Valine === 'function') initValine()
+    else {
+      await getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js')
+      initValine()
+    }
+  }
+
+  if ('Giscus' === 'Valine' || !true) {
+    if (true) btf.loadComment(document.getElementById('vcomment'),loadValine)
+    else setTimeout(loadValine, 0)
+  } else {
+    window.loadOtherComment = loadValine
+  }
+})()</script></div><div class="aplayer no-destroy" data-id="421801417" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="false"> </div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = false;
+POWERMODE.mobile = true;
+document.body.addEventListener('input', POWERMODE);
+</script><link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/aplayer/1.10.1/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/aplayer/1.10.1/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["link[rel=\"canonical\"]","meta[property=\"og:image\"]","meta[property=\"og:title\"]","meta[property=\"og:url\"]","head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener
+  btf.removeGlobalFnEvent('pjax')
+  btf.removeGlobalFnEvent('themeChange')
+
+  document.getElementById('rightside').classList.remove('rightside-show')
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', e => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div><div id="nav-music"><div id="nav-music-hoverTips" onclick="anzhiyu.musicToggle()">播放音乐</div><meting-js id="421801417" server="netease" type="playlist" mutex="true" preload="none" theme="var(--anzhiyu-main)" data-lrctype="0" order="random"></meting-js></div>
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(e.href.match(t)||e.href.match(r))&&(e.href=a.dataset.original)})});</script><script>!function(r){r.imageLazyLoadSetting.processImages=t;var e=r.imageLazyLoadSetting.isSPA,n=r.imageLazyLoadSetting.preloadRatio||1,c=a();function a(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(){e&&(c=a());for(var t,o=0;o<c.length;o++)0<=(t=(t=c[o]).getBoundingClientRect()).bottom&&0<=t.left&&t.top<=(r.innerHeight*n||document.documentElement.clientHeight*n)&&function(){var t,e,n,a,i=c[o];e=function(){c=c.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(n=new Image,a=t.getAttribute("data-original"),n.onload=function(){t.src=a,t.removeAttribute("data-original"),e&&e()},t.src!==a&&(n.src=a))}()}function i(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",i),r.addEventListener("resize",i),r.addEventListener("orientationchange",i)}(this);</script></body></html>
