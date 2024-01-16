@@ -4,6 +4,39 @@
   
     
     <entry>
+      <title>【Spring】@RequestMapping等方法注释用法</title>
+      <link href="/2024/01/15/%E3%80%90Spring%E3%80%91-RequestMapping%E7%AD%89%E6%96%B9%E6%B3%95%E6%B3%A8%E9%87%8A%E7%94%A8%E6%B3%95/"/>
+      <url>/2024/01/15/%E3%80%90Spring%E3%80%91-RequestMapping%E7%AD%89%E6%96%B9%E6%B3%95%E6%B3%A8%E9%87%8A%E7%94%A8%E6%B3%95/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\css\APlayer.min.css"><script src="\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="\js\Meting.min.js"></script><p>Spring Boot 提供了一组新的 REST 请求注释，可以简化构建 RESTful Web 服务的过程。</p><p>在Spring 4.3之前，我们使用<code>@RequestMapping</code>注解来实现RESTful的URL映射。</p><p>在Spring 4.3之后，拓展简化了<code>@RequestMapping</code>的方法级别注解，新的方法注释更加简洁且更易于阅读。它们还提供更具体的功能，并有助于减少构建 RESTful Web 服务所需的样板代码量。</p><h1 id="RequestMapping"><a href="#RequestMapping" class="headerlink" title="@RequestMapping"></a>@RequestMapping</h1><p>不设置 <code>method</code> 请求方式是 <code>get</code> 还是 <code>post</code> 时，<code>GET</code>、<code>POST</code> 都可以访问。</p><h2 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h2><ul><li><code>consumes</code> – 映射请求的消耗媒体类型，缩小主映射范围。（例如@RequestMapping(consumes &#x3D; {“application&#x2F;json”, “application&#x2F;xml”}））。</li><li><code>method</code> – 要映射的 HTTP 请求方法（例如method &#x3D; {RequestMethod.GET,RequestMethod.POST}).</li><li><code>header</code> – 映射请求的标头。</li><li><code>name</code> – 映射的名称。</li><li><code>value</code> – 该注释表达的<font color="#ff0000">主要映射</font>（例如：<code>/login</code>）</li><li><code>produces</code> – 映射请求的可产生媒体类型。</li><li><code>params</code> - 提供了一种有条件地将处理程序方法映射到包含某些具有预期值的参数的请求的方法。（如果是可选参数，则可以在名称前加上<code>!</code>）</li></ul><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@RequestMapping(value = &quot;/products&quot;, params = &quot;category=electronics&quot;)</span></span><br><span class="line"><span class="keyword">public</span> String <span class="title function_">listElectronicProducts</span><span class="params">()</span> &#123; <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="参数注解"><a href="#参数注解" class="headerlink" title="参数注解"></a>参数注解</h2><h3 id="RequestBody"><a href="#RequestBody" class="headerlink" title="@RequestBody"></a>@RequestBody</h3><p>用于读取请求体，将请求正文内容（例如<code>JSON</code>）映射到对象。</p><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@PostMapping(&quot;/users&quot;)</span></span><br><span class="line"><span class="keyword">public</span> User <span class="title function_">createUser</span><span class="params">(<span class="meta">@RequestBody</span> User user)</span> &#123; <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@PostMapping(value = &quot;/users&quot;, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)</span></span><br><span class="line"><span class="keyword">public</span> ResponseEntity <span class="title function_">createUser</span><span class="params">(<span class="meta">@RequestBody</span> MultiValueMap&lt;String, String&gt; formData)</span> &#123; <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h3 id="PathVariable"><a href="#PathVariable" class="headerlink" title="@PathVariable"></a>@PathVariable</h3><p>用于从请求 URI 中提取值。</p><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@GetMapping(&quot;/users/&#123;id&#125;&quot;)</span></span><br><span class="line"><span class="keyword">public</span> ResponseEntity <span class="title function_">getUserById</span><span class="params">(<span class="meta">@PathVariable</span> Long id)</span> &#123;</span><br><span class="line"><span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> userService.getUserById(id);</span><br><span class="line"><span class="keyword">return</span> ResponseEntity.ok(user);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h3 id="RequestParam"><a href="#RequestParam" class="headerlink" title="@RequestParam"></a>@RequestParam</h3><p>从HTTP请求中提取查询参数或表单数据。</p><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@GetMapping(&quot;/search&quot;)</span></span><br><span class="line"><span class="keyword">public</span> String <span class="title function_">search</span><span class="params">(<span class="meta">@RequestParam</span> String query, <span class="meta">@RequestParam</span> <span class="type">int</span> page)</span> &#123; <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h3 id="RequestHeader"><a href="#RequestHeader" class="headerlink" title="@RequestHeader"></a>@RequestHeader</h3><p>访问 HTTP 请求标头。</p><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@GetMapping(&quot;/users&quot;)</span></span><br><span class="line"><span class="keyword">public</span> List <span class="title function_">getUsers</span><span class="params">(<span class="meta">@RequestHeader(&quot;Accept-Language&quot;)</span> String language)</span> &#123; <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h1 id="GetMapping"><a href="#GetMapping" class="headerlink" title="@GetMapping"></a>@GetMapping</h1><p>该注解用于处理 HTTP GET 请求。</p><p>参数：</p><ul><li><code>value</code>：一个字符串，指定此方法应处理的 URL 路径。</li><li><code>produces</code>：一个字符串或字符串数组，指定此方法生成的响应的媒体类型。</li><li><code>params</code>：一个字符串数组，指定调用此方法必须存在的请求参数。</li><li><code>headers</code>：一个字符串数组，指定调用此方法必须存在的标头。</li></ul><h1 id="PostMapping"><a href="#PostMapping" class="headerlink" title="@PostMapping"></a>@PostMapping</h1><p>该注解用于处理 HTTP POST 请求。</p><p>参数：</p><ul><li><code>value</code>：一个字符串，指定此方法应处理的 URL 路径。</li><li><code>consumes</code>：一个字符串或字符串数组，指定此方法使用的请求正文的媒体类型。</li><li><code>produces</code>：一个字符串或字符串数组，指定此方法生成的响应的媒体类型。</li><li><code>params</code>：一个字符串数组，指定调用此方法必须存在的请求参数。</li><li><code>headers</code>：一个字符串数组，指定调用此方法必须存在的标头。</li></ul><h1 id="PutMapping"><a href="#PutMapping" class="headerlink" title="@PutMapping"></a>@PutMapping</h1><p>该注解用于处理 HTTP PUT 请求。</p><h1 id="DeleteMapping"><a href="#DeleteMapping" class="headerlink" title="@DeleteMapping"></a>@DeleteMapping</h1><p>该注释用于处理 HTTP DELETE 请求。</p><h1 id><a href="#" class="headerlink" title></a></h1><h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><p><a href="https://zhuanlan.zhihu.com/p/673748887">Spring框架@RequestMapping完整指南 - 知乎 (zhihu.com)</a></p><p><a href="https://blog.csdn.net/m0_61285646/article/details/129579486">浅谈@RequestMapping和@GetMapping等其他请求注解的区别_requestmapping还是getmapping-CSDN博客</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 教程 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 后端 </tag>
+            
+            <tag> Spring </tag>
+            
+            <tag> MVC </tag>
+            
+            <tag> 请求 </tag>
+            
+            <tag> 注释 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>【无参整理】之前从vsqx下的工程整理</title>
       <link href="/2024/01/14/%E3%80%90%E6%97%A0%E5%8F%82%E6%95%B4%E7%90%86%E3%80%91%E4%B9%8B%E5%89%8D%E4%BB%8Evsqx%E4%B8%8B%E7%9A%84%E5%B7%A5%E7%A8%8B%E6%95%B4%E7%90%86/"/>
       <url>/2024/01/14/%E3%80%90%E6%97%A0%E5%8F%82%E6%95%B4%E7%90%86%E3%80%91%E4%B9%8B%E5%89%8D%E4%BB%8Evsqx%E4%B8%8B%E7%9A%84%E5%B7%A5%E7%A8%8B%E6%95%B4%E7%90%86/</url>
