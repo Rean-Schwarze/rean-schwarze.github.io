@@ -4,6 +4,35 @@
   
     
     <entry>
+      <title>SSH连接github.com:22超时解决方法</title>
+      <link href="/2024/01/17/SSH%E8%BF%9E%E6%8E%A5github-com-22%E8%B6%85%E6%97%B6%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/"/>
+      <url>/2024/01/17/SSH%E8%BF%9E%E6%8E%A5github-com-22%E8%B6%85%E6%97%B6%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\css\APlayer.min.css"><script src="\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="\js\Meting.min.js"></script><h1 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h1><p>写完文章和代码提交到GitHub时，提示SSH连接超时了，提交不了。</p><div class="note flat danger simple"><p>ssh: connect to host github.com port 22: Connection timed out</p><p>Please make sure you have the correct access rights and the repository exists.</p></div><p>这下给我整不会了，之前提交都是没问题的，怎么突然就出问题了呢？</p><h1 id="排查"><a href="#排查" class="headerlink" title="排查"></a>排查</h1><p>用浏览器访问GitHub官网，可以访问，说明目前的网络没有墙掉（有时候会）。</p><p><img src="/2024/01/17/SSH%E8%BF%9E%E6%8E%A5github-com-22%E8%B6%85%E6%97%B6%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/image-20240117153604836.png" alt="image-20240117153604836"></p><p>检查SSH连接：</p><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ssh -T git@github.com</span><br></pre></td></tr></table></figure><p>然后就是之前显示的报错（</p><h1 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h1><p>总之遇事不决百度一下，找到以下方法，亲测有效（</p><p>具体是改变SSH连接的端口，从22变为443（HTTPs）</p><ol><li>首先进入系统用户目录下的<code>.ssh</code>目录：</li></ol><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cd ~/.ssh</span><br></pre></td></tr></table></figure><ol start="2"><li>然后创建一个<code>config</code>文件</li></ol><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">vim config</span><br></pre></td></tr></table></figure><ol start="3"><li>编辑文件内容（<code>i</code>）</li></ol><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Host github.com</span><br><span class="line">User YourEmail（你的邮箱）</span><br><span class="line">Hostname ssh.github.com</span><br><span class="line">PreferredAuthentications publickey</span><br><span class="line">IdentityFile ~/.ssh/id_rsa</span><br><span class="line">Port 443</span><br></pre></td></tr></table></figure><ol start="4"><li>然后<code>:wq</code>即可。<del>（顺便复习vim编辑器用法了属于是）</del></li></ol><p>然后再提交就可以了~</p><h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><p><a href="https://www.cnblogs.com/tsalita/p/16181711.html">SSH：连接到主机github.com端口22：连接时间超时 - 天使阿丽塔 - 博客园 (cnblogs.com)</a></p><p><a href="https://blog.csdn.net/weixin_45637036/article/details/106560217">Git问题：解决“ssh:connect to host github.com port 22: Connection timed out”_ssh: connect to host github.com port 22: connectio-CSDN博客</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 修bug日常 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Ssh </tag>
+            
+            <tag> GitHub </tag>
+            
+            <tag> Git </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>【NLP】Python Refresh</title>
       <link href="/2024/01/17/%E3%80%90NLP%E3%80%91Python-Refresh/"/>
       <url>/2024/01/17/%E3%80%90NLP%E3%80%91Python-Refresh/</url>
