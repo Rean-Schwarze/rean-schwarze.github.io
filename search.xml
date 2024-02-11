@@ -4,6 +4,37 @@
   
     
     <entry>
+      <title>sklearn.svm.SVC()参数解析</title>
+      <link href="/2024/02/11/sklearn-svm-SVC-%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%90/"/>
+      <url>/2024/02/11/sklearn-svm-SVC-%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%90/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\css\APlayer.min.css"><script src="\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><script class="meting-secondary-script-marker" src="\js\Meting.min.js"></script><p>sklearn.svm.SVC() 函数全称为 C-支持向量分类器 。</p><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">sklearn</span>.svm.SVC(C=<span class="number">1.0</span>, kernel=’rbf’, degree=<span class="number">3</span>, gamma=’auto_deprecated’, </span><br><span class="line">coef0=<span class="number">0.0</span>, shrinking=<span class="literal">True</span>, probability=<span class="literal">False</span>, tol=<span class="number">0.001</span>, </span><br><span class="line">cache_size=<span class="number">200</span>, class_weight=<span class="literal">None</span>, verbose=<span class="literal">False</span>, max_iter=-<span class="number">1</span>, </span><br><span class="line">decision_function_shape=’ovr’, random_state=<span class="literal">None</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure><h2 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h2><h3 id="C"><a href="#C" class="headerlink" title="C"></a>C</h3><p>float，optional (default &#x3D; 1.0)</p><p>错误术语的惩罚参数<code>C</code>。<code>C</code>越大，相当于惩罚松弛变量，希望松弛变量接近0，即对误分类的惩罚增大，趋向于对训练集全分对的情况，这样对训练集测试时准确率很高，但容易<strong>过拟合</strong>，泛化能力弱。<code>C</code>值小，对误分类的惩罚减小，允许容错，将他们当成噪声点，泛化能力较强。</p><h3 id="kernel"><a href="#kernel" class="headerlink" title="kernel"></a>kernel</h3><p>string，optional (default &#x3D; ‘rbf’)</p><p>核函数类型，str类型，默认为’rbf’。可选参数为：</p><ul><li><code>linear</code>：线性核函数</li><li><code>poly</code>：多项式核函数</li><li><code>rbf</code>：径像核函数&#x2F;高斯核</li><li><code>sigmod</code>：sigmod核函数</li><li><code>precomputed</code>：核矩阵</li></ul><p>precomputed表示自己提前计算好核函数矩阵，这时候算法内部就不再用核函数去计算核矩阵，而是直接用你给的核矩阵，核矩阵需要为n*n的。</p><h3 id="degree"><a href="#degree" class="headerlink" title="degree"></a>degree</h3><p>int，optional (default &#x3D; 3)</p><p>多项式核函数的阶数，int类型，可选参数，默认为3。这个参数只对多项式核函数有用，是指多项式核函数的阶数n，如果给的核函数参数是其他核函数，则会自动忽略该参数。</p><h3 id="gamma"><a href="#gamma" class="headerlink" title="gamma"></a>gamma</h3><p>float，optional (default &#x3D; ‘auto’)</p><p>核函数系数，float类型，可选参数，默认为<code>auto</code>。只对’rbf’ ,’poly’ ,’sigmod’有效。如果<code>gamma</code>为<code>auto</code>，代表其值为样本特征数的倒数，即<code>1/n_features</code>。</p><h3 id="coef0"><a href="#coef0" class="headerlink" title="coef0"></a>coef0</h3><p>float，optional (default &#x3D; 0.0)</p><p>核函数中的独立项，float类型，可选参数，默认为0.0。只有对 ’poly’ 和 ’sigmod’ 核函数有用，是指其中的参数c。</p><h3 id="shrinking"><a href="#shrinking" class="headerlink" title="shrinking"></a>shrinking</h3><p>bool, optional (default &#x3D; True)</p><p>是否采用启发式收缩方式，bool类型，可选参数，默认为True。</p><p>启发式收缩方式就是：如果能预知哪些变量对应着支持向量，则只要在这些样本上训练就够了，其他样本可不予考虑，这不影响训练结果，但降低了问题的规模并有助于迅速求解，起到一个加速训练的效果。</p><h3 id="probability"><a href="#probability" class="headerlink" title="probability"></a>probability</h3><p>bool, optional (default &#x3D; True)</p><p>是否启用概率估计，bool类型，可选参数，默认为False，这必须在调用fit()之前启用，并且会fit()方法速度变慢。</p><h3 id="tol"><a href="#tol" class="headerlink" title="tol"></a>tol</h3><p>float，optional (default &#x3D; 1e-3)</p><p>svm停止训练的误差精度，float类型，可选参数，默认为1e^-3。</p><h3 id="cache-size"><a href="#cache-size" class="headerlink" title="cache_size"></a>cache_size</h3><p>float，optional (default &#x3D; 200)</p><p>内存大小，float类型，可选参数，默认为200。指定训练所需要的内存，以MB为单位，默认为200MB。</p><h3 id="class-weight"><a href="#class-weight" class="headerlink" title="class_weight"></a>class_weight</h3><p>{dict，‘balanced’}，可选</p><p>类别权重，dict类型或str类型，可选参数，默认为None。给每个类别分别设置不同的惩罚参数C，如果没有给，则会给所有类别都给C&#x3D;1，即前面参数指出的参数C。如果给定参数’balance’，则使用y的值自动调整与输入数据中的类频率成反比的权重。</p><h3 id="verbose"><a href="#verbose" class="headerlink" title="verbose"></a>verbose</h3><p>bool, optional (default &#x3D; False)</p><p>是否启用详细输出，bool类型，默认为False，此设置利用libsvm中的每个进程运行时设置，如果启用，可能无法在多线程上下文中正常工作。一般情况都设为False，不用管它。</p><h3 id="max-iter"><a href="#max-iter" class="headerlink" title="max_iter"></a>max_iter</h3><p>int，optional (default &#x3D; -1)</p><p>最大迭代次数，int类型，默认为-1，表示不限制。</p><h3 id="decision-function-shape"><a href="#decision-function-shape" class="headerlink" title="decision_function_shape"></a>decision_function_shape</h3><p>‘ovo’，‘ovr’，默认&#x3D;‘ovr’</p><p>决策函数类型，可选参数’ovo’和’ovr’，默认为’ovr’。’ovo’表示one vs one，’ovr’表示one vs rest。</p><p>决定了分类时，是一对多的方式来构建超平面，还是一对一。</p><p>一对多：训练时依次把某个类别的样本归为一类，其他剩余的样本归为另一类，这样k个类别的样本就构造出了k个SVM。分类时将未知样本分类为具有最大分类函数值的那类。</p><p>一对一：其做法是在任意两类样本之间设计一个SVM，因此k个类别的样本就需要设计k(k-1)&#x2F;2个SVM。当对一个未知样本进行分类时，最后得票最多的类别即为该未知样本的类别。Libsvm中的多类分类就是根据这个方法实现的。</p><h3 id="random-state"><a href="#random-state" class="headerlink" title="random_state"></a>random_state</h3><p>int，RandomState实例或None，可选(默认&#x3D;无)</p><p>数据洗牌时的种子值，int类型，可选参数，默认为None。伪随机数发生器的种子,在混洗数据时用于概率估计。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 学习 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 机器学习 </tag>
+            
+            <tag> scikit-learn </tag>
+            
+            <tag> SVM </tag>
+            
+            <tag> SVC </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>【无参配布】墨隐侠声【忘川风华录·墨子】</title>
       <link href="/2024/02/07/%E3%80%90%E6%97%A0%E5%8F%82%E9%85%8D%E5%B8%83%E3%80%91%E5%A2%A8%E9%9A%90%E4%BE%A0%E5%A3%B0%E3%80%90%E5%BF%98%E5%B7%9D%E9%A3%8E%E5%8D%8E%E5%BD%95%C2%B7%E5%A2%A8%E5%AD%90%E3%80%91/"/>
       <url>/2024/02/07/%E3%80%90%E6%97%A0%E5%8F%82%E9%85%8D%E5%B8%83%E3%80%91%E5%A2%A8%E9%9A%90%E4%BE%A0%E5%A3%B0%E3%80%90%E5%BF%98%E5%B7%9D%E9%A3%8E%E5%8D%8E%E5%BD%95%C2%B7%E5%A2%A8%E5%AD%90%E3%80%91/</url>
