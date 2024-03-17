@@ -1,0 +1,414 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>【NLP】Text Feature Extraction &amp; Classification | Rean's Blog</title><meta name="author" content="Rean"><meta name="copyright" content="Rean"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="A revision of NLP Course&#39;s module 5.(Text Feature Extraction &amp; Text Classification)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【NLP】Text Feature Extraction &amp; Classification">
+<meta property="og:url" content="https://rean-schwarze.github.io/p/66a6c396.html">
+<meta property="og:site_name" content="Rean&#39;s Blog">
+<meta property="og:description" content="A revision of NLP Course&#39;s module 5.(Text Feature Extraction &amp; Text Classification)">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover2.jpg">
+<meta property="article:published_time" content="2024-01-29T05:57:00.000Z">
+<meta property="article:modified_time" content="2024-01-29T06:07:28.554Z">
+<meta property="article:author" content="Rean">
+<meta property="article:tag" content="NLP">
+<meta property="article:tag" content="spaCy">
+<meta property="article:tag" content="Classification">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover2.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://rean-schwarze.github.io/p/66a6c396.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '【NLP】Text Feature Extraction & Classification',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-01-29 14:07:28'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/custom.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css"><div id="aplayer"></div><script src="https://cdn.jsdelivr.net/gh/radium-bit/res@master/live2d/autoload.js" async></script><script src="https://rean-shop-bucket.oss-cn-guangzhou.aliyuncs.com/assets/js/Meting.min.js" async></script><script src="https://rean-shop-bucket.oss-cn-guangzhou.aliyuncs.com/assets/js/busuanzi.pure.mini.js" async></script><meta name="generator" content="Hexo 7.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/spin.svg" data-original="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">44</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">135</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">9</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 文章</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover2.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Rean's Blog"><span class="site-name">Rean's Blog</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 文章</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">【NLP】Text Feature Extraction &amp; Classification</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-01-29T05:57:00.000Z" title="发表于 2024-01-29 13:57:00">2024-01-29</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-01-29T06:07:28.554Z" title="更新于 2024-01-29 14:07:28">2024-01-29</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.5k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>9分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="【NLP】Text Feature Extraction &amp; Classification"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="Text-Feature-Extraction"><a href="#Text-Feature-Extraction" class="headerlink" title="Text Feature Extraction"></a>Text Feature Extraction</h1><h2 id="Count-Vectorization"><a href="#Count-Vectorization" class="headerlink" title="Count Vectorization"></a>Count Vectorization</h2><p>Document Term Matrix (DTM) : a matrix of counts, with columns as words.</p>
+<p>Term Frequency (TF)</p>
+<p>Inverse Term Frequency (ITF)</p>
+<p>TF-ITF : Term Frequency times Inverse Document Frequency</p>
+<p>TF-ITF allows  us to understand the context of words across an entire corpus of documents, instead of just its relative importance in a single document</p>
+<h2 id="Text-Feature-Extraction-using-Scikit-Learn’s-Vectorizer-classes"><a href="#Text-Feature-Extraction-using-Scikit-Learn’s-Vectorizer-classes" class="headerlink" title="Text Feature Extraction using Scikit-Learn’s Vectorizer classes"></a>Text Feature Extraction using Scikit-Learn’s Vectorizer classes</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.feature_extraction.text <span class="keyword">import</span> CountVectorizer</span><br><span class="line">vect = CountVectorizer()</span><br><span class="line">messages = [<span class="string">&#x27;Hey, lets go to the game today!&#x27;</span>, <span class="string">&#x27;Call your sister.&#x27;</span>, <span class="string">&#x27;Want to go walk your dog?&#x27;</span>]</span><br><span class="line">vect = CountVectorizer()</span><br><span class="line">count = vect.fit_transform(messages)</span><br><span class="line"><span class="built_in">print</span>(vect.get_feature_names())</span><br><span class="line"><span class="built_in">print</span>(count.todense())</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[&#x27;call&#x27;, &#x27;dog&#x27;, &#x27;game&#x27;, &#x27;go&#x27;, &#x27;hey&#x27;, &#x27;lets&#x27;, &#x27;sister&#x27;, &#x27;the&#x27;, &#x27;to&#x27;, &#x27;today&#x27;, &#x27;walk&#x27;, &#x27;want&#x27;, &#x27;your&#x27;]</span><br><span class="line">[[0 0 1 1 1 1 0 1 1 1 0 0 0]</span><br><span class="line"> [1 0 0 0 0 0 1 0 0 0 0 0 1]</span><br><span class="line"> [0 1 0 1 0 0 0 0 1 0 1 1 1]]</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.feature_extraction.text <span class="keyword">import</span> TfidfVectorizer</span><br><span class="line">tdidfvect = TfidfVectorizer()</span><br><span class="line">tdidfcount = tdidfvect.fit_transform(messages)</span><br><span class="line"><span class="built_in">print</span>(tdidfvect.get_feature_names())</span><br><span class="line"><span class="built_in">print</span>(tdidfcount.todense())</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[&#x27;call&#x27;, &#x27;dog&#x27;, &#x27;game&#x27;, &#x27;go&#x27;, &#x27;hey&#x27;, &#x27;lets&#x27;, &#x27;sister&#x27;, &#x27;the&#x27;, &#x27;to&#x27;, &#x27;today&#x27;, &#x27;walk&#x27;, &#x27;want&#x27;, &#x27;your&#x27;]</span><br><span class="line">[[0.         0.         0.40301621 0.30650422 0.40301621 0.40301621</span><br><span class="line">  0.         0.40301621 0.30650422 0.40301621 0.         0.</span><br><span class="line">  0.        ]</span><br><span class="line"> [0.62276601 0.         0.         0.         0.         0.</span><br><span class="line">  0.62276601 0.         0.         0.         0.         0.</span><br><span class="line">  0.4736296 ]</span><br><span class="line"> [0.         0.45954803 0.         0.34949812 0.         0.</span><br><span class="line">  0.         0.         0.34949812 0.         0.45954803 0.45954803</span><br><span class="line">  0.34949812]]</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Transform-Counts-to-Frequencies-with-Tf-idf"><a href="#Transform-Counts-to-Frequencies-with-Tf-idf" class="headerlink" title="Transform Counts to Frequencies with Tf-idf"></a>Transform Counts to Frequencies with Tf-idf</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.feature_extraction.text <span class="keyword">import</span> TfidfTransformer</span><br><span class="line">tfidf_transformer = TfidfTransformer()</span><br><span class="line"></span><br><span class="line">X_train_tfidf = tfidf_transformer.fit_transform(X_train_counts)</span><br><span class="line">X_train_tfidf.shape</span><br><span class="line"><span class="comment">#(3733, 7082)</span></span><br></pre></td></tr></table></figure>
+
+<div class="note flat info simple"><p>the <code>fit_transform()</code> method actually performs two operations: it fits an estimator to the data and then transforms our count-matrix to a tf-idf representation.</p>
+</div>
+
+
+
+<h2 id="Train-a-Classifier"><a href="#Train-a-Classifier" class="headerlink" title="Train a Classifier"></a>Train a Classifier</h2><p>Here we’ll introduce an SVM classifier that’s similar to SVC, called <a target="_blank" rel="noopener" href="https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html">LinearSVC</a>. LinearSVC handles sparse input better, and scales well to large numbers of samples.</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.svm <span class="keyword">import</span> LinearSVC</span><br><span class="line">clf = LinearSVC()</span><br><span class="line">clf.fit(X_train_tfidf,y_train)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,</span><br><span class="line">     intercept_scaling=1, loss=&#x27;squared_hinge&#x27;, max_iter=1000,</span><br><span class="line">     multi_class=&#x27;ovr&#x27;, penalty=&#x27;l2&#x27;, random_state=None, tol=0.0001,</span><br><span class="line">     verbose=0)</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Build-a-Pipeline"><a href="#Build-a-Pipeline" class="headerlink" title="Build a Pipeline"></a>Build a Pipeline</h2><p>Remember that only our training set has been vectorized into a full vocabulary. In order to perform an analysis on our test set we’ll have to submit it to the same procedures. Fortunately scikit-learn offers a <a target="_blank" rel="noopener" href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html"><strong>Pipeline</strong></a> class that behaves like a compound classifier.</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.pipeline <span class="keyword">import</span> Pipeline</span><br><span class="line"><span class="comment"># from sklearn.feature_extraction.text import TfidfVectorizer</span></span><br><span class="line"><span class="comment"># from sklearn.svm import LinearSVC</span></span><br><span class="line"></span><br><span class="line">text_clf = Pipeline([(<span class="string">&#x27;tfidf&#x27;</span>, TfidfVectorizer()), (<span class="string">&#x27;clf&#x27;</span>, LinearSVC())])</span><br><span class="line"></span><br><span class="line"><span class="comment"># Feed the training data through the pipeline</span></span><br><span class="line">text_clf.fit(X_train, y_train) </span><br></pre></td></tr></table></figure>
+
+<h2 id="Test-the-classifier-and-display-results"><a href="#Test-the-classifier-and-display-results" class="headerlink" title="Test the classifier and display results"></a>Test the classifier and display results</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Form a prediction set</span></span><br><span class="line">predictions = text_clf.predict(X_test)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Report the confusion matrix</span></span><br><span class="line"><span class="keyword">from</span> sklearn <span class="keyword">import</span> metrics</span><br><span class="line"><span class="built_in">print</span>(metrics.confusion_matrix(y_test,predictions))</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[[1586    7]</span><br><span class="line"> [  12  234]]</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Print a classification report</span></span><br><span class="line"><span class="built_in">print</span>(metrics.classification_report(y_test,predictions))</span><br></pre></td></tr></table></figure>
+
+<pre><code>          precision    recall  f1-score   support
+
+     ham       0.99      1.00      0.99      1593
+    spam       0.97      0.95      0.96       246
+    
+   micro avg       0.99      0.99      0.99      1839
+   macro avg       0.98      0.97      0.98      1839
+weighted avg       0.99      0.99      0.99      1839
+</code></pre>
+<p>Using the text of the messages, our model performed exceedingly well; it correctly predicted spam <strong>98.97%</strong> of the time!</p>
+<p>Now let’s apply what we’ve learned to a text classification project involving positive and negative movie reviews.</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">text_clf.predict([<span class="string">&quot;Hello, how are you?&quot;</span>])</span><br><span class="line"><span class="comment">#array([&#x27;ham&#x27;], dtype=object)</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="Text-Classification-Project"><a href="#Text-Classification-Project" class="headerlink" title="Text Classification Project"></a>Text Classification Project</h1><h2 id="Step-1-Import-and-load-the-dataset"><a href="#Step-1-Import-and-load-the-dataset" class="headerlink" title="Step 1 - Import and load the dataset"></a>Step 1 - Import and load the dataset</h2><p>The dataset contains the text of 2000 movie reviews. 1000 are positive, 1000 are negative, and the text has been preprocessed as a tab-delimited file.</p>
+<h2 id="Step-2-Prep-dataset-check-for-missing-values"><a href="#Step-2-Prep-dataset-check-for-missing-values" class="headerlink" title="Step 2 - Prep dataset, check for missing values"></a>Step 2 - Prep dataset, check for missing values</h2><p>We have intentionally included records with missing data. Some have NaN values, others have short strings composed of only spaces. This might happen if a reviewer declined to provide a comment with their review. We will show two ways using pandas to identify and remove records containing empty data.</p>
+<ul>
+<li>NaN records are efficiently handled with <a target="_blank" rel="noopener" href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.isnull.html">.isnull()</a> and <a target="_blank" rel="noopener" href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.dropna.html">.dropna()</a></li>
+<li>Strings that contain only whitespace can be handled with <a target="_blank" rel="noopener" href="https://docs.python.org/3/library/stdtypes.html#str.isspace">.isspace()</a>, <a target="_blank" rel="noopener" href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.itertuples.html">.itertuples()</a>, and <a target="_blank" rel="noopener" href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.drop.html">.drop()</a></li>
+</ul>
+<h3 id="Detect-remove-NaN-values"><a href="#Detect-remove-NaN-values" class="headerlink" title="Detect &amp; remove NaN values"></a>Detect &amp; remove NaN values</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">df.dropna(inplace=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
+
+<div class="note flat warning simple"><p>By setting inplace&#x3D;True, we permanently affect the DataFrame currently in memory, and this can’t be undone. However, it does <em>not</em> affect the original source data. If we needed to, we could always load the original DataFrame from scratch.</p>
+</div>
+
+<h3 id="Detect-remove-empty-strings"><a href="#Detect-remove-empty-strings" class="headerlink" title="Detect &amp; remove empty strings"></a>Detect &amp; remove empty strings</h3><p>Technically, we’re dealing with “whitespace only” strings. If the original .tsv file had contained empty strings, pandas <strong>.read_csv()</strong> would have assigned NaN values to those cells by default.</p>
+<p>In order to detect these strings we need to iterate over each row in the DataFrame. The <strong>.itertuples()</strong> pandas method is a good tool for this as it provides access to every field. For brevity we’ll assign the names <code>i</code>, <code>lb</code> and <code>rv</code> to the <code>index</code>, <code>label</code> and <code>review</code> columns.</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">blanks = []  <span class="comment"># start with an empty list</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i,lb,rv <span class="keyword">in</span> df.itertuples():  <span class="comment"># iterate over the DataFrame</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">type</span>(rv)==<span class="built_in">str</span>:            <span class="comment"># avoid NaN values</span></span><br><span class="line">        <span class="keyword">if</span> rv.isspace():         <span class="comment"># test &#x27;review&#x27; for whitespace</span></span><br><span class="line">            blanks.append(i)     <span class="comment"># add matching index numbers to the list</span></span><br><span class="line">            </span><br><span class="line">df.drop(blanks, inplace=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="Step-3-Split-the-data-into-train-test-sets"><a href="#Step-3-Split-the-data-into-train-test-sets" class="headerlink" title="Step 3 - Split the data into train &amp; test sets"></a>Step 3 - Split the data into train &amp; test sets</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br><span class="line"></span><br><span class="line">X = df[<span class="string">&#x27;review&#x27;</span>]</span><br><span class="line">y = df[<span class="string">&#x27;label&#x27;</span>]</span><br><span class="line"></span><br><span class="line">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="number">0.33</span>, random_state=<span class="number">42</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="Step-4-Build-pipelines-to-vectorize-the-data-then-train-and-fit-a-model"><a href="#Step-4-Build-pipelines-to-vectorize-the-data-then-train-and-fit-a-model" class="headerlink" title="Step 4 - Build pipelines to vectorize the data, then train and fit a model"></a>Step 4 - Build pipelines to vectorize the data, then train and fit a model</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.pipeline <span class="keyword">import</span> Pipeline</span><br><span class="line"><span class="keyword">from</span> sklearn.feature_extraction.text <span class="keyword">import</span> TfidfVectorizer</span><br><span class="line"><span class="keyword">from</span> sklearn.naive_bayes <span class="keyword">import</span> MultinomialNB</span><br><span class="line"><span class="keyword">from</span> sklearn.svm <span class="keyword">import</span> LinearSVC</span><br><span class="line"></span><br><span class="line"><span class="comment"># Naïve Bayes:</span></span><br><span class="line">text_clf_nb = Pipeline([(<span class="string">&#x27;tfidf&#x27;</span>, TfidfVectorizer()),</span><br><span class="line">                     (<span class="string">&#x27;clf&#x27;</span>, MultinomialNB()),</span><br><span class="line">])</span><br><span class="line"></span><br><span class="line"><span class="comment"># Linear SVC:</span></span><br><span class="line">text_clf_lsvc = Pipeline([(<span class="string">&#x27;tfidf&#x27;</span>, TfidfVectorizer()),</span><br><span class="line">                     (<span class="string">&#x27;clf&#x27;</span>, LinearSVC()),</span><br><span class="line">])</span><br></pre></td></tr></table></figure>
+
+<h2 id="Step-5-Feed-the-training-data-through-the-first-pipeline"><a href="#Step-5-Feed-the-training-data-through-the-first-pipeline" class="headerlink" title="Step 5 - Feed the training data through the first pipeline"></a>Step 5 - Feed the training data through the first pipeline</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">text_clf_nb.fit(X_train, y_train)</span><br></pre></td></tr></table></figure>
+
+<h2 id="Step-6-Run-predictions-and-analyze-the-results-naive-Bayes"><a href="#Step-6-Run-predictions-and-analyze-the-results-naive-Bayes" class="headerlink" title="Step 6 - Run predictions and analyze the results (naïve Bayes)"></a>Step 6 - Run predictions and analyze the results (naïve Bayes)</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Form a prediction set</span></span><br><span class="line">predictions = text_clf_nb.predict(X_test)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Report the confusion matrix</span></span><br><span class="line"><span class="keyword">from</span> sklearn <span class="keyword">import</span> metrics</span><br><span class="line"><span class="built_in">print</span>(metrics.confusion_matrix(y_test,predictions))</span><br><span class="line"></span><br><span class="line"><span class="comment"># Print a classification report</span></span><br><span class="line"><span class="built_in">print</span>(metrics.classification_report(y_test,predictions))</span><br><span class="line"></span><br><span class="line"><span class="comment"># Print the overall accuracy</span></span><br><span class="line"><span class="built_in">print</span>(metrics.accuracy_score(y_test,predictions))</span><br></pre></td></tr></table></figure>
+
+<h2 id="Advanced-Topic-Adding-Stopwords-to-CountVectorizer"><a href="#Advanced-Topic-Adding-Stopwords-to-CountVectorizer" class="headerlink" title="Advanced Topic - Adding Stopwords to CountVectorizer"></a>Advanced Topic - Adding Stopwords to CountVectorizer</h2><p>By default, <strong>CountVectorizer</strong> and <strong>TfidfVectorizer</strong> do <em>not</em> filter stopwords. However, they offer some optional settings, including passing in your own stopword list.</p>
+<div class="note flat info simple"><p>There are some <a target="_blank" rel="noopener" href="http://aclweb.org/anthology/W18-2502">known issues</a> using Scikit-learn’s built-in stopwords list. Some words that are filtered may in fact aid in classification. In this section we’ll pass in our own stopword list, so that we know exactly what’s being filtered.</p>
+</div>
+
+<p>The <a target="_blank" rel="noopener" href="https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html">CountVectorizer</a> class accepts the following arguments:</p>
+<blockquote>
+<p><em>CountVectorizer(input&#x3D;’content’, encoding&#x3D;’utf-8’, decode_error&#x3D;’strict’, strip_accents&#x3D;None, lowercase&#x3D;True, preprocessor&#x3D;None, tokenizer&#x3D;None, <strong>stop_words&#x3D;None</strong>, token_pattern&#x3D;’(?u)\b\w\w+\b’, ngram_range&#x3D;(1, 1), analyzer&#x3D;’word’, max_df&#x3D;1.0, min_df&#x3D;1, max_features&#x3D;None, vocabulary&#x3D;None, binary&#x3D;False, dtype&#x3D;&lt;class ‘numpy.int64’&gt;)</em></p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html">TfidVectorizer</a> supports the same arguments and more. Under <em>stop_words</em> we have the following options:</p>
+<blockquote>
+<p>stop_words : <em>string {‘english’}, list, or None (default)</em></p>
+</blockquote>
+<p>That is, we can run <code>TfidVectorizer(stop_words=&#39;english&#39;)</code> to accept scikit-learn’s built-in list,<br>or <code>TfidVectorizer(stop_words=[a, and, the])</code> to filter these three words. In practice we would assign our list to a variable and pass that in instead.</p>
+<p>Scikit-learn’s built-in list contains 318 stopwords. However, there are words in this list that may influence a classification of movie reviews. With this in mind, let’s trim the list to just 60 words:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">stopwords = [<span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;about&#x27;</span>, <span class="string">&#x27;an&#x27;</span>, <span class="string">&#x27;and&#x27;</span>, <span class="string">&#x27;are&#x27;</span>, <span class="string">&#x27;as&#x27;</span>, <span class="string">&#x27;at&#x27;</span>, <span class="string">&#x27;be&#x27;</span>, <span class="string">&#x27;been&#x27;</span>, <span class="string">&#x27;but&#x27;</span>, <span class="string">&#x27;by&#x27;</span>, <span class="string">&#x27;can&#x27;</span>, \</span><br><span class="line">             <span class="string">&#x27;even&#x27;</span>, <span class="string">&#x27;ever&#x27;</span>, <span class="string">&#x27;for&#x27;</span>, <span class="string">&#x27;from&#x27;</span>, <span class="string">&#x27;get&#x27;</span>, <span class="string">&#x27;had&#x27;</span>, <span class="string">&#x27;has&#x27;</span>, <span class="string">&#x27;have&#x27;</span>, <span class="string">&#x27;he&#x27;</span>, <span class="string">&#x27;her&#x27;</span>, <span class="string">&#x27;hers&#x27;</span>, <span class="string">&#x27;his&#x27;</span>, \</span><br><span class="line">             <span class="string">&#x27;how&#x27;</span>, <span class="string">&#x27;i&#x27;</span>, <span class="string">&#x27;if&#x27;</span>, <span class="string">&#x27;in&#x27;</span>, <span class="string">&#x27;into&#x27;</span>, <span class="string">&#x27;is&#x27;</span>, <span class="string">&#x27;it&#x27;</span>, <span class="string">&#x27;its&#x27;</span>, <span class="string">&#x27;just&#x27;</span>, <span class="string">&#x27;me&#x27;</span>, <span class="string">&#x27;my&#x27;</span>, <span class="string">&#x27;of&#x27;</span>, <span class="string">&#x27;on&#x27;</span>, <span class="string">&#x27;or&#x27;</span>, \</span><br><span class="line">             <span class="string">&#x27;see&#x27;</span>, <span class="string">&#x27;seen&#x27;</span>, <span class="string">&#x27;she&#x27;</span>, <span class="string">&#x27;so&#x27;</span>, <span class="string">&#x27;than&#x27;</span>, <span class="string">&#x27;that&#x27;</span>, <span class="string">&#x27;the&#x27;</span>, <span class="string">&#x27;their&#x27;</span>, <span class="string">&#x27;there&#x27;</span>, <span class="string">&#x27;they&#x27;</span>, <span class="string">&#x27;this&#x27;</span>, \</span><br><span class="line">             <span class="string">&#x27;to&#x27;</span>, <span class="string">&#x27;was&#x27;</span>, <span class="string">&#x27;we&#x27;</span>, <span class="string">&#x27;were&#x27;</span>, <span class="string">&#x27;what&#x27;</span>, <span class="string">&#x27;when&#x27;</span>, <span class="string">&#x27;which&#x27;</span>, <span class="string">&#x27;who&#x27;</span>, <span class="string">&#x27;will&#x27;</span>, <span class="string">&#x27;with&#x27;</span>, <span class="string">&#x27;you&#x27;</span>]</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">text_clf_lsvc2 = Pipeline([(<span class="string">&#x27;tfidf&#x27;</span>, TfidfVectorizer(stop_words=<span class="string">&#x27;english&#x27;</span>)),</span><br><span class="line">                     (<span class="string">&#x27;clf&#x27;</span>, LinearSVC()),</span><br><span class="line">])</span><br><span class="line">text_clf_lsvc2.fit(X_train, y_train)</span><br></pre></td></tr></table></figure>
+
+<h2 id="Feed-new-data-into-a-trained-model"><a href="#Feed-new-data-into-a-trained-model" class="headerlink" title="Feed new data into a trained model"></a>Feed new data into a trained model</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">myreview = <span class="string">&quot;I enjoyed this movie&quot;</span></span><br><span class="line"><span class="built_in">print</span>(text_clf_nb.predict([myreview]))</span><br><span class="line"><span class="comment"># [&#x27;pos&#x27;]</span></span><br><span class="line"><span class="built_in">print</span>(text_clf_lsvc.predict([myreview]))</span><br><span class="line"><span class="comment"># [&#x27;neg&#x27;]</span></span><br></pre></td></tr></table></figure>
+
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://rean-schwarze.github.io">Rean</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://rean-schwarze.github.io/p/66a6c396.html">https://rean-schwarze.github.io/p/66a6c396.html</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://rean-schwarze.github.io" target="_blank">Rean's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/NLP/">NLP</a><a class="post-meta__tags" href="/tags/spaCy/">spaCy</a><a class="post-meta__tags" href="/tags/Classification/">Classification</a></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover2.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/p/18cda1b3.html" title="【Vue】父子组件通信方法整理"><img class="cover" src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover7.JPG" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">【Vue】父子组件通信方法整理</div></div></a></div><div class="next-post pull-right"><a href="/p/5f33341.html" title="【无参配布】岭风无岸【明日方舟新春会·重岳】"><img class="cover" src="/img/spin.svg" data-original="/img/fc3669c83752460d501cccf92771704df276e803.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">【无参配布】岭风无岸【明日方舟新春会·重岳】</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/p/ae6b0147.html" title="【NLP】NLP Fundamentals &amp; Introduction to spaCy"><img class="cover" src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover6.JPG" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-21</div><div class="title">【NLP】NLP Fundamentals &amp; Introduction to spaCy</div></div></a></div><div><a href="/p/acac46b.html" title="【NLP】NLP Techniques(POS&#x2F;NER)"><img class="cover" src="/img/spin.svg" data-original="/img/SynthV_banner_Image_BG1.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-25</div><div class="title">【NLP】NLP Techniques(POS&#x2F;NER)</div></div></a></div><div><a href="/p/240e5e52.html" title="【NLP】Semantic &amp; Sentiment Analysis"><img class="cover" src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover6.JPG" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-02-01</div><div class="title">【NLP】Semantic &amp; Sentiment Analysis</div></div></a></div><div><a href="/p/f6e1007e.html" title="【NLP】Python Refresh"><img class="cover" src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover5.JPG" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-17</div><div class="title">【NLP】Python Refresh</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div><div class="comment-switch"><span class="first-comment">Giscus</span><span id="switch-btn"></span><span class="second-comment">Valine</span></div></div><div class="comment-wrap"><div><div id="giscus-wrap"></div></div><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/spin.svg" data-original="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Rean</div><div class="author-info__description">日常写bug 偶尔调调歌</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">44</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">135</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">9</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/Rean-Schwarze" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="https://space.bilibili.com/6531436" target="_blank" title="bilibili"><i class="fab fa-bilibili"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">随缘更新~（ps：如果加载不完全可以等等或者刷新）</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Text-Feature-Extraction"><span class="toc-text">Text Feature Extraction</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Count-Vectorization"><span class="toc-text">Count Vectorization</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Text-Feature-Extraction-using-Scikit-Learn%E2%80%99s-Vectorizer-classes"><span class="toc-text">Text Feature Extraction using Scikit-Learn’s Vectorizer classes</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Transform-Counts-to-Frequencies-with-Tf-idf"><span class="toc-text">Transform Counts to Frequencies with Tf-idf</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Train-a-Classifier"><span class="toc-text">Train a Classifier</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Build-a-Pipeline"><span class="toc-text">Build a Pipeline</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Test-the-classifier-and-display-results"><span class="toc-text">Test the classifier and display results</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Text-Classification-Project"><span class="toc-text">Text Classification Project</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Step-1-Import-and-load-the-dataset"><span class="toc-text">Step 1 - Import and load the dataset</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Step-2-Prep-dataset-check-for-missing-values"><span class="toc-text">Step 2 - Prep dataset, check for missing values</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Detect-remove-NaN-values"><span class="toc-text">Detect &amp; remove NaN values</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Detect-remove-empty-strings"><span class="toc-text">Detect &amp; remove empty strings</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Step-3-Split-the-data-into-train-test-sets"><span class="toc-text">Step 3 - Split the data into train &amp; test sets</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Step-4-Build-pipelines-to-vectorize-the-data-then-train-and-fit-a-model"><span class="toc-text">Step 4 - Build pipelines to vectorize the data, then train and fit a model</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Step-5-Feed-the-training-data-through-the-first-pipeline"><span class="toc-text">Step 5 - Feed the training data through the first pipeline</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Step-6-Run-predictions-and-analyze-the-results-naive-Bayes"><span class="toc-text">Step 6 - Run predictions and analyze the results (naïve Bayes)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Advanced-Topic-Adding-Stopwords-to-CountVectorizer"><span class="toc-text">Advanced Topic - Adding Stopwords to CountVectorizer</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Feed-new-data-into-a-trained-model"><span class="toc-text">Feed new data into a trained model</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/p/a0efc292.html" title="【翻唱·无参配布】11（Cover：G.E.M.邓紫棋）【ROSE AI】【Synthesizer V Cover】"><img src="/img/spin.svg" data-original="/img/11_cover.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【翻唱·无参配布】11（Cover：G.E.M.邓紫棋）【ROSE AI】【Synthesizer V Cover】"/></a><div class="content"><a class="title" href="/p/a0efc292.html" title="【翻唱·无参配布】11（Cover：G.E.M.邓紫棋）【ROSE AI】【Synthesizer V Cover】">【翻唱·无参配布】11（Cover：G.E.M.邓紫棋）【ROSE AI】【Synthesizer V Cover】</a><time datetime="2024-03-17T03:59:17.000Z" title="发表于 2024-03-17 11:59:17">2024-03-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/ec2ecf28.html" title="【补档】【永夜Minus】最长的旅途 (live)（Cover：单依纯）【Synthesizer V Cover】"><img src="/img/spin.svg" data-original="/img/%E6%9C%80%E9%95%BF%E7%9A%84%E6%97%85%E9%80%94.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【补档】【永夜Minus】最长的旅途 (live)（Cover：单依纯）【Synthesizer V Cover】"/></a><div class="content"><a class="title" href="/p/ec2ecf28.html" title="【补档】【永夜Minus】最长的旅途 (live)（Cover：单依纯）【Synthesizer V Cover】">【补档】【永夜Minus】最长的旅途 (live)（Cover：单依纯）【Synthesizer V Cover】</a><time datetime="2024-03-15T09:37:38.000Z" title="发表于 2024-03-15 17:37:38">2024-03-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/85f11265.html" title="【TCP】三次握手与四次挥手"><img src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover7.JPG" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【TCP】三次握手与四次挥手"/></a><div class="content"><a class="title" href="/p/85f11265.html" title="【TCP】三次握手与四次挥手">【TCP】三次握手与四次挥手</a><time datetime="2024-03-13T08:37:24.000Z" title="发表于 2024-03-13 16:37:24">2024-03-13</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/db95e6f5.html" title="【LeetCode】25. K 个一组翻转链表 - 个人题解记录"><img src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover6.JPG" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【LeetCode】25. K 个一组翻转链表 - 个人题解记录"/></a><div class="content"><a class="title" href="/p/db95e6f5.html" title="【LeetCode】25. K 个一组翻转链表 - 个人题解记录">【LeetCode】25. K 个一组翻转链表 - 个人题解记录</a><time datetime="2024-03-12T09:36:25.000Z" title="发表于 2024-03-12 17:36:25">2024-03-12</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/a8296e6d.html" title="【无参配布】凄美地 (live)【声生不息·家年华】"><img src="/img/spin.svg" data-original="/img/%E5%87%84%E7%BE%8E%E5%9C%B0.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【无参配布】凄美地 (live)【声生不息·家年华】"/></a><div class="content"><a class="title" href="/p/a8296e6d.html" title="【无参配布】凄美地 (live)【声生不息·家年华】">【无参配布】凄美地 (live)【声生不息·家年华】</a><time datetime="2024-03-10T08:38:23.000Z" title="发表于 2024-03-10 16:38:23">2024-03-10</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover2.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Rean</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(()=>{
+  const getGiscusTheme = theme => {
+    return theme === 'dark' ? 'dark' : 'light'
+  }
+
+  const loadGiscus = () => {
+    const config = Object.assign({
+      src: 'https://giscus.app/client.js',
+      'data-repo': 'Rean-Schwarze/rean-schwarze.github.io',
+      'data-repo-id': 'R_kgDOLBrDcw',
+      'data-category-id': 'DIC_kwDOLBrDc84CcRNZ',
+      'data-mapping': 'pathname',
+      'data-theme': getGiscusTheme(document.documentElement.getAttribute('data-theme')),
+      'data-reactions-enabled': '1',
+      crossorigin: 'anonymous',
+      async: true
+    },null)
+
+    const ele = document.createElement('script')
+    for (let key in config) {
+      ele.setAttribute(key, config[key])
+    }
+    document.getElementById('giscus-wrap').appendChild(ele)
+  }
+
+  const changeGiscusTheme = theme => {
+    const sendMessage = message => {
+      const iframe = document.querySelector('iframe.giscus-frame')
+      if (!iframe) return
+      iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app')
+    }
+
+    sendMessage({
+      setConfig: {
+        theme: getGiscusTheme(theme)
+      }
+    });
+  }
+
+  btf.addGlobalFn('themeChange', changeGiscusTheme, 'giscus')
+
+  if ('Giscus' === 'Giscus' || !true) {
+    if (true) btf.loadComment(document.getElementById('giscus-wrap'), loadGiscus)
+    else loadGiscus()
+  } else {
+    window.loadOtherComment= loadGiscus
+  }
+})()</script><script>(() => {
+  const initValine = () => {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: 'QnAsdrfTiQIDoi3lzCxrt49u-gzGzoHsz',
+      appKey: 'KKrkQZ3iUk9DIotqfHwARyAq',
+      avatar: 'monsterid',
+      serverURLs: 'https://qnasdrft.lc-cn-n1-shared.com',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: false
+    }, null))
+  }
+
+  const loadValine = async () => {
+    if (typeof Valine === 'function') initValine()
+    else {
+      await getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js')
+      initValine()
+    }
+  }
+
+  if ('Giscus' === 'Valine' || !true) {
+    if (true) btf.loadComment(document.getElementById('vcomment'),loadValine)
+    else setTimeout(loadValine, 0)
+  } else {
+    window.loadOtherComment = loadValine
+  }
+})()</script></div><div class="aplayer no-destroy" data-id="421801417" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="false"> </div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = false;
+POWERMODE.mobile = true;
+document.body.addEventListener('input', POWERMODE);
+</script><link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/aplayer/1.10.1/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/aplayer/1.10.1/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["link[rel=\"canonical\"]","meta[property=\"og:image\"]","meta[property=\"og:title\"]","meta[property=\"og:url\"]","head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener
+  btf.removeGlobalFnEvent('pjax')
+  btf.removeGlobalFnEvent('themeChange')
+
+  document.getElementById('rightside').classList.remove('rightside-show')
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', e => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div><div id="nav-music"><div id="nav-music-hoverTips" onclick="anzhiyu.musicToggle()">播放音乐</div><meting-js id="421801417" server="netease" type="playlist" mutex="true" preload="none" theme="var(--anzhiyu-main)" data-lrctype="0" order="random"></meting-js></div>
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(e.href.match(t)||e.href.match(r))&&(e.href=a.dataset.original)})});</script><script>!function(r){r.imageLazyLoadSetting.processImages=t;var e=r.imageLazyLoadSetting.isSPA,n=r.imageLazyLoadSetting.preloadRatio||1,c=a();function a(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(){e&&(c=a());for(var t,o=0;o<c.length;o++)0<=(t=(t=c[o]).getBoundingClientRect()).bottom&&0<=t.left&&t.top<=(r.innerHeight*n||document.documentElement.clientHeight*n)&&function(){var t,e,n,a,i=c[o];e=function(){c=c.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(n=new Image,a=t.getAttribute("data-original"),n.onload=function(){t.src=a,t.removeAttribute("data-original"),e&&e()},t.src!==a&&(n.src=a))}()}function i(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",i),r.addEventListener("resize",i),r.addEventListener("orientationchange",i)}(this);</script></body></html>
