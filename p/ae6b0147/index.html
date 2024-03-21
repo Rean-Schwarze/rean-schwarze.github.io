@@ -159,199 +159,358 @@
         }
       }
       detectApple()
-    })(window)</script><link rel="stylesheet" href="/css/custom.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css"><div id="aplayer"></div><script src="https://cdn.jsdelivr.net/gh/radium-bit/res@master/live2d/autoload.js" async></script><script src="https://rean-shop-bucket.oss-cn-guangzhou.aliyuncs.com/assets/js/Meting.min.js" async></script><script src="https://rean-shop-bucket.oss-cn-guangzhou.aliyuncs.com/assets/js/busuanzi.pure.mini.js" async></script><meta name="generator" content="Hexo 7.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/spin.svg" data-original="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">49</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">153</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">13</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 文章</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/SynthV_banner_Image_BG1.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Rean's Blog"><span class="site-name">Rean's Blog</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 文章</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">【NLP】NLP Fundamentals &amp; Introduction to spaCy</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-01-21T04:20:29.000Z" title="发表于 2024-01-21 12:20:29">2024-01-21</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-03-17T08:27:17.959Z" title="更新于 2024-03-17 16:27:17">2024-03-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.3k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>14分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="【NLP】NLP Fundamentals &amp; Introduction to spaCy"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="NLP-Fundamentals-amp-Common-Techniques"><a href="#NLP-Fundamentals-amp-Common-Techniques" class="headerlink" title="NLP Fundamentals &amp; Common Techniques"></a>NLP Fundamentals &amp; Common Techniques</h1><h2 id="What-is-NLP"><a href="#What-is-NLP" class="headerlink" title="What is NLP"></a>What is NLP</h2><p>NLP attempts to use a variety of common techniques to create structure out of raw text data, by applying language specific grammatical rules and semantics.</p>
-<h2 id="Common-NLP-Techniques"><a href="#Common-NLP-Techniques" class="headerlink" title="Common NLP Techniques"></a>Common NLP Techniques</h2><div class="table-container">
+    })(window)</script><link rel="stylesheet" href="/css/custom.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css"><div id="aplayer"></div><script src="https://cdn.jsdelivr.net/gh/radium-bit/res@master/live2d/autoload.js" async></script><script src="https://rean-shop-bucket.oss-cn-guangzhou.aliyuncs.com/assets/js/Meting.min.js" async></script><script src="https://rean-shop-bucket.oss-cn-guangzhou.aliyuncs.com/assets/js/busuanzi.pure.mini.js" async></script><meta name="generator" content="Hexo 7.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/spin.svg" data-original="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">50</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">158</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">14</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 文章</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/SynthV_banner_Image_BG1.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Rean's Blog"><span class="site-name">Rean's Blog</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 文章</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">【NLP】NLP Fundamentals &amp; Introduction to spaCy</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-01-21T04:20:29.000Z" title="发表于 2024-01-21 12:20:29">2024-01-21</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-03-17T08:27:17.959Z" title="更新于 2024-03-17 16:27:17">2024-03-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.4k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>14分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="【NLP】NLP Fundamentals &amp; Introduction to spaCy"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="nlp-fundamentals-common-techniques">NLP Fundamentals &amp;
+Common Techniques</h1>
+<h2 id="what-is-nlp">What is NLP</h2>
+<p>NLP attempts to use a variety of common techniques to create
+structure out of raw text data, by applying language specific
+grammatical rules and semantics.</p>
+<h2 id="common-nlp-techniques">Common NLP Techniques</h2>
 <table>
+<colgroup>
+<col style="width: 34%">
+<col style="width: 65%">
+</colgroup>
 <thead>
-<tr>
-<th style="text-align:left">NLP Technique</th>
+<tr class="header">
+<th style="text-align: left;">NLP Technique</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-<td style="text-align:left">Tokenization(word segmentation)</td>
+<tr class="odd">
+<td style="text-align: left;">Tokenization(word segmentation)</td>
 <td>Convert raw text into separate words or tokens.</td>
 </tr>
-<tr>
-<td style="text-align:left">Parsing &amp; Tagging</td>
-<td>Parsing is about creating a tree like structure with words, focusing on relationships between them. Tagging is attaching additional info with tokens.</td>
+<tr class="even">
+<td style="text-align: left;">Parsing &amp; Tagging</td>
+<td>Parsing is about creating a tree like structure with words, focusing
+on relationships between them. Tagging is attaching additional info with
+tokens.</td>
 </tr>
-<tr>
-<td style="text-align:left">Stemming</td>
-<td>Reducing words into their <strong>base form</strong> using rules</td>
+<tr class="odd">
+<td style="text-align: left;">Stemming</td>
+<td>Reducing words into their <strong>base form</strong> using
+rules</td>
 </tr>
-<tr>
-<td style="text-align:left">Lemmatization</td>
-<td>Reducing words into their <strong>base dictionary form</strong> (called as lemma)</td>
+<tr class="even">
+<td style="text-align: left;">Lemmatization</td>
+<td>Reducing words into their <strong>base dictionary form</strong>
+(called as lemma)</td>
 </tr>
-<tr>
-<td style="text-align:left">Stop Word Filtering</td>
+<tr class="odd">
+<td style="text-align: left;">Stop Word Filtering</td>
 <td></td>
 </tr>
-<tr>
-<td style="text-align:left">Parts of Speech Tagging</td>
+<tr class="even">
+<td style="text-align: left;">Parts of Speech Tagging</td>
 <td></td>
 </tr>
-<tr>
-<td style="text-align:left">Named Entity Recognition</td>
+<tr class="odd">
+<td style="text-align: left;">Named Entity Recognition</td>
+<td></td>
 </tr>
 </tbody>
 </table>
-</div>
-<h3 id="Tokenization"><a href="#Tokenization" class="headerlink" title="Tokenization"></a>Tokenization</h3><p>uses prefix, suffix and infix characters, and punctuation rules</p>
-<h3 id="Stemming"><a href="#Stemming" class="headerlink" title="Stemming"></a>Stemming</h3><p>Portal’s Algorithm</p>
+<h3 id="tokenization">Tokenization</h3>
+<p>uses prefix, suffix and infix characters, and punctuation rules</p>
+<h3 id="stemming">Stemming</h3>
+<p>Portal's Algorithm</p>
 <p>cats→cat</p>
-<h3 id="Lemmatization"><a href="#Lemmatization" class="headerlink" title="Lemmatization"></a>Lemmatization</h3><p>The lemma of <code>was</code> is <code>be</code></p>
-<h3 id="Stop-word-Filtering"><a href="#Stop-word-Filtering" class="headerlink" title="Stop word Filtering"></a>Stop word Filtering</h3><p>Words like <code>a</code> and <code>the</code> appears so frequently that they don’t require tagging as thoroughly as nouns, verbs and modifiers.</p>
+<h3 id="lemmatization">Lemmatization</h3>
+<p>The lemma of <code>was</code> is <code>be</code></p>
+<h3 id="stop-word-filtering">Stop word Filtering</h3>
+<p>Words like <code>a</code> and <code>the</code> appears so frequently
+that they don't require tagging as thoroughly as nouns, verbs and
+modifiers.</p>
 <p>We call these stop words.</p>
-<h3 id="Part-of-Speech-Tagging"><a href="#Part-of-Speech-Tagging" class="headerlink" title="Part of Speech Tagging"></a>Part of Speech Tagging</h3><p>using linguistic knowledge to add useful information to tokens.</p>
-<h3 id="Named-Entity-Recognition-NER"><a href="#Named-Entity-Recognition-NER" class="headerlink" title="Named Entity Recognition (NER)"></a>Named Entity Recognition (NER)</h3><p>seeks to locate and classify named entities.</p>
-<h1 id="Introduction-to-NLTK-and-spcCy"><a href="#Introduction-to-NLTK-and-spcCy" class="headerlink" title="Introduction to NLTK and spcCy"></a>Introduction to NLTK and spcCy</h1><h2 id="What-is-NLTK"><a href="#What-is-NLTK" class="headerlink" title="What is NLTK"></a>What is NLTK</h2><p>Natural Language Toolkit</p>
-<h2 id="What-is-spcCy"><a href="#What-is-spcCy" class="headerlink" title="What is spcCy"></a>What is spcCy</h2><p>choosing the most efficient method</p>
-<h2 id="Getting-Started-with-spcCy"><a href="#Getting-Started-with-spcCy" class="headerlink" title="Getting Started with spcCy"></a>Getting Started with spcCy</h2><h3 id="Install-en-model"><a href="#Install-en-model" class="headerlink" title="Install en model"></a>Install en model</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">pip install --upgrade spacy</span><br></pre></td></tr></table></figure>
+<h3 id="part-of-speech-tagging">Part of Speech Tagging</h3>
+<p>using linguistic knowledge to add useful information to tokens.</p>
+<h3 id="named-entity-recognition-ner">Named Entity Recognition
+(NER)</h3>
+<p>seeks to locate and classify named entities.</p>
+<h1 id="introduction-to-nltk-and-spccy">Introduction to NLTK and
+spcCy</h1>
+<h2 id="what-is-nltk">What is NLTK</h2>
+<p>Natural Language Toolkit</p>
+<h2 id="what-is-spccy">What is spcCy</h2>
+<p>choosing the most efficient method</p>
+<h2 id="getting-started-with-spccy">Getting Started with spcCy</h2>
+<h3 id="install-en-model">Install en model</h3>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">pip install --upgrade spacy</span><br></pre></td></tr></table></figure>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">python -m spacy download en</span><br></pre></td></tr></table></figure>
-<p>if failed, visit <a target="_blank" rel="noopener" href="https://spacy.io/models/en#en_core_web_sm">English · spaCy Models Documentation</a>, and then download the <code>.whl</code> file to disk and install.</p>
-<p><img src="/img/spin.svg" data-original="/p/ae6b0147/image-20240121105911708.png" alt="image-20240121105911708"></p>
+<p>if failed, visit <a target="_blank" rel="noopener" href="https://spacy.io/models/en#en_core_web_sm">English · spaCy Models
+Documentation</a>, and then download the <code>.whl</code> file to disk
+and install.</p>
+<figure>
+<img src="/img/spin.svg" data-original="/p/ae6b0147/image-20240121105911708.png" alt="image-20240121105911708">
+<figcaption aria-hidden="true">image-20240121105911708</figcaption>
+</figure>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">pip install somewhere/en_core_web_sm-3.7.1-py3-none-any.whl</span><br></pre></td></tr></table></figure>
-<h3 id="Using-spcCy"><a href="#Using-spcCy" class="headerlink" title="Using spcCy"></a>Using spcCy</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Import spaCy and load the language library</span></span><br><span class="line"><span class="keyword">import</span> spacy</span><br><span class="line">nlp = spacy.load(<span class="string">&#x27;en_core_web_sm&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Create a Doc object</span></span><br><span class="line">doc = nlp(<span class="string">u&#x27;Apple is looking at buying a U.K. startup for $1 Billion&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Print each token separately</span></span><br><span class="line"><span class="keyword">for</span> token <span class="keyword">in</span> doc:</span><br><span class="line">    <span class="built_in">print</span>(token.text, token.pos_, token.dep_)</span><br></pre></td></tr></table></figure>
+<h3 id="using-spccy">Using spcCy</h3>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Import spaCy and load the language library</span></span><br><span class="line"><span class="keyword">import</span> spacy</span><br><span class="line">nlp = spacy.load(<span class="string">&#x27;en_core_web_sm&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Create a Doc object</span></span><br><span class="line">doc = nlp(<span class="string">u&#x27;Apple is looking at buying a U.K. startup for $1 Billion&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Print each token separately</span></span><br><span class="line"><span class="keyword">for</span> token <span class="keyword">in</span> doc:</span><br><span class="line">    <span class="built_in">print</span>(token.text, token.pos_, token.dep_)</span><br></pre></td></tr></table></figure>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Apple PROPN nsubj</span><br><span class="line">is VERB aux</span><br><span class="line">looking VERB ROOT</span><br><span class="line">at ADP prep</span><br><span class="line">buying VERB pcomp</span><br><span class="line">a DET det</span><br><span class="line">U.K. PROPN compound</span><br><span class="line">startup NOUN dobj</span><br><span class="line">for ADP prep</span><br><span class="line">$ SYM quantmod</span><br><span class="line">1 NUM compound</span><br><span class="line">Billion NUM pobj</span><br></pre></td></tr></table></figure>
-<h3 id="spcCy-Objects"><a href="#spcCy-Objects" class="headerlink" title="spcCy Objects"></a>spcCy Objects</h3><p>After importing the spacy module in the cell above we loaded a <strong>model</strong> and named it <code>nlp</code>.<br>Next we created a <strong>Doc</strong> object by applying the model to our text, and named it <code>doc</code>.<br>spaCy also builds a companion <strong>Vocab</strong> object that we’ll cover in later sections.<br>The <strong>Doc</strong> object that holds the processed text is our focus here.</p>
-<h3 id="Pipeline"><a href="#Pipeline" class="headerlink" title="Pipeline"></a>Pipeline</h3><p>When we run <code>nlp</code>, our text enters a <em>processing pipeline</em> that first breaks down the text and then performs a series of operations to tag, parse and describe the data.</p>
-<h3 id="Tokenization-amp-POS-amp-Dependencies"><a href="#Tokenization-amp-POS-amp-Dependencies" class="headerlink" title="Tokenization &amp; POS &amp; Dependencies"></a>Tokenization &amp; POS &amp; Dependencies</h3><p>The first step in processing text is to split up all the component parts (words &amp; punctuation) into “tokens”. These tokens are annotated inside the Doc object to contain descriptive information. </p>
-<p>The next step after splitting the text up into tokens is to assign parts of speech.</p>
-<p>We also looked at the syntactic dependencies assigned to each token. <code>Apple</code> is identified as an <code>nsubj</code> or the <strong><em>nominal subject</em></strong> of the sentence.</p>
+<h3 id="spccy-objects">spcCy Objects</h3>
+<p>After importing the spacy module in the cell above we loaded a
+<strong>model</strong> and named it <code>nlp</code>. Next we created a
+<strong>Doc</strong> object by applying the model to our text, and named
+it <code>doc</code>. spaCy also builds a companion
+<strong>Vocab</strong> object that we'll cover in later sections. The
+<strong>Doc</strong> object that holds the processed text is our focus
+here.</p>
+<h3 id="pipeline">Pipeline</h3>
+<p>When we run <code>nlp</code>, our text enters a <em>processing
+pipeline</em> that first breaks down the text and then performs a series
+of operations to tag, parse and describe the data.</p>
+<h3 id="tokenization-pos-dependencies">Tokenization &amp; POS &amp;
+Dependencies</h3>
+<p>The first step in processing text is to split up all the component
+parts (words &amp; punctuation) into "tokens". These tokens are
+annotated inside the Doc object to contain descriptive information.</p>
+<p>The next step after splitting the text up into tokens is to assign
+parts of speech.</p>
+<p>We also looked at the syntactic dependencies assigned to each token.
+<code>Apple</code> is identified as an <code>nsubj</code> or the
+<strong><em>nominal subject</em></strong> of the sentence.</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line">doc2 = nlp(<span class="string">u&quot;Apple isn&#x27;t looking into startups anymore.&quot;</span>)</span><br><span class="line"><span class="keyword">for</span> token <span class="keyword">in</span> doc2:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&#x27;<span class="subst">&#123;token.text:&#123;<span class="number">10</span>&#125;</span>&#125; <span class="subst">&#123;token.pos_:&#123;<span class="number">10</span>&#125;</span>&#125; <span class="subst">&#123;token.dep_:&#123;<span class="number">10</span>&#125;</span>&#125;&#x27;</span>)</span><br></pre></td></tr></table></figure>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Apple      PROPN      nsubj     </span><br><span class="line">is         VERB       aux       </span><br><span class="line">n&#x27;t        ADV        neg       </span><br><span class="line">looking    VERB       ROOT      </span><br><span class="line">into       ADP        prep      </span><br><span class="line">startups   NOUN       pobj      </span><br><span class="line">anymore    ADV        advmod    </span><br><span class="line">.          PUNCT      punct     </span><br></pre></td></tr></table></figure>
-<p>Notice how <code>isn&#39;t</code> has been split into <strong>two tokens</strong>. spaCy recognizes both the root verb <code>is</code> and the negation attached to it. Notice also that both the extended whitespace and the period at the end of the sentence are assigned their own tokens.</p>
+<p>Notice how <code>isn't</code> has been split into <strong>two
+tokens</strong>. spaCy recognizes both the root verb <code>is</code> and
+the negation attached to it. Notice also that both the extended
+whitespace and the period at the end of the sentence are assigned their
+own tokens.</p>
 <p>To see the full name of a tag use <code>spacy.explain(tag)</code></p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line">spacy.explain(<span class="string">&#x27;nsubj&#x27;</span>)</span><br><span class="line"><span class="comment"># &#x27;nominal subject&#x27;</span></span><br><span class="line">spacy.explain(<span class="built_in">str</span>(doc[<span class="number">0</span>].pos_))</span><br><span class="line"><span class="comment"># &#x27;proper noun&#x27;</span></span><br></pre></td></tr></table></figure>
-<h4 id="Additional-Token-Attributes"><a href="#Additional-Token-Attributes" class="headerlink" title="Additional Token Attributes"></a>Additional Token Attributes</h4><div class="table-container">
+<h4 id="additional-token-attributes">Additional Token Attributes</h4>
 <table>
+<colgroup>
+<col style="width: 11%">
+<col style="width: 60%">
+<col style="width: 28%">
+</colgroup>
 <thead>
-<tr>
-<th style="text-align:left">Tag</th>
-<th style="text-align:center">Description</th>
-<th style="text-align:left">doc2[0].tag</th>
+<tr class="header">
+<th style="text-align: left;">Tag</th>
+<th style="text-align: center;">Description</th>
+<th style="text-align: left;">doc2[0].tag</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-<td style="text-align:left"><code>.text</code></td>
-<td style="text-align:center">The original word text</td>
-<td style="text-align:left"><code>Apple</code></td>
+<tr class="odd">
+<td style="text-align: left;"><code>.text</code></td>
+<td style="text-align: center;">The original word text</td>
+<td style="text-align: left;"><code>Apple</code></td>
 </tr>
-<tr>
-<td style="text-align:left"><code>.lemma_</code></td>
-<td style="text-align:center">The base form of the word</td>
-<td style="text-align:left"><code>apple</code></td>
+<tr class="even">
+<td style="text-align: left;"><code>.lemma_</code></td>
+<td style="text-align: center;">The base form of the word</td>
+<td style="text-align: left;"><code>apple</code></td>
 </tr>
-<tr>
-<td style="text-align:left"><code>.pos_</code></td>
-<td style="text-align:center">The simple part-of-speech tag</td>
-<td style="text-align:left"><code>PROPN</code>/<code>proper noun</code></td>
+<tr class="odd">
+<td style="text-align: left;"><code>.pos_</code></td>
+<td style="text-align: center;">The simple part-of-speech tag</td>
+<td style="text-align: left;"><code>PROPN</code>/<code>proper noun</code></td>
 </tr>
-<tr>
-<td style="text-align:left"><code>.tag_</code></td>
-<td style="text-align:center">The detailed part-of-speech tag</td>
-<td style="text-align:left"><code>NNP</code>/<code>noun, proper singular</code></td>
+<tr class="even">
+<td style="text-align: left;"><code>.tag_</code></td>
+<td style="text-align: center;">The detailed part-of-speech tag</td>
+<td style="text-align: left;"><code>NNP</code>/<code>noun, proper singular</code></td>
 </tr>
-<tr>
-<td style="text-align:left"><code>.shape_</code></td>
-<td style="text-align:center">The word shape – capitalization, punctuation, digits</td>
-<td style="text-align:left"><code>Xxxxx</code></td>
+<tr class="odd">
+<td style="text-align: left;"><code>.shape_</code></td>
+<td style="text-align: center;">The word shape – capitalization,
+punctuation, digits</td>
+<td style="text-align: left;"><code>Xxxxx</code></td>
 </tr>
-<tr>
-<td style="text-align:left"><code>.is_alpha</code></td>
-<td style="text-align:center">Is the token an alpha character?</td>
-<td style="text-align:left"><code>True</code></td>
+<tr class="even">
+<td style="text-align: left;"><code>.is_alpha</code></td>
+<td style="text-align: center;">Is the token an alpha character?</td>
+<td style="text-align: left;"><code>True</code></td>
 </tr>
-<tr>
-<td style="text-align:left"><code>.is_stop</code></td>
-<td style="text-align:center">Is the token part of a stop list, i.e. the most common words of the language?</td>
-<td style="text-align:left"><code>False</code></td>
+<tr class="odd">
+<td style="text-align: left;"><code>.is_stop</code></td>
+<td style="text-align: center;">Is the token part of a stop list, i.e.
+the most common words of the language?</td>
+<td style="text-align: left;"><code>False</code></td>
 </tr>
 </tbody>
 </table>
-</div>
-<h3 id="Spans"><a href="#Spans" class="headerlink" title="Spans"></a>Spans</h3><p>Large Doc objects can be hard to work with at times. A <strong>span</strong> is a slice of Doc object in the form <code>Doc[start:stop]</code>.</p>
+<h3 id="spans">Spans</h3>
+<p>Large Doc objects can be hard to work with at times. A
+<strong>span</strong> is a slice of Doc object in the form
+<code>Doc[start:stop]</code>.</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line">doc3 = nlp(<span class="string">u&#x27;Although commmonly attributed to John Lennon from his song &quot;Beautiful Boy&quot;, \</span></span><br><span class="line"><span class="string">the phrase &quot;Life is what happens to us while we are making other plans&quot; was written by \</span></span><br><span class="line"><span class="string">cartoonist Allen Saunders and published in Reader\&#x27;s Digest in 1957, when Lennon was 17.&#x27;</span>)</span><br><span class="line"></span><br><span class="line">life_quote = doc3[<span class="number">16</span>:<span class="number">30</span>]</span><br><span class="line"><span class="built_in">print</span>(life_quote)</span><br><span class="line"><span class="comment"># &quot;Life is what happens to us while we are making other plans&quot;</span></span><br><span class="line"><span class="built_in">type</span>(life_quote)</span><br><span class="line"><span class="comment"># spacy.tokens.span.Span</span></span><br></pre></td></tr></table></figure>
-<h3 id="Sentences"><a href="#Sentences" class="headerlink" title="Sentences"></a>Sentences</h3><p>Certain tokens inside a Doc object may also receive a “start of sentence” tag. While this doesn’t immediately build a list of sentences, these tags enable the generation of sentence segments through <code>Doc.sents</code>. Later we’ll write our own segmentation rules.</p>
+<h3 id="sentences">Sentences</h3>
+<p>Certain tokens inside a Doc object may also receive a "start of
+sentence" tag. While this doesn't immediately build a list of sentences,
+these tags enable the generation of sentence segments through
+<code>Doc.sents</code>. Later we'll write our own segmentation
+rules.</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line">doc4 = nlp(<span class="string">u&#x27;This is the first sentence. This is another sentence. This is the last sentence.&#x27;</span>)</span><br><span class="line"><span class="keyword">for</span> sent <span class="keyword">in</span> doc4.sents:</span><br><span class="line">    <span class="built_in">print</span>(sent)</span><br><span class="line"><span class="comment"># This is the first sentence.</span></span><br><span class="line"><span class="comment"># This is another sentence.</span></span><br><span class="line"><span class="comment"># This is the last sentence.</span></span><br></pre></td></tr></table></figure>
 <hr>
-<h2 id="Tokenization-1"><a href="#Tokenization-1" class="headerlink" title="Tokenization"></a>Tokenization</h2><ul>
-<li><strong>Prefix</strong>: Character(s) at the beginning ▸ <code>$ ( “ ¿</code></li>
-<li><strong>Suffix</strong>: Character(s) at the end ▸ <code>km ) , . ! ”</code></li>
-<li><strong>Infix</strong>: Character(s) in between ▸ <code>- -- / ...</code></li>
-<li><strong>Exception</strong>: Special-case rule to split a string into several tokens or prevent a token from being split when punctuation rules are applied ▸ <code>St. U.S.</code></li>
+<h2 id="tokenization-1">Tokenization</h2>
+<ul>
+<li><strong>Prefix</strong>: Character(s) at the beginning ▸
+<code>$ ( “ ¿</code></li>
+<li><strong>Suffix</strong>: Character(s) at the end ▸
+<code>km ) , . ! ”</code></li>
+<li><strong>Infix</strong>: Character(s) in between ▸
+<code>- -- / ...</code></li>
+<li><strong>Exception</strong>: Special-case rule to split a string into
+several tokens or prevent a token from being split when punctuation
+rules are applied ▸ <code>St. U.S.</code></li>
 </ul>
-<h3 id="Prefixes-Suffixes-and-Infixes"><a href="#Prefixes-Suffixes-and-Infixes" class="headerlink" title="Prefixes, Suffixes and Infixes"></a>Prefixes, Suffixes and Infixes</h3><p>However, punctuation that exists as part of an email address, website or numerical value will be kept as part of the token.</p>
+<h3 id="prefixes-suffixes-and-infixes">Prefixes, Suffixes and
+Infixes</h3>
+<p>However, punctuation that exists as part of an email address, website
+or numerical value will be kept as part of the token.</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line">doc2 = nlp(<span class="string">u&quot;We&#x27;re here to help! Send snail-mail, email support@oursite.com or visit us at http://www.oursite.com!&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> t <span class="keyword">in</span> doc2:</span><br><span class="line">    <span class="built_in">print</span>(t)</span><br></pre></td></tr></table></figure>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">......</span><br><span class="line">email</span><br><span class="line">support@oursite.com</span><br><span class="line">or</span><br><span class="line">visit</span><br><span class="line">us</span><br><span class="line">at</span><br><span class="line">http://www.oursite.com</span><br><span class="line">!</span><br></pre></td></tr></table></figure>
-<font color="green">Note that the exclamation points, comma, and the hyphen in 'snail-mail' are assigned their own tokens, yet both the email address and website are preserved.</font>
-
-<h3 id="Exceptions"><a href="#Exceptions" class="headerlink" title="Exceptions"></a>Exceptions</h3><p>Punctuation that exists as part of a known abbreviation will be kept as part of the token.</p>
+<p><font color="green">Note that the exclamation points, comma, and the
+hyphen in 'snail-mail' are assigned their own tokens, yet both the email
+address and website are preserved.</font></p>
+<h3 id="exceptions">Exceptions</h3>
+<p>Punctuation that exists as part of a known abbreviation will be kept
+as part of the token.</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line">doc4 = nlp(<span class="string">u&quot;Let&#x27;s visit St. Louis in the U.S. next year.&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> t <span class="keyword">in</span> doc4:</span><br><span class="line">    <span class="built_in">print</span>(t)</span><br></pre></td></tr></table></figure>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Let</span><br><span class="line">&#x27;s</span><br><span class="line">visit</span><br><span class="line">St.</span><br><span class="line">Louis</span><br><span class="line">in</span><br><span class="line">the</span><br><span class="line">U.S.</span><br><span class="line">next</span><br><span class="line">year</span><br><span class="line">.</span><br></pre></td></tr></table></figure>
-<font color="green">Here the abbreviations for "Saint" and "United States" are both preserved.</font>
-
-<h3 id="Counting-Vocab-Entries"><a href="#Counting-Vocab-Entries" class="headerlink" title="Counting Vocab Entries"></a>Counting Vocab Entries</h3><p><code>Vocab</code> objects contain a full library of items!</p>
+<p><font color="green">Here the abbreviations for "Saint" and "United
+States" are both preserved.</font></p>
+<h3 id="counting-vocab-entries">Counting Vocab Entries</h3>
+<p><code>Vocab</code> objects contain a full library of items!</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="built_in">len</span>(doc.vocab)</span><br><span class="line"><span class="comment"># 57852</span></span><br></pre></td></tr></table></figure>
-<font color="green">NOTE: This number changes based on the language library loaded at the start, and any new lexemes introduced to the `vocab` when the `Doc` was created.</font>
-
-<h3 id="Tokens-cannot-be-reassigned"><a href="#Tokens-cannot-be-reassigned" class="headerlink" title="Tokens cannot be reassigned"></a>Tokens cannot be reassigned</h3><p>Although <code>Doc</code> objects can be considered lists of tokens, they do <em>not</em> support item reassignment.</p>
-<h3 id="Named-Entities"><a href="#Named-Entities" class="headerlink" title="Named Entities"></a>Named Entities</h3><p>Going a step beyond tokens, <em>named entities</em> add another layer of context. The language model recognizes that certain words are organizational names while others are locations, and still other combinations relate to money, dates, etc. Named entities are accessible through the <code>ents</code> property of a <code>Doc</code> object.</p>
+<p><font color="green">NOTE: This number changes based on the language
+library loaded at the start, and any new lexemes introduced to the
+<code>vocab</code> when the <code>Doc</code> was created.</font></p>
+<h3 id="tokens-cannot-be-reassigned">Tokens cannot be reassigned</h3>
+<p>Although <code>Doc</code> objects can be considered lists of tokens,
+they do <em>not</em> support item reassignment.</p>
+<h3 id="named-entities">Named Entities</h3>
+<p>Going a step beyond tokens, <em>named entities</em> add another layer
+of context. The language model recognizes that certain words are
+organizational names while others are locations, and still other
+combinations relate to money, dates, etc. Named entities are accessible
+through the <code>ents</code> property of a <code>Doc</code> object.</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line">doc8 = nlp(<span class="string">u&#x27;Apple to build a Hong Kong factory for $6 million&#x27;</span>)</span><br><span class="line"><span class="keyword">for</span> ent <span class="keyword">in</span> doc8.ents:</span><br><span class="line">    <span class="built_in">print</span>(ent.text+<span class="string">&#x27; - &#x27;</span>+ent.label_+<span class="string">&#x27; - &#x27;</span>+<span class="built_in">str</span>(spacy.explain(ent.label_)))</span><br></pre></td></tr></table></figure>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Apple - ORG - Companies, agencies, institutions, etc.</span><br><span class="line">Hong Kong - GPE - Countries, cities, states</span><br><span class="line">$6 million - MONEY - Monetary values, including unit</span><br></pre></td></tr></table></figure>
-<h3 id="Noun-Chunks"><a href="#Noun-Chunks" class="headerlink" title="Noun Chunks"></a>Noun Chunks</h3><p>Similar to <code>Doc.ents</code>, <code>Doc.noun_chunks</code> are another object property. <em>Noun chunks</em> are “base noun <strong>phrases</strong>“ – flat phrases that have a noun as their head. You can think of noun chunks as a noun plus the words describing the noun – for example, in <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/The_Purple_People_Eater">Sheb Wooley’s 1958 song</a>, a <em>“one-eyed, one-horned, flying, purple people-eater”</em> would be one long noun chunk.</p>
+<h3 id="noun-chunks">Noun Chunks</h3>
+<p>Similar to <code>Doc.ents</code>, <code>Doc.noun_chunks</code> are
+another object property. <em>Noun chunks</em> are "base noun
+<strong>phrases</strong>" – flat phrases that have a noun as their head.
+You can think of noun chunks as a noun plus the words describing the
+noun – for example, in <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/The_Purple_People_Eater">Sheb
+Wooley's 1958 song</a>, a <em>"one-eyed, one-horned, flying, purple
+people-eater"</em> would be one long noun chunk.</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line">doc11 = nlp(<span class="string">u&quot;He was a one-eyed, one-horned, flying, purple people-eater.&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> chunk <span class="keyword">in</span> doc11.noun_chunks:</span><br><span class="line">    <span class="built_in">print</span>(chunk.text)</span><br><span class="line"><span class="comment"># He</span></span><br><span class="line"><span class="comment"># a one-eyed, one-horned, flying, purple people-eater</span></span><br></pre></td></tr></table></figure>
-<h3 id="Built-in-Visualizers"><a href="#Built-in-Visualizers" class="headerlink" title="Built-in Visualizers"></a>Built-in Visualizers</h3><p>spaCy includes a built-in visualization tool called <strong>displaCy</strong>. displaCy is able to detect whether you’re working in a <strong>Jupyter notebook</strong>, and will return markup that can be rendered in a cell right away. When you export your notebook, the visualizations will be included as <strong>HTML</strong>.</p>
-<p>For more info visit <a target="_blank" rel="noopener" href="https://spacy.io/usage/visualizers">https://spacy.io/usage/visualizers</a></p>
+<h3 id="built-in-visualizers">Built-in Visualizers</h3>
+<p>spaCy includes a built-in visualization tool called
+<strong>displaCy</strong>. displaCy is able to detect whether you're
+working in a <strong>Jupyter notebook</strong>, and will return markup
+that can be rendered in a cell right away. When you export your
+notebook, the visualizations will be included as
+<strong>HTML</strong>.</p>
+<p>For more info visit https://spacy.io/usage/visualizers</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line">doc = nlp(<span class="string">u&#x27;Over the last quarter Apple sold nearly 20 thousand iPods for a profit of $6 million.&#x27;</span>)</span><br><span class="line">displacy.render(doc, style=<span class="string">&#x27;ent&#x27;</span>, jupyter=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
-<p><div class="entities" style="line-height:2.5">Over<br><mark class="entity" style="background:#bfe1d9;padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone"><br>    the last quarter<br>    <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">DATE</span>
-</mark><br><mark class="entity" style="background:#7aecec;padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone"><br>    Apple<br>    <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">ORG</span>
-</mark><br>sold<br><mark class="entity" style="background:#e4e7d2;padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone"><br>    nearly 20 thousand<br>    <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">CARDINAL</span>
-</mark><br><mark class="entity" style="background:#bfeeb7;padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone"><br>    iPods<br>    <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">PRODUCT</span>
-</mark><br>     for a profit of<br><mark class="entity" style="background:#e4e7d2;padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone"><br>    $6 million<br>    <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">MONEY</span>
-</mark><br>    .</div></p>
+<div class="entities" style="line-height:2.5">
+<p>Over
+<mark class="entity" style="background:#bfe1d9;padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone">
+the last quarter <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">DATE</span>
+</mark>
+<mark class="entity" style="background:#7aecec;padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone">
+Apple <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">ORG</span>
+</mark> sold
+<mark class="entity" style="background:#e4e7d2;padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone">
+nearly 20 thousand <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">CARDINAL</span>
+</mark>
+<mark class="entity" style="background:#bfeeb7;padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone">
+iPods <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">PRODUCT</span>
+</mark> for a profit of
+<mark class="entity" style="background:#e4e7d2;padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone">
+$6 million <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">MONEY</span>
+</mark> .</p>
 <hr>
-<h2 id="Stemming-1"><a href="#Stemming-1" class="headerlink" title="Stemming"></a>Stemming</h2><p>Often when searching text for a certain keyword, it helps if the search returns variations of the word. For instance, searching for “boat” might also return “boats” and “boating”. Here, “boat” would be the <strong>stem</strong> for [boat, boater, boating, boats].</p>
-<p>Instead, we’ll use another popular NLP tool called <strong>NLTK</strong>.</p>
-<h3 id="Porter-Stemmer"><a href="#Porter-Stemmer" class="headerlink" title="Porter Stemmer"></a>Porter Stemmer</h3><p>One of the most common - and effective - stemming tools is <a target="_blank" rel="noopener" href="https://tartarus.org/martin/PorterStemmer/"><em>Porter’s Algorithm</em></a> developed by Martin Porter in <a target="_blank" rel="noopener" href="https://tartarus.org/martin/PorterStemmer/def.txt">1980</a>. The algorithm employs five phases of word reduction, each with its own set of mapping rules.</p>
+<h2 id="stemming-1">Stemming</h2>
+<p>Often when searching text for a certain keyword, it helps if the
+search returns variations of the word. For instance, searching for
+"boat" might also return "boats" and "boating". Here, "boat" would be
+the <strong>stem</strong> for [boat, boater, boating, boats].</p>
+<p>Instead, we'll use another popular NLP tool called
+<strong>NLTK</strong>.</p>
+<h3 id="porter-stemmer">Porter Stemmer</h3>
+<p>One of the most common - and effective - stemming tools is <a target="_blank" rel="noopener" href="https://tartarus.org/martin/PorterStemmer/"><em>Porter's
+Algorithm</em></a> developed by Martin Porter in <a target="_blank" rel="noopener" href="https://tartarus.org/martin/PorterStemmer/def.txt">1980</a>. The
+algorithm employs five phases of word reduction, each with its own set
+of mapping rules.</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Import the toolkit and the full Porter Stemmer library</span></span><br><span class="line"><span class="keyword">import</span> nltk</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> nltk.stem.porter <span class="keyword">import</span> *</span><br><span class="line">p_stemmer = PorterStemmer()</span><br><span class="line">words = [<span class="string">&#x27;run&#x27;</span>,<span class="string">&#x27;runner&#x27;</span>,<span class="string">&#x27;running&#x27;</span>,<span class="string">&#x27;ran&#x27;</span>,<span class="string">&#x27;runs&#x27;</span>,<span class="string">&#x27;easily&#x27;</span>,<span class="string">&#x27;fairly&#x27;</span>]</span><br><span class="line"><span class="keyword">for</span> word <span class="keyword">in</span> words:</span><br><span class="line">    <span class="built_in">print</span>(word+<span class="string">&#x27; --&gt; &#x27;</span>+p_stemmer.stem(word))</span><br></pre></td></tr></table></figure>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">run --&gt; run</span><br><span class="line">runner --&gt; runner</span><br><span class="line">running --&gt; run</span><br><span class="line">ran --&gt; ran</span><br><span class="line">runs --&gt; run</span><br><span class="line">easily --&gt; easili</span><br><span class="line">fairly --&gt; fairli</span><br><span class="line">eighteen --&gt; eighteen</span><br></pre></td></tr></table></figure>
-<font color="green">Note how the stemmer recognizes "runner" as a noun, not a verb form or participle. Also, the adverbs "easily" and "fairly" are stemmed to the unusual root "easili" and "fairli"</font>
-
-<h3 id="Snowball-Stemmer"><a href="#Snowball-Stemmer" class="headerlink" title="Snowball Stemmer"></a>Snowball Stemmer</h3><p>This is somewhat of a misnomer, as Snowball is the name of a stemming language developed by Martin Porter. The algorithm used here is more acurately called the “English Stemmer” or “Porter2 Stemmer”. It offers a slight improvement over the original Porter stemmer, both in logic and speed.</p>
+<p><font color="green">Note how the stemmer recognizes "runner" as a noun,
+not a verb form or participle. Also, the adverbs "easily" and "fairly"
+are stemmed to the unusual root "easili" and "fairli"</font></p>
+<h3 id="snowball-stemmer">Snowball Stemmer</h3>
+<p>This is somewhat of a misnomer, as Snowball is the name of a stemming
+language developed by Martin Porter. The algorithm used here is more
+acurately called the "English Stemmer" or "Porter2 Stemmer". It offers a
+slight improvement over the original Porter stemmer, both in logic and
+speed.</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> nltk.stem.snowball <span class="keyword">import</span> SnowballStemmer</span><br><span class="line"></span><br><span class="line"><span class="comment"># The Snowball Stemmer requires that you pass a language parameter</span></span><br><span class="line">s_stemmer = SnowballStemmer(language=<span class="string">&#x27;english&#x27;</span>)</span><br><span class="line"><span class="keyword">for</span> word <span class="keyword">in</span> words:</span><br><span class="line">    <span class="built_in">print</span>(word+<span class="string">&#x27; --&gt; &#x27;</span>+s_stemmer.stem(word))</span><br></pre></td></tr></table></figure>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">run --&gt; run</span><br><span class="line">runner --&gt; runner</span><br><span class="line">running --&gt; run</span><br><span class="line">ran --&gt; ran</span><br><span class="line">runs --&gt; run</span><br><span class="line">easily --&gt; easili</span><br><span class="line">fairly --&gt; fair</span><br></pre></td></tr></table></figure>
-<font color="green">In this case the stemmer performed the same as the Porter Stemmer, with the exception that it handled the stem of "fairly" more appropriately with "fair"</font>
-
-<p>Stemming has its drawbacks. If given the token <code>saw</code>, stemming might always return <code>saw</code>, whereas lemmatization would likely return either <code>see</code> or <code>saw</code> depending on whether the use of the token was as a verb or a noun. As an example, consider the following:</p>
+<p><font color="green">In this case the stemmer performed the same as the
+Porter Stemmer, with the exception that it handled the stem of "fairly"
+more appropriately with "fair"</font></p>
+<p>Stemming has its drawbacks. If given the token <code>saw</code>,
+stemming might always return <code>saw</code>, whereas lemmatization
+would likely return either <code>see</code> or <code>saw</code>
+depending on whether the use of the token was as a verb or a noun. As an
+example, consider the following:</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line">phrase = <span class="string">&#x27;I am meeting him tomorrow at the meeting&#x27;</span></span><br><span class="line"><span class="keyword">for</span> word <span class="keyword">in</span> phrase.split():</span><br><span class="line">    <span class="built_in">print</span>(word+<span class="string">&#x27; --&gt; &#x27;</span>+p_stemmer.stem(word))</span><br></pre></td></tr></table></figure>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">I --&gt; I</span><br><span class="line">am --&gt; am</span><br><span class="line">meeting --&gt; meet</span><br><span class="line">him --&gt; him</span><br><span class="line">tomorrow --&gt; tomorrow</span><br><span class="line">at --&gt; at</span><br><span class="line">the --&gt; the</span><br><span class="line">meeting --&gt; meet</span><br></pre></td></tr></table></figure>
-<p>Here the word “meeting” appears twice - once as a verb, and once as a noun, and yet the stemmer treats both equally.</p>
+<p>Here the word "meeting" appears twice - once as a verb, and once as a
+noun, and yet the stemmer treats both equally.</p>
 <hr>
-<h2 id="Lemmatization-1"><a href="#Lemmatization-1" class="headerlink" title="Lemmatization"></a>Lemmatization</h2><p>In contrast to stemming, lemmatization looks beyond word reduction, and considers a language’s full vocabulary to apply a <em>morphological analysis</em> to words. The lemma of ‘was’ is ‘be’ and the lemma of ‘mice’ is ‘mouse’. Further, the lemma of ‘meeting’ might be ‘meet’ or ‘meeting’ depending on its use in a sentence.</p>
+<h2 id="lemmatization-1">Lemmatization</h2>
+<p>In contrast to stemming, lemmatization looks beyond word reduction,
+and considers a language's full vocabulary to apply a <em>morphological
+analysis</em> to words. The lemma of 'was' is 'be' and the lemma of
+'mice' is 'mouse'. Further, the lemma of 'meeting' might be 'meet' or
+'meeting' depending on its use in a sentence.</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> spacy</span><br><span class="line">nlp = spacy.load(<span class="string">&#x27;en_core_web_sm&#x27;</span>)</span><br><span class="line">doc1 = nlp(<span class="string">u&quot;I am a runner running in a race because I love to run since I ran today&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> token <span class="keyword">in</span> doc1:</span><br><span class="line">    <span class="built_in">print</span>(token.text, <span class="string">&#x27;\t\t&#x27;</span>, token.pos_, <span class="string">&#x27;\t&#x27;</span>, token.lemma, <span class="string">&#x27;\t\t&#x27;</span>, token.lemma_)</span><br></pre></td></tr></table></figure>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">I 		 PRON 	 561228191312463089 		 -PRON-</span><br><span class="line">am 		 VERB 	 10382539506755952630 		 be</span><br><span class="line">a 		 DET 	 11901859001352538922 		 a</span><br><span class="line">runner 		 NOUN 	 12640964157389618806 		 runner</span><br><span class="line">running 		 VERB 	 12767647472892411841 		 run</span><br><span class="line">in 		 ADP 	 3002984154512732771 		 in</span><br><span class="line">a 		 DET 	 11901859001352538922 		 a</span><br><span class="line">race 		 NOUN 	 8048469955494714898 		 race</span><br><span class="line">because 		 ADP 	 16950148841647037698 		 because</span><br><span class="line">I 		 PRON 	 561228191312463089 		 -PRON-</span><br><span class="line">love 		 VERB 	 3702023516439754181 		 love</span><br><span class="line">to 		 PART 	 3791531372978436496 		 to</span><br><span class="line">run 		 VERB 	 12767647472892411841 		 run</span><br><span class="line">since 		 ADP 	 10066841407251338481 		 since</span><br><span class="line">I 		 PRON 	 561228191312463089 		 -PRON-</span><br><span class="line">ran 		 VERB 	 12767647472892411841 		 run</span><br><span class="line">today 		 NOUN 	 11042482332948150395 		 today</span><br></pre></td></tr></table></figure>
-<font color="green">In the above sentence, `running`, `run` and `ran` all point to the same lemma `run` (...11841) to avoid duplication.</font> 
-
-<p>Also notice that Spacy does not try to find lemma for personal pronouns, instead it assigns them the same symbol <strong>-PRON-</strong></p>
+<p><font color="green">In the above sentence, <code>running</code>,
+<code>run</code> and <code>ran</code> all point to the same lemma
+<code>run</code> (...11841) to avoid duplication.</font></p>
+<p>Also notice that Spacy does not try to find lemma for personal
+pronouns, instead it assigns them the same symbol
+<strong>-PRON-</strong></p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">show_lemmas</span>(<span class="params">text</span>):</span><br><span class="line">    <span class="keyword">for</span> token <span class="keyword">in</span> text:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&#x27;<span class="subst">&#123;token.text:&#123;<span class="number">12</span>&#125;</span>&#125; <span class="subst">&#123;token.pos_:&#123;<span class="number">6</span>&#125;</span>&#125; <span class="subst">&#123;token.lemma:&lt;&#123;<span class="number">22</span>&#125;</span>&#125; <span class="subst">&#123;token.lemma_&#125;</span>&#x27;</span>)</span><br></pre></td></tr></table></figure>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line">doc3 = nlp(<span class="string">u&quot;I am meeting him tomorrow at the meeting.&quot;</span>)</span><br><span class="line"></span><br><span class="line">show_lemmas(doc3)</span><br></pre></td></tr></table></figure>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">I            PRON   561228191312463089     -PRON-</span><br><span class="line">am           VERB   10382539506755952630   be</span><br><span class="line">meeting      VERB   6880656908171229526    meet</span><br><span class="line">him          PRON   561228191312463089     -PRON-</span><br><span class="line">tomorrow     NOUN   3573583789758258062    tomorrow</span><br><span class="line">at           ADP    11667289587015813222   at</span><br><span class="line">the          DET    7425985699627899538    the</span><br><span class="line">meeting      NOUN   14798207169164081740   meeting</span><br><span class="line">.            PUNCT  12646065887601541794   .</span><br></pre></td></tr></table></figure>
-<font color="green">Here the lemma of `meeting` is determined by its Part of Speech tag.</font>
-
+<p><font color="green">Here the lemma of <code>meeting</code> is
+determined by its Part of Speech tag.</font></p>
 <hr>
-<h2 id="Stop-Words"><a href="#Stop-Words" class="headerlink" title="Stop Words"></a>Stop Words</h2><p>Words like “a” and “the” appear so frequently that they don’t require tagging as thoroughly as nouns, verbs and modifiers. We call these <em>stop words</em>, and they can be filtered from the text to be processed. spaCy holds a built-in list of some 305 English stop words.</p>
-<h3 id="Add-a-stop-word"><a href="#Add-a-stop-word" class="headerlink" title="Add a stop word"></a>Add a stop word</h3><p>There may be times when you wish to add a stop word to the default set. Perhaps you decide that <code>&#39;btw&#39;</code> (common shorthand for “by the way”) should be considered a stop word.</p>
+<h2 id="stop-words">Stop Words</h2>
+<p>Words like "a" and "the" appear so frequently that they don't require
+tagging as thoroughly as nouns, verbs and modifiers. We call these
+<em>stop words</em>, and they can be filtered from the text to be
+processed. spaCy holds a built-in list of some 305 English stop
+words.</p>
+<h3 id="add-a-stop-word">Add a stop word</h3>
+<p>There may be times when you wish to add a stop word to the default
+set. Perhaps you decide that <code>'btw'</code> (common shorthand for
+"by the way") should be considered a stop word.</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Add the word to the set of stop words. Use lowercase!</span></span><br><span class="line">nlp.Defaults.stop_words.add(<span class="string">&#x27;btw&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Set the stop_word tag on the lexeme</span></span><br><span class="line">nlp.vocab[<span class="string">&#x27;btw&#x27;</span>].is_stop = <span class="literal">True</span></span><br></pre></td></tr></table></figure>
-<font color="green">When adding stop words, always use lowercase. Lexemes are converted to lowercase before being added to **vocab**.</font>
-
-<h3 id="Remove-a-stop-word"><a href="#Remove-a-stop-word" class="headerlink" title="Remove a stop word"></a>Remove a stop word</h3><p>Alternatively, you may decide that <code>&#39;beyond&#39;</code> should not be considered a stop word.</p>
+<p><font color="green">When adding stop words, always use lowercase.
+Lexemes are converted to lowercase before being added to
+<strong>vocab</strong>.</font></p>
+<h3 id="remove-a-stop-word">Remove a stop word</h3>
+<p>Alternatively, you may decide that <code>'beyond'</code> should not
+be considered a stop word.</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Remove the word from the set of stop words</span></span><br><span class="line">nlp.Defaults.stop_words.remove(<span class="string">&#x27;beyond&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Remove the stop_word tag from the lexeme</span></span><br><span class="line">nlp.vocab[<span class="string">&#x27;beyond&#x27;</span>].is_stop = <span class="literal">False</span></span><br></pre></td></tr></table></figure>
-</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://rean-schwarze.github.io">Rean</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://rean-schwarze.github.io/p/ae6b0147/">https://rean-schwarze.github.io/p/ae6b0147/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://rean-schwarze.github.io" target="_blank">Rean's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/NLP/">NLP</a><a class="post-meta__tags" href="/tags/spaCy/">spaCy</a><a class="post-meta__tags" href="/tags/NLTK/">NLTK</a><a class="post-meta__tags" href="/tags/Tokenization/">Tokenization</a><a class="post-meta__tags" href="/tags/Stemming/">Stemming</a><a class="post-meta__tags" href="/tags/Lemmatization/">Lemmatization</a><a class="post-meta__tags" href="/tags/Stop-word/">Stop word</a></div><div class="post_share"><div class="social-share" data-image="/img/SynthV_banner_Image_BG1.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/p/a4189438/" title="【Vue】Element表单中按钮的摆放（内嵌/追加）"><img class="cover" src="/img/spin.svg" data-original="/img/image-20240122215722256.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">【Vue】Element表单中按钮的摆放（内嵌/追加）</div></div></a></div><div class="next-post pull-right"><a href="/p/4e982f2d/" title="【Vue】Class与Style绑定"><img class="cover" src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover7.JPG" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">【Vue】Class与Style绑定</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/p/acac46b/" title="【NLP】NLP Techniques(POS&#x2F;NER)"><img class="cover" src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover4.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-25</div><div class="title">【NLP】NLP Techniques(POS&#x2F;NER)</div></div></a></div><div><a href="/p/240e5e52/" title="【NLP】Semantic &amp; Sentiment Analysis"><img class="cover" src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover3.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-02-01</div><div class="title">【NLP】Semantic &amp; Sentiment Analysis</div></div></a></div><div><a href="/p/66a6c396/" title="【NLP】Text Feature Extraction &amp; Classification"><img class="cover" src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover3.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-29</div><div class="title">【NLP】Text Feature Extraction &amp; Classification</div></div></a></div><div><a href="/p/f6e1007e/" title="【NLP】Python Refresh"><img class="cover" src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover8.JPG" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-17</div><div class="title">【NLP】Python Refresh</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div><div class="comment-switch"><span class="first-comment">Giscus</span><span id="switch-btn"></span><span class="second-comment">Valine</span></div></div><div class="comment-wrap"><div><div id="giscus-wrap"></div></div><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/spin.svg" data-original="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Rean</div><div class="author-info__description">日常写bug 偶尔调调歌</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">49</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">153</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">13</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/Rean-Schwarze" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="https://space.bilibili.com/6531436" target="_blank" title="bilibili"><i class="fab fa-bilibili"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">随缘更新~（ps：如果加载不完全可以等等或者刷新）</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#NLP-Fundamentals-amp-Common-Techniques"><span class="toc-text">NLP Fundamentals &amp; Common Techniques</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#What-is-NLP"><span class="toc-text">What is NLP</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Common-NLP-Techniques"><span class="toc-text">Common NLP Techniques</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Tokenization"><span class="toc-text">Tokenization</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Stemming"><span class="toc-text">Stemming</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Lemmatization"><span class="toc-text">Lemmatization</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Stop-word-Filtering"><span class="toc-text">Stop word Filtering</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Part-of-Speech-Tagging"><span class="toc-text">Part of Speech Tagging</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Named-Entity-Recognition-NER"><span class="toc-text">Named Entity Recognition (NER)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Introduction-to-NLTK-and-spcCy"><span class="toc-text">Introduction to NLTK and spcCy</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#What-is-NLTK"><span class="toc-text">What is NLTK</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#What-is-spcCy"><span class="toc-text">What is spcCy</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Getting-Started-with-spcCy"><span class="toc-text">Getting Started with spcCy</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Install-en-model"><span class="toc-text">Install en model</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Using-spcCy"><span class="toc-text">Using spcCy</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#spcCy-Objects"><span class="toc-text">spcCy Objects</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Pipeline"><span class="toc-text">Pipeline</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Tokenization-amp-POS-amp-Dependencies"><span class="toc-text">Tokenization &amp; POS &amp; Dependencies</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Additional-Token-Attributes"><span class="toc-text">Additional Token Attributes</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Spans"><span class="toc-text">Spans</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Sentences"><span class="toc-text">Sentences</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tokenization-1"><span class="toc-text">Tokenization</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Prefixes-Suffixes-and-Infixes"><span class="toc-text">Prefixes, Suffixes and Infixes</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Exceptions"><span class="toc-text">Exceptions</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Counting-Vocab-Entries"><span class="toc-text">Counting Vocab Entries</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Tokens-cannot-be-reassigned"><span class="toc-text">Tokens cannot be reassigned</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Named-Entities"><span class="toc-text">Named Entities</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Noun-Chunks"><span class="toc-text">Noun Chunks</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Built-in-Visualizers"><span class="toc-text">Built-in Visualizers</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Stemming-1"><span class="toc-text">Stemming</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Porter-Stemmer"><span class="toc-text">Porter Stemmer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Snowball-Stemmer"><span class="toc-text">Snowball Stemmer</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Lemmatization-1"><span class="toc-text">Lemmatization</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Stop-Words"><span class="toc-text">Stop Words</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Add-a-stop-word"><span class="toc-text">Add a stop word</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Remove-a-stop-word"><span class="toc-text">Remove a stop word</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/p/f9b9edb2/" title="【数据库】索引"><img src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover4.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【数据库】索引"/></a><div class="content"><a class="title" href="/p/f9b9edb2/" title="【数据库】索引">【数据库】索引</a><time datetime="2024-03-20T09:08:31.000Z" title="发表于 2024-03-20 17:08:31">2024-03-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/cbe55d0/" title="【数据结构】树"><img src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover5.JPG" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【数据结构】树"/></a><div class="content"><a class="title" href="/p/cbe55d0/" title="【数据结构】树">【数据结构】树</a><time datetime="2024-03-20T07:02:28.000Z" title="发表于 2024-03-20 15:02:28">2024-03-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/156c59d0/" title="【分布式】分布式锁介绍 &amp; 常见实现方案"><img src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover3.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【分布式】分布式锁介绍 &amp; 常见实现方案"/></a><div class="content"><a class="title" href="/p/156c59d0/" title="【分布式】分布式锁介绍 &amp; 常见实现方案">【分布式】分布式锁介绍 &amp; 常见实现方案</a><time datetime="2024-03-20T03:50:19.000Z" title="发表于 2024-03-20 11:50:19">2024-03-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/d4d6f818/" title="【TCP】重传、滑动窗口、流量控制、拥塞控制"><img src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover6.JPG" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【TCP】重传、滑动窗口、流量控制、拥塞控制"/></a><div class="content"><a class="title" href="/p/d4d6f818/" title="【TCP】重传、滑动窗口、流量控制、拥塞控制">【TCP】重传、滑动窗口、流量控制、拥塞控制</a><time datetime="2024-03-19T07:12:22.000Z" title="发表于 2024-03-19 15:12:22">2024-03-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/2574cf15/" title="【Hexo】永久短链生成 &amp; 插入视频"><img src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover1.JPG" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Hexo】永久短链生成 &amp; 插入视频"/></a><div class="content"><a class="title" href="/p/2574cf15/" title="【Hexo】永久短链生成 &amp; 插入视频">【Hexo】永久短链生成 &amp; 插入视频</a><time datetime="2024-03-17T16:13:26.000Z" title="发表于 2024-03-18 00:13:26">2024-03-18</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/img/SynthV_banner_Image_BG1.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Rean</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(()=>{
+</div></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://rean-schwarze.github.io">Rean</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://rean-schwarze.github.io/p/ae6b0147/">https://rean-schwarze.github.io/p/ae6b0147/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://rean-schwarze.github.io" target="_blank">Rean's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/NLP/">NLP</a><a class="post-meta__tags" href="/tags/spaCy/">spaCy</a><a class="post-meta__tags" href="/tags/NLTK/">NLTK</a><a class="post-meta__tags" href="/tags/Tokenization/">Tokenization</a><a class="post-meta__tags" href="/tags/Stemming/">Stemming</a><a class="post-meta__tags" href="/tags/Lemmatization/">Lemmatization</a><a class="post-meta__tags" href="/tags/Stop-word/">Stop word</a></div><div class="post_share"><div class="social-share" data-image="/img/SynthV_banner_Image_BG1.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/p/a4189438/" title="【Vue】Element表单中按钮的摆放（内嵌/追加）"><img class="cover" src="/img/spin.svg" data-original="/img/image-20240122215722256.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">【Vue】Element表单中按钮的摆放（内嵌/追加）</div></div></a></div><div class="next-post pull-right"><a href="/p/4e982f2d/" title="【Vue】Class与Style绑定"><img class="cover" src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover8.JPG" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">【Vue】Class与Style绑定</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/p/acac46b/" title="【NLP】NLP Techniques(POS&#x2F;NER)"><img class="cover" src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover2.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-25</div><div class="title">【NLP】NLP Techniques(POS&#x2F;NER)</div></div></a></div><div><a href="/p/240e5e52/" title="【NLP】Semantic &amp; Sentiment Analysis"><img class="cover" src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover4.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-02-01</div><div class="title">【NLP】Semantic &amp; Sentiment Analysis</div></div></a></div><div><a href="/p/66a6c396/" title="【NLP】Text Feature Extraction &amp; Classification"><img class="cover" src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover3.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-29</div><div class="title">【NLP】Text Feature Extraction &amp; Classification</div></div></a></div><div><a href="/p/f6e1007e/" title="【NLP】Python Refresh"><img class="cover" src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover3.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-17</div><div class="title">【NLP】Python Refresh</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div><div class="comment-switch"><span class="first-comment">Giscus</span><span id="switch-btn"></span><span class="second-comment">Valine</span></div></div><div class="comment-wrap"><div><div id="giscus-wrap"></div></div><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/spin.svg" data-original="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Rean</div><div class="author-info__description">日常写bug 偶尔调调歌</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">50</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">158</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">14</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/Rean-Schwarze" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="https://space.bilibili.com/6531436" target="_blank" title="bilibili"><i class="fab fa-bilibili"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">随缘更新~（ps：如果加载不完全可以等等或者刷新）</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#nlp-fundamentals-common-techniques"><span class="toc-text">NLP Fundamentals &amp;
+Common Techniques</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#what-is-nlp"><span class="toc-text">What is NLP</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#common-nlp-techniques"><span class="toc-text">Common NLP Techniques</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#tokenization"><span class="toc-text">Tokenization</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#stemming"><span class="toc-text">Stemming</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#lemmatization"><span class="toc-text">Lemmatization</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#stop-word-filtering"><span class="toc-text">Stop word Filtering</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#part-of-speech-tagging"><span class="toc-text">Part of Speech Tagging</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#named-entity-recognition-ner"><span class="toc-text">Named Entity Recognition
+(NER)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#introduction-to-nltk-and-spccy"><span class="toc-text">Introduction to NLTK and
+spcCy</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#what-is-nltk"><span class="toc-text">What is NLTK</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#what-is-spccy"><span class="toc-text">What is spcCy</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#getting-started-with-spccy"><span class="toc-text">Getting Started with spcCy</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#install-en-model"><span class="toc-text">Install en model</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#using-spccy"><span class="toc-text">Using spcCy</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#spccy-objects"><span class="toc-text">spcCy Objects</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#pipeline"><span class="toc-text">Pipeline</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#tokenization-pos-dependencies"><span class="toc-text">Tokenization &amp; POS &amp;
+Dependencies</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#additional-token-attributes"><span class="toc-text">Additional Token Attributes</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#spans"><span class="toc-text">Spans</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sentences"><span class="toc-text">Sentences</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#tokenization-1"><span class="toc-text">Tokenization</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#prefixes-suffixes-and-infixes"><span class="toc-text">Prefixes, Suffixes and
+Infixes</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#exceptions"><span class="toc-text">Exceptions</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#counting-vocab-entries"><span class="toc-text">Counting Vocab Entries</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#tokens-cannot-be-reassigned"><span class="toc-text">Tokens cannot be reassigned</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#named-entities"><span class="toc-text">Named Entities</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#noun-chunks"><span class="toc-text">Noun Chunks</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#built-in-visualizers"><span class="toc-text">Built-in Visualizers</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#stemming-1"><span class="toc-text">Stemming</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#porter-stemmer"><span class="toc-text">Porter Stemmer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#snowball-stemmer"><span class="toc-text">Snowball Stemmer</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lemmatization-1"><span class="toc-text">Lemmatization</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#stop-words"><span class="toc-text">Stop Words</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#add-a-stop-word"><span class="toc-text">Add a stop word</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#remove-a-stop-word"><span class="toc-text">Remove a stop word</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/p/74e1a37c/" title="【Java】并发（一） | 进程 &amp; 线程"><img src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover3.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Java】并发（一） | 进程 &amp; 线程"/></a><div class="content"><a class="title" href="/p/74e1a37c/" title="【Java】并发（一） | 进程 &amp; 线程">【Java】并发（一） | 进程 &amp; 线程</a><time datetime="2024-03-20T13:44:37.000Z" title="发表于 2024-03-20 21:44:37">2024-03-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/f9b9edb2/" title="【数据库】索引"><img src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover2.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【数据库】索引"/></a><div class="content"><a class="title" href="/p/f9b9edb2/" title="【数据库】索引">【数据库】索引</a><time datetime="2024-03-20T09:08:31.000Z" title="发表于 2024-03-20 17:08:31">2024-03-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/cbe55d0/" title="【数据结构】树"><img src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover8.JPG" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【数据结构】树"/></a><div class="content"><a class="title" href="/p/cbe55d0/" title="【数据结构】树">【数据结构】树</a><time datetime="2024-03-20T07:02:28.000Z" title="发表于 2024-03-20 15:02:28">2024-03-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/156c59d0/" title="【分布式】分布式锁介绍 &amp; 常见实现方案"><img src="/img/spin.svg" data-original="/img/SynthV_banner_Image_BG1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【分布式】分布式锁介绍 &amp; 常见实现方案"/></a><div class="content"><a class="title" href="/p/156c59d0/" title="【分布式】分布式锁介绍 &amp; 常见实现方案">【分布式】分布式锁介绍 &amp; 常见实现方案</a><time datetime="2024-03-20T03:50:19.000Z" title="发表于 2024-03-20 11:50:19">2024-03-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/d4d6f818/" title="【TCP】重传、滑动窗口、流量控制、拥塞控制"><img src="/img/spin.svg" data-original="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover4.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【TCP】重传、滑动窗口、流量控制、拥塞控制"/></a><div class="content"><a class="title" href="/p/d4d6f818/" title="【TCP】重传、滑动窗口、流量控制、拥塞控制">【TCP】重传、滑动窗口、流量控制、拥塞控制</a><time datetime="2024-03-19T07:12:22.000Z" title="发表于 2024-03-19 15:12:22">2024-03-19</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/img/SynthV_banner_Image_BG1.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Rean</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(()=>{
   const getGiscusTheme = theme => {
     return theme === 'dark' ? 'dark' : 'light'
   }
