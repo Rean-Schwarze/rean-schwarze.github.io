@@ -1,11 +1,11 @@
-<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>【TCP】三次握手与四次挥手 | Rean's Blog</title><meta name="author" content="Rean"><meta name="copyright" content="Rean"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="TCP基本认识 TCP头  序列号：在建立连接时由计算机生成的随机数作为其初始值，通过 SYN 包传给接收端主机，每发送一次数据，就「累加」一次该「数据字节数」的大小。用来解决网络包乱序问题。 确认应答号：指下一次「期望」收到的数据的序列号，发送端收到这个确认应答以后可以认为在这个序号以前的数据都已经被正常接收。用来解决丢包的问题。 为什么需要TCP协议？TCP工作在哪一层？ IP">
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><title>【TCP】三次握手与四次挥手 | Rean's Blog</title><noscript>开启JavaScript才能访问本站哦~</noscript><link rel="icon" href="/img/favicon.png"><!-- index.css--><link rel="stylesheet" href="/css/index.css?v=1.6.0"><!-- inject head--><link rel="stylesheet" href="https://cdn2.codesign.qq.com/icons/7pOrz0WXB5ZWJPX/latest/iconfont.css"><!-- aplayer--><link rel="stylesheet" href="https://cdn.staticfile.net/aplayer/1.10.1/APlayer.min.css"><!-- swiper--><link rel="stylesheet" href="https://cdn.staticfile.net/fancyapps-ui/5.0.33/fancybox/fancybox.min.css"><!-- Open Graph--><meta name="description" content="TCP基本认识 TCP头  序列号：在建立连接时由计算机生成的随机数作为其初始值，通过 SYN 包传给接收端主机，每发送一次数据，就「累加」一次该「数据字节数」的大小。用来解决网络包乱序问题。 确认应答号：指下一次「期望」收到的数据的序列号，发送端收到这个确认应答以后可以认为在这个序号以前的数据都已经被正常接收。用来解决丢包的问题。 为什么需要TCP协议？TCP工作在哪一层？ IP">
 <meta property="og:type" content="article">
 <meta property="og:title" content="【TCP】三次握手与四次挥手">
 <meta property="og:url" content="https://rean-schwarze.github.io/p/85f11265/index.html">
 <meta property="og:site_name" content="Rean&#39;s Blog">
 <meta property="og:description" content="TCP基本认识 TCP头  序列号：在建立连接时由计算机生成的随机数作为其初始值，通过 SYN 包传给接收端主机，每发送一次数据，就「累加」一次该「数据字节数」的大小。用来解决网络包乱序问题。 确认应答号：指下一次「期望」收到的数据的序列号，发送端收到这个确认应答以后可以认为在这个序号以前的数据都已经被正常接收。用来解决丢包的问题。 为什么需要TCP协议？TCP工作在哪一层？ IP">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture7.jpg">
+<meta property="og:image" content="https://npm.elemecdn.com/justlovesmile-photo/235139-15499002994bfe.jpg">
 <meta property="article:published_time" content="2024-03-13T08:37:24.000Z">
 <meta property="article:modified_time" content="2024-03-19T07:15:02.137Z">
 <meta property="article:author" content="Rean">
@@ -14,151 +14,153 @@
 <meta property="article:tag" content="四次挥手">
 <meta property="article:tag" content="Socket">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture7.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://rean-schwarze.github.io/p/85f11265/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
-  root: '/',
-  algolia: undefined,
-  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
-  translate: undefined,
-  noticeOutdate: undefined,
-  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
-  copy: {
-    success: '复制成功',
-    error: '复制错误',
-    noSupport: '浏览器不支持'
-  },
-  relativeDate: {
-    homepage: false,
-    post: false
-  },
-  runtime: '',
-  dateSuffix: {
-    just: '刚刚',
-    min: '分钟前',
-    hour: '小时前',
-    day: '天前',
-    month: '个月前'
-  },
-  copyright: undefined,
-  lightbox: 'fancybox',
-  Snackbar: undefined,
-  infinitegrid: {
-    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
-    buttonText: '加载更多'
-  },
-  isPhotoFigcaption: false,
-  islazyload: false,
-  isAnchor: false,
-  percent: {
-    toc: true,
-    rightside: false,
-  },
-  autoDarkmode: false
-}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
-  title: '【TCP】三次握手与四次挥手',
-  isPost: true,
-  isHome: false,
-  isHighlightShrink: false,
-  isToc: true,
-  postUpdate: '2024-03-19 15:15:02'
-}</script><script>(win=>{
-      win.saveToLocal = {
-        set: (key, value, ttl) => {
-          if (ttl === 0) return
-          const now = Date.now()
-          const expiry = now + ttl * 86400000
-          const item = {
-            value,
-            expiry
-          }
-          localStorage.setItem(key, JSON.stringify(item))
+<meta name="twitter:image" content="https://npm.elemecdn.com/justlovesmile-photo/235139-15499002994bfe.jpg"><!-- pwa--><script>(win => {
+        win.saveToLocal = {
+            set: function setWithExpiry(key, value, ttl) {
+                if (ttl === 0)
+                    return
+                const now = new Date()
+                const expiryDay = ttl * 86400000
+                const item = {
+                    value: value,
+                    expiry: now.getTime() + expiryDay,
+                }
+                localStorage.setItem(key, JSON.stringify(item))
+            },
+
+            get: function getWithExpiry(key) {
+                const itemStr = localStorage.getItem(key)
+
+                if (!itemStr) {
+                    return undefined
+                }
+                const item = JSON.parse(itemStr)
+                const now = new Date()
+
+                if (now.getTime() > item.expiry) {
+                    localStorage.removeItem(key)
+                    return undefined
+                }
+                return item.value
+            }
+        }
+
+        const DarkModeStatus = localStorage.getItem('theme')
+        if (DarkModeStatus !== null) {
+            if (DarkModeStatus === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark')
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light')
+            }
+        }
+
+        const asideStatus = saveToLocal.get('aside-status')
+        if (asideStatus !== undefined) {
+            if (asideStatus === 'hide') {
+                document.documentElement.classList.add('hide-aside')
+            } else {
+                document.documentElement.classList.remove('hide-aside')
+            }
+        }
+    }
+)(window)
+
+console.log(
+    "%c Program: Hexo %c Theme: Solitude %c Version: v1.6.0",
+    "border-radius:5px 0 0 5px;padding: 5px 10px;color:white;background:#ff3842;",
+    "padding: 5px 10px;color:white;background:#3e9f50;",
+    "border-radius:0 5px 5px 0;padding: 5px 10px;background:#0084ff;color:white;"
+);</script><!-- global head--><script>const GLOBAL_CONFIG = {
+    root: '/',
+    algolia: undefined,
+    localsearch: {"preload":false,"path":"/search.xml"},
+    runtime: '2024-01-05 00:00:00',
+    lazyload: {
+        enable: true,
+        error: '/img/error_load.png'
+    },
+    highlight: {
+        enable: true,
+        limit: 200,
+        expand: true,
+        copy: true,
+        syntax: 'highlight.js'
+    },
+    randomlinks: false,
+    lang: {
+        theme: {
+            dark: '已切换至深色模式',
+            light: '已切换至浅色模式',
         },
-      
-        get: key => {
-          const itemStr = localStorage.getItem(key)
-      
-          if (!itemStr) {
-            return undefined
-          }
-          const item = JSON.parse(itemStr)
-          const now = Date.now()
-      
-          if (now > item.expiry) {
-            localStorage.removeItem(key)
-            return undefined
-          }
-          return item.value
+        copy: {
+            success: '复制成功',
+            error: '复制失败',
+        },
+        backtop: '返回顶部',
+        lately: {
+            second: '秒',
+            minute: '分钟',
+            hour: '小时',
+            day: '天',
+            month: '个月',
+            year: '年',
+            ago: '前',
+            error: 'NaN',
+        },
+        search: {
+            empty: '找不到你查询的内容：${query}',
+            hit: '找到 ${hits} 条结果，用时 ${time} 毫秒',
+            placeholder: '输入关键词快速查找',
+        },
+        chs: {
+            chs_to_cht: '繁體中文',
+            cht_to_chs: '简体中文',
         }
-      }
-    
-      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
-        const script = document.createElement('script')
-        script.src = url
-        script.async = true
-        script.onerror = reject
-        script.onload = script.onreadystatechange = function() {
-          const loadState = this.readyState
-          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
-          script.onload = script.onreadystatechange = null
-          resolve()
+    },
+    aside: {
+        sayhello: {
+            morning: '一日之计在于晨',
+            noon: '吃饱了才有力气干活',
+            afternoon: '集中精力，攻克难关',
+            night: '不要太劳累了，早睡更健康',
+            goodnight: '睡个好觉，保证精力充沛',
+        },
+        sayhello2: ["🤖️ 数码科技爱好者","🔍 分享与热心帮助","🏠 智能家居小能手","🔨 设计开发一条龙","🤝 专修交互与设计","🏃 脚踏实地行动派","🧱 团队小组发动机","💢 壮汉人狠话不多","🎮 电竞游戏爱好者","🎮 游戏爱好者"],
+    },
+    covercolor: {
+        enable: true
+    },
+    comment: {
+        enable: false,
+        type: '',
+        commentBarrage: false,
+        randomInfoStart: ["聪敏的","可爱的","美丽的"],
+        randomInfoEnd: ["白菜","小可爱","小仙女"],
+        twikoo: {
+            url: '',
+            accessToken: ''
+        },
+        waline: {
+            url: '',
         }
-
-        Object.keys(attr).forEach(key => {
-          script.setAttribute(key, attr[key])
-        })
-
-        document.head.appendChild(script)
-      })
-    
-      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
-        const link = document.createElement('link')
-        link.rel = 'stylesheet'
-        link.href = url
-        if (id) link.id = id
-        link.onerror = reject
-        link.onload = link.onreadystatechange = function() {
-          const loadState = this.readyState
-          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
-          link.onload = link.onreadystatechange = null
-          resolve()
-        }
-        document.head.appendChild(link)
-      })
-    
-      win.activateDarkMode = () => {
-        document.documentElement.setAttribute('data-theme', 'dark')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
-        }
-      }
-      win.activateLightMode = () => {
-        document.documentElement.setAttribute('data-theme', 'light')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
-        }
-      }
-      const t = saveToLocal.get('theme')
-    
-        if (t === 'dark') activateDarkMode()
-        else if (t === 'light') activateLightMode()
-      
-      const asideStatus = saveToLocal.get('aside-status')
-      if (asideStatus !== undefined) {
-        if (asideStatus === 'hide') {
-          document.documentElement.classList.add('hide-aside')
-        } else {
-          document.documentElement.classList.remove('hide-aside')
-        }
-      }
-    
-      const detectApple = () => {
-        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
-          document.documentElement.classList.add('apple')
-        }
-      }
-      detectApple()
-    })(window)</script><link rel="stylesheet" href="/css/custom.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css"><div id="aplayer"></div><script src="https://cdn.jsdelivr.net/gh/radium-bit/res@master/live2d/autoload.js" async></script><script src="https://rean-shop-bucket.oss-cn-guangzhou.aliyuncs.com/assets/js/Meting.min.js" async></script><script src="https://rean-shop-bucket.oss-cn-guangzhou.aliyuncs.com/assets/js/busuanzi.pure.mini.js" async></script><meta name="generator" content="Hexo 7.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">55</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">168</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">17</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 文章</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture7.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Rean's Blog"><span class="site-name">Rean's Blog</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 文章</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">【TCP】三次握手与四次挥手</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-03-13T08:37:24.000Z" title="发表于 2024-03-13 16:37:24">2024-03-13</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-03-19T07:15:02.137Z" title="更新于 2024-03-19 15:15:02">2024-03-19</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0/%E7%BD%91%E7%BB%9C/">网络</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">16.7k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>51分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="【TCP】三次握手与四次挥手"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="tcp基本认识">TCP基本认识</h1>
+    },
+    lightbox: 'fancybox',
+    rightside: {
+        enable: true
+    },
+    ai: {
+        enable: false,
+        key: '',
+        talk: '我是 Efu 开发的摘要生成助理EfuGPT，EfuGPT在静态部署时进行摘要的撰写，并且在访客访问时通过EfuCorrection转译后的文本摘要实现工具。我在这里只负责已经生成的摘要显示，你无法与我直接沟通，但我可以回答一些预设的问题。',
+        randomPost: false,
+    },
+    music: {
+        enable: true,
+    },
+    translate: {"defaultEncoding":2,"translateDelay":0},
+};</script><meta name="generator" content="Hexo 7.0.0"></head><body id="body"><!-- universe--><canvas id="universe"></canvas><!-- loading--><!-- console--><div id="console"><div class="close-btn" onclick="sco.hideConsole()"><i class="solitude st-close-fill"></i></div><div class="button-group"><div class="console-btn-item"><a class="darkmode_switchbutton" onclick="sco.switchDarkMode()" title="昼夜切换" href="javascript:void(0);"><i class="solitude st-moon-clear-fill"></i></a></div><div class="console-btn-item" id="consoleHideAside"><a class="asideSwitch" onclick="sco.switchHideAside()" title="边栏显示控制" href="javascript:void(0);"><i class="solitude st-side-bar-fill"></i></a></div><div class="console-btn-item" id="consoleMusic" onclick="sco.musicToggle()"><a class="music-switch" title="音乐开关" href="javascript:void(0);"><i class="solitude st-disc-fill"></i></a></div></div><div class="console-mask" onclick="sco.hideConsole()"></div></div><!-- sidebar--><div id="sidebar" style="zoom: 1;"><div id="menu-mask" style="display: none;"></div><div id="sidebar-menus"><span class="sidebar-menu-item-title">功能</span><div class="sidebar-menu-item"><a class="darkmode_switchbutton menu-child" onclick="sco.switchDarkMode()" href="javascript:void(0);"><i class="solitude st-moon-clear-fill"></i><span>显示模式</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文章</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  st-folder-fill"></i><span>文章列表</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  st-checkbox-multiple-blank-fill"></i><span>分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  st-price-tag-fill"></i><span>标签</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>我的</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="solitude  st-disc-fill"></i><span>音乐馆</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>关于本站</span></a></li></ul></div></div><span class="sidebar-menu-item-title">标签</span><div class="card-widget card-tags card-archives card-webinfo card-allinfo"><div class="card-tag-cloud"><a href="/tags/%E8%85%BE%E8%AE%AF/">腾讯<sup>1</sup></a><a href="/tags/%E5%90%8E%E5%8F%B0%E5%BC%80%E5%8F%91/">后台开发<sup>1</sup></a><a href="/tags/Markdown/">Markdown<sup>1</sup></a><a href="/tags/Butterfly/">Butterfly<sup>2</sup></a><a href="/tags/Tag-Plugins/">Tag Plugins<sup>1</sup></a><a href="/tags/Hexo/">Hexo<sup>3</sup></a><a href="/tags/APlayer/">APlayer<sup>1</sup></a><a href="/tags/MeingJS/">MeingJS<sup>1</sup></a><a href="/tags/Valine/">Valine<sup>1</sup></a><a href="/tags/Giscus/">Giscus<sup>1</sup></a><a href="/tags/PyCharm/">PyCharm<sup>1</sup></a><a href="/tags/IDEA/">IDEA<sup>1</sup></a><a href="/tags/IDE/">IDE<sup>1</sup></a><a href="/tags/Git/">Git<sup>2</sup></a><a href="/tags/Vue/">Vue<sup>11</sup></a><a href="/tags/Vite/">Vite<sup>1</sup></a><a href="/tags/JavaScript/">JavaScript<sup>2</sup></a><a href="/tags/%E9%83%A8%E7%BD%B2/">部署<sup>1</sup></a><a href="/tags/%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8/">云服务器<sup>1</sup></a><a href="/tags/%E5%AE%9D%E5%A1%94/">宝塔<sup>1</sup></a><a href="/tags/Ssh/">Ssh<sup>1</sup></a><a href="/tags/GitHub/">GitHub<sup>1</sup></a><a href="/tags/%E5%89%8D%E7%AB%AF/">前端<sup>8</sup></a><a href="/tags/Java/">Java<sup>7</sup></a><a href="/tags/%E7%BD%91%E7%AB%99/">网站<sup>3</sup></a><a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习<sup>1</sup></a><a href="/tags/scikit-learn/">scikit-learn<sup>1</sup></a><a href="/tags/SVM/">SVM<sup>1</sup></a><a href="/tags/SVC/">SVC<sup>1</sup></a><a href="/tags/vocalremover/">vocalremover<sup>1</sup></a><a href="/tags/BPM/">BPM<sup>1</sup></a><a href="/tags/%E9%9F%B3%E9%A2%91%E5%A4%84%E7%90%86/">音频处理<sup>1</sup></a><a href="/tags/Essentia/">Essentia<sup>1</sup></a><a href="/tags/Librosa/">Librosa<sup>1</sup></a><a href="/tags/HTTP/">HTTP<sup>3</sup></a><a href="/tags/HTTP-1-1/">HTTP/1.1<sup>1</sup></a><a href="/tags/HTTPS/">HTTPS<sup>2</sup></a><a href="/tags/LaTex/">LaTex<sup>1</sup></a><a href="/tags/%E5%8A%A0%E5%AF%86/">加密<sup>1</sup></a><a href="/tags/I-O/">I/O<sup>1</sup></a><a href="/tags/JVM/">JVM<sup>1</sup></a><a href="/tags/%E7%9F%AD%E9%93%BE/">短链<sup>1</sup></a><a href="/tags/%E8%A7%86%E9%A2%91/">视频<sup>1</sup></a><a href="/tags/Springboot/">Springboot<sup>1</sup></a><a href="/tags/%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C/">参数校验<sup>1</sup></a><a href="/tags/%E5%85%A8%E5%B1%80%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/">全局异常处理<sup>1</sup></a><a href="/tags/UUID/">UUID<sup>1</sup></a><a href="/tags/%E9%93%BE%E8%A1%A8/">链表<sup>1</sup></a><a href="/tags/%E5%8A%9B%E6%89%A3/">力扣<sup>1</sup></a><a href="/tags/LeetCode/">LeetCode<sup>1</sup></a><a href="/tags/%E5%B9%B6%E5%8F%91/">并发<sup>1</sup></a><a href="/tags/%E8%BF%9B%E7%A8%8B/">进程<sup>1</sup></a><a href="/tags/%E7%BA%BF%E7%A8%8B/">线程<sup>1</sup></a><a href="/tags/%E6%AD%BB%E9%94%81/">死锁<sup>1</sup></a><a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统<sup>1</sup></a><a href="/tags/%E5%85%AB%E8%82%A1/">八股<sup>3</sup></a><a href="/tags/NLP/">NLP<sup>5</sup></a><a href="/tags/spaCy/">spaCy<sup>4</sup></a><a href="/tags/NLTK/">NLTK<sup>3</sup></a><a href="/tags/Tokenization/">Tokenization<sup>1</sup></a><a href="/tags/Stemming/">Stemming<sup>1</sup></a><a href="/tags/Lemmatization/">Lemmatization<sup>1</sup></a><a href="/tags/Stop-word/">Stop word<sup>1</sup></a><a href="/tags/POS/">POS<sup>1</sup></a><a href="/tags/NER/">NER<sup>1</sup></a><a href="/tags/Sentence-Segmentation/">Sentence Segmentation<sup>1</sup></a><a href="/tags/Python/">Python<sup>1</sup></a><a href="/tags/PDF/">PDF<sup>1</sup></a><a href="/tags/Regular/">Regular<sup>1</sup></a><a href="/tags/Pattern/">Pattern<sup>1</sup></a><a href="/tags/Semantic/">Semantic<sup>1</sup></a><a href="/tags/Sentiment/">Sentiment<sup>1</sup></a><a href="/tags/Classification/">Classification<sup>1</sup></a><a href="/tags/Redis/">Redis<sup>2</sup></a><a href="/tags/%E6%8C%81%E4%B9%85%E5%8C%96/">持久化<sup>1</sup></a><a href="/tags/%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F/">缓存穿透<sup>1</sup></a><a href="/tags/%E7%BC%93%E5%AD%98%E5%87%BB%E7%A9%BF/">缓存击穿<sup>1</sup></a><a href="/tags/%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9/">缓存雪崩<sup>1</sup></a><a href="/tags/Spring/">Spring<sup>1</sup></a><a href="/tags/MVC/">MVC<sup>1</sup></a><a href="/tags/%E5%90%8E%E7%AB%AF/">后端<sup>2</sup></a><a href="/tags/%E8%AF%B7%E6%B1%82/">请求<sup>1</sup></a><a href="/tags/%E6%B3%A8%E9%87%8A/">注释<sup>1</sup></a><a href="/tags/TCP/">TCP<sup>4</sup></a><a href="/tags/%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B/">三次握手<sup>2</sup></a><a href="/tags/%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B/">四次挥手<sup>2</sup></a><a href="/tags/%E9%87%8D%E4%BC%A0/">重传<sup>1</sup></a><a href="/tags/%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3/">滑动窗口<sup>1</sup></a><a href="/tags/%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6/">流量控制<sup>1</sup></a><a href="/tags/%E6%8B%A5%E5%A1%9E%E6%8E%A7%E5%88%B6/">拥塞控制<sup>1</sup></a><a href="/tags/ECMAScript/">ECMAScript<sup>2</sup></a><a href="/tags/%E6%A0%B7%E5%BC%8F/">样式<sup>1</sup></a><a href="/tags/Element/">Element<sup>2</sup></a><a href="/tags/%E8%A1%A8%E5%8D%95/">表单<sup>1</sup></a><a href="/tags/Socket/">Socket<sup>1</sup></a><a href="/tags/ElementUI/">ElementUI<sup>1</sup></a><a href="/tags/el-pagination/">el-pagination<sup>1</sup></a><a href="/tags/%E5%88%86%E9%A1%B5/">分页<sup>1</sup></a><a href="/tags/Dialog/">Dialog<sup>1</sup></a><a href="/tags/%E5%BC%B9%E7%AA%97/">弹窗<sup>1</sup></a><a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式<sup>1</sup></a><a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">分布式锁<sup>1</sup></a><a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库<sup>1</sup></a><a href="/tags/%E7%B4%A2%E5%BC%95/">索引<sup>1</sup></a><a href="/tags/B%E6%A0%91/">B树<sup>1</sup></a><a href="/tags/B-%E6%A0%91/">B+树<sup>1</sup></a><a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构<sup>1</sup></a><a href="/tags/%E6%A0%91/">树<sup>1</sup></a><a href="/tags/%E4%BA%8C%E5%8F%89%E6%A0%91/">二叉树<sup>1</sup></a><a href="/tags/%E7%BA%A2%E9%BB%91%E6%A0%91/">红黑树<sup>1</sup></a><a href="/tags/%E5%80%8F%E7%84%B6%E6%A2%A6/">倏然梦<sup>1</sup></a><a href="/tags/%E6%97%A0%E5%8F%82/">无参<sup>11</sup></a><a href="/tags/%E5%8F%A4%E9%A3%8E/">古风<sup>7</sup></a><a href="/tags/%E5%9B%BD%E9%A3%8E/">国风<sup>7</sup></a><a href="/tags/%E9%9F%B3%E4%B9%90/">音乐<sup>11</sup></a><a href="/tags/%E4%B8%89%E6%97%A0Marblue/">三无Marblue<sup>1</sup></a><a href="/tags/vsqx/">vsqx<sup>1</sup></a><a href="/tags/midi/">midi<sup>1</sup></a><a href="/tags/svp/">svp<sup>1</sup></a><a href="/tags/%E4%BB%99%E8%88%9F%E6%97%A7%E7%BA%AA/">仙舟旧纪<sup>1</sup></a><a href="/tags/%E5%B4%A9%E5%9D%8F%EF%BC%9A%E6%98%9F%E7%A9%B9%E9%93%81%E9%81%93/">崩坏：星穹铁道<sup>2</sup></a><a href="/tags/%E4%BB%99%E8%88%9F/">仙舟<sup>1</sup></a><a href="/tags/%E8%B5%A4%E7%BE%BD/">赤羽<sup>1</sup></a><a href="/tags/%E5%87%84%E7%BE%8E%E5%9C%B0/">凄美地<sup>1</sup></a><a href="/tags/%E5%A3%B0%E7%94%9F%E4%B8%8D%E6%81%AF%C2%B7%E5%AE%B6%E5%B9%B4%E5%8D%8E/">声生不息·家年华<sup>2</sup></a><a href="/tags/%E5%8D%8E%E8%AF%AD%E6%B5%81%E8%A1%8C/">华语流行<sup>2</sup></a><a href="/tags/%E9%83%AD%E9%A1%B6/">郭顶<sup>1</sup></a><a href="/tags/%E5%91%A8%E6%B7%B1/">周深<sup>2</sup></a><a href="/tags/%E9%99%88%E6%A5%9A%E7%94%9F/">陈楚生<sup>2</sup></a><a href="/tags/%E5%90%91%E6%98%A5%E9%A3%8E/">向春风<sup>1</sup></a><a href="/tags/%E9%99%88%E4%BA%A6%E6%B4%BA/">陈亦洺<sup>1</sup></a><a href="/tags/%E5%B0%9A%E8%BE%B0/">尚辰<sup>1</sup></a><a href="/tags/%E5%A2%A8%E9%9A%90%E4%BE%A0%E5%A3%B0/">墨隐侠声<sup>1</sup></a><a href="/tags/%E5%BF%98%E5%B7%9D%E9%A3%8E%E5%8D%8E%E5%BD%95/">忘川风华录<sup>1</sup></a><a href="/tags/%E5%A2%A8%E5%AD%90/">墨子<sup>1</sup></a><a href="/tags/%E4%B9%90%E6%AD%A3%E9%BE%99%E7%89%99/">乐正龙牙<sup>1</sup></a><a href="/tags/%E6%95%85%E6%88%91%E9%80%A2%E7%9C%9F/">故我逢真<sup>1</sup></a><a href="/tags/%E9%98%AE%E6%A2%85/">阮梅<sup>1</sup></a><a href="/tags/%E5%B2%AD%E9%A3%8E%E6%97%A0%E5%B2%B8/">岭风无岸<sup>1</sup></a><a href="/tags/%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F/">明日方舟<sup>1</sup></a><a href="/tags/%E9%87%8D%E5%B2%B3/">重岳<sup>1</sup></a><a href="/tags/%E7%BA%A2%E5%B0%98%E5%85%B1%E9%95%BF%E7%94%9F/">红尘共长生<sup>1</sup></a><a href="/tags/%E6%9C%AA%E5%AE%9A%E4%BA%8B%E4%BB%B6%E7%B0%BF/">未定事件簿<sup>1</sup></a><a href="/tags/%E9%80%86%E5%85%89/">逆光<sup>1</sup></a><a href="/tags/%E5%AD%99%E7%87%95%E5%A7%BF/">孙燕姿<sup>1</sup></a><a href="/tags/%E9%87%8E%E8%8A%B1%E9%A6%99/">野花香<sup>1</sup></a><a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络<sup>1</sup></a><a href="/tags/DNS/">DNS<sup>1</sup></a><a href="/tags/IP/">IP<sup>1</sup></a><a href="/tags/MAC/">MAC<sup>1</sup></a><a href="/tags/11/">11<sup>1</sup></a><a href="/tags/G-E-M-%E9%82%93%E7%B4%AB%E6%A3%8B/">G.E.M.邓紫棋<sup>1</sup></a><a href="/tags/T-I-M-E/">T.I.M.E.<sup>1</sup></a><a href="/tags/%E6%97%B6%E5%85%89%E9%9F%B3%E4%B9%90%E4%BC%9A%C2%B7%E8%80%81%E5%8F%8B%E8%AE%B0/">时光音乐会·老友记<sup>1</sup></a><a href="/tags/SynthV/">SynthV<sup>2</sup></a><a href="/tags/%E6%9C%80%E9%95%BF%E7%9A%84%E6%97%85%E9%80%94/">最长的旅途<sup>1</sup></a><a href="/tags/%E6%B0%B8%E5%A4%9CMinus/">永夜Minus<sup>1</sup></a><a href="/tags/%E4%BA%94%E7%BB%B4%E4%BB%8B%E8%B4%A8/">五维介质<sup>1</sup></a><a href="/tags/%E5%89%A7%E5%A5%BD%E5%90%AC%E7%9A%84%E6%AD%8C/">剧好听的歌<sup>1</sup></a><a href="/tags/%E7%BF%BB%E5%94%B1/">翻唱<sup>1</sup></a><a href="/tags/Syncthing/">Syncthing<sup>1</sup></a><a href="/tags/%E5%90%8C%E6%AD%A5/">同步<sup>1</sup></a><a href="/tags/Bug/">Bug<sup>2</sup></a><a href="/tags/%E7%99%BB%E9%99%86/">登陆<sup>1</sup></a><a href="/tags/Apifox/">Apifox<sup>2</sup></a><a href="/tags/%E6%94%AF%E4%BB%98%E5%AE%9D/">支付宝<sup>1</sup></a><a href="/tags/SpringBoot/">SpringBoot<sup>1</sup></a><a href="/tags/%E5%BC%82%E6%AD%A5%E5%9B%9E%E8%B0%83/">异步回调<sup>1</sup></a></div></div></div></div><!-- keyboard--><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav class="show" id="nav"><div id="nav-group"><div id="blog_name"><a id="site-name" href="/" title="返回博客主页"><span class="title">Rean's Blog</span></a></div><div id="page-name-mask"><div id="page-name"><a id="page-name-text" onclick="sco.toTop()">【TCP】三次握手与四次挥手</a></div></div><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文章</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  st-folder-fill"></i><span>文章列表</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  st-checkbox-multiple-blank-fill"></i><span>分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  st-price-tag-fill"></i><span>标签</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>我的</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="solitude  st-disc-fill"></i><span>音乐馆</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>关于本站</span></a></li></ul></div></div></div><div id="nav-left"></div><div id="nav-right"><div class="nav-button" id="randomPost_button"><a class="site-page" onclick="toRandomPost()" title="随机一篇文章" href="javascript:void(0);"><i class="solitude st-signal-tower-fill"></i></a></div><div class="nav-button" id="search-button"><a class="site-page social-icon search" href="javascript:void(0);" title="搜索"><i class="solitude st-search-line"></i></a></div><div class="nav-button" id="nav-console"><a class="console_switchbutton" onclick="sco.showConsole()" title="中控台" href="javascript:void(0);"><i class="solitude st-dashboard-fill"></i></a></div><div class="nav-button" id="nav-totop" onclick="sco.toTop()"><a class="totopbtn"><i class="solitude st-arrow-up-line"></i><span id="percent">0</span></a></div><div id="toggle-menu"><a class="site-page"><i class="solitude st-menu-line"></i></a></div></div></div></nav><div class="coverdiv" id="coverdiv"><img class="nolazyload" id="post-cover" src="https://npm.elemecdn.com/justlovesmile-photo/235139-15499002994bfe.jpg" alt="【TCP】三次握手与四次挥手"></div><div id="post-info"><div id="post-firstinfo"><div class="meta-firstline"><a class="post-meta-original" title="该文章为原创文章，注意版权协议">原创</a><span class="post-meta-categories"><a class="post-meta-categories" href="/categories/学习/">学习</a></span><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/TCP/"><span class="tags-name tags-punctuation">TCP</span></a><a class="post-meta__tags" href="/tags/%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B/"><span class="tags-name tags-punctuation">三次握手</span></a><a class="post-meta__tags" href="/tags/%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B/"><span class="tags-name tags-punctuation">四次挥手</span></a><a class="post-meta__tags" href="/tags/Socket/"><span class="tags-name tags-punctuation">Socket</span></a></div></div></div></div><h1 class="post-title">【TCP】三次握手与四次挥手</h1><div id="post-meta"><div class="meta-secondline"><span class="post-meta-date" title="meta_posted 2024-03-13 16:37:24"><i class="post-meta-icon solitude st-calendar-todo-fill"></i><time datetime="2024-03-13T08:37:24.000Z">2024-03-13T08:37:24.000Z</time></span><span class="post-meta-date" title="meta_updated 2024-03-19 15:15:02"><i class="post-meta-icon solitude st-refresh-line"></i><time datetime="2024-03-19T07:15:02.137Z">2024-03-19T07:15:02.137Z</time></span><span class="post-meta-wordcount"><i class="post-meta-icon solitude st-word-fill" title="文章字数"></i><span class="word-count">16.7k</span><span class="post-meta-separator"></span><i class="post-meta-icon solitude st-clock-fill" title="阅读耗时"></i><span>59 min</span></span><a class="post-meta-pv" href="/p/85f11265/" title="文章热度"><i class="post-meta-icon solitude st-fire-fill"></i><span id="busuanzi_value_page_pv"><i class="solitude st-loading-line"></i></span></a></div></div></div><section class="main-hero-waves-area waves-area"><svg class="waves-svg" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto"><defs><path id="gentle-wave" d="M -160 44 c 30 0 58 -18 88 -18 s 58 18 88 18 s 58 -18 88 -18 s 58 18 88 18 v 44 h -352 Z"></path></defs><g class="parallax"><use href="#gentle-wave" x="48" y="0"></use><use href="#gentle-wave" x="48" y="3"></use><use href="#gentle-wave" x="48" y="5"></use><use href="#gentle-wave" x="48" y="7"></use></g></svg></section></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="tcp基本认识">TCP基本认识</h1>
 <h2 id="tcp头">TCP头</h2>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/format,png-20230309230534096.png" alt="TCP 头格式"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/format,png-20230309230534096.png" alt="TCP 头格式"></p>
 <p><strong>序列号</strong>：在建立连接时由计算机生成的随机数作为其初始值，通过
 SYN
 包传给接收端主机，每发送一次数据，就「累加」一次该「数据字节数」的大小。<strong>用来解决网络包乱序问题。</strong></p>
@@ -173,7 +175,7 @@ SYN
 <h2 id="什么是tcp">什么是TCP？</h2>
 <p>TCP
 是<font color="red"><strong>面向连接的、可靠的、基于字节流</strong></font>的传输层通信协议。</p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/format,png-20230309230424714.png" alt="img"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/format,png-20230309230424714.png" alt="img"></p>
 <ul>
 <li><strong>面向连接</strong>：一定是「一对一」才能连接，不能像 UDP
 协议可以一个主机同时向多个主机发送消息，也就是一对多是无法做到的；</li>
@@ -190,7 +192,7 @@ TCP 报文是「有序的」，当「前一个」TCP
 <h2 id="什么是tcp连接">什么是TCP连接？</h2>
 <p><strong>用于保证可靠性和流量控制维护的某些状态信息，这些信息的组合，包括
 Socket、序列号和窗口大小称为连接。</strong></p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/format,png-20230309230428466.png" alt="img"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/format,png-20230309230428466.png" alt="img"></p>
 <ul>
 <li><strong>Socket</strong>：由 IP 地址和端口号组成</li>
 <li><strong>序列号</strong>：用来解决乱序问题等</li>
@@ -200,7 +202,7 @@ Socket、序列号和窗口大小称为连接。</strong></p>
 <p>UDP 不提供复杂的控制机制，利用 IP 提供面向「无连接」的通信服务。</p>
 <p>UDP 协议真的非常简单，头部只有 <code>8</code> 个字节（64 位），UDP
 的头部格式如下：</p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/format,png-20230309230439961.png" alt="UDP 头部格式"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/format,png-20230309230439961.png" alt="UDP 头部格式"></p>
 <ul>
 <li>包长度：该字段保存了 UDP 首部的长度跟数据的长度之和。</li>
 <li>校验和：校验和是为了提供可靠的 UDP
@@ -273,7 +275,7 @@ UDP，在内核中是两个完全独立的软件模块。</p>
 <p>当主机收到数据包后，可以在 IP 包头的「协议号」字段知道该数据包是
 TCP/UDP，所以可以根据这个信息确定送给哪个模块（TCP/UDP）处理，送给
 TCP/UDP 模块的报文根据「端口号」确定送给哪个应用程序处理。</p>
-<p><img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/network/port/tcp%E5%92%8Cudp%E6%A8%A1%E5%9D%97.jpeg" alt="img"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/network/port/tcp%E5%92%8Cudp%E6%A8%A1%E5%9D%97.jpeg" alt="img"></p>
 <p>因此，TCP/UDP 各自的端口号也相互独立，如 TCP 有一个 80 号端口，UDP
 也可以有一个 80 号端口，二者并不冲突。</p>
 <p>关于端口的知识点，还是挺多可以讲的，比如还可以牵扯到这几个问题：</p>
@@ -289,7 +291,7 @@ use”的报错信息？又该怎么避免？</li>
 可以使用同一个端口吗？</a></p>
 <h1 id="tcp连接建立">TCP连接建立</h1>
 <h2 id="tcp三次握手过程是怎样的">TCP三次握手过程是怎样的？</h2>
-<p><img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost4/%E7%BD%91%E7%BB%9C/TCP%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B.drawio.png" alt="TCP 三次握手"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost4/%E7%BD%91%E7%BB%9C/TCP%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B.drawio.png" alt="TCP 三次握手"></p>
 <p><strong>第三次握手是可以携带数据的，前两次握手是不可以携带数据的</strong></p>
 <h2 id="为什么是三次握手而不是两次四次">为什么是三次握手？而不是两次/四次？</h2>
 <p>在前面我们知道了什么是 <strong>TCP 连接</strong>：</p>
@@ -313,7 +315,7 @@ Socket、序列号和窗口大小并建立 TCP 连接。</strong></p>
 SYN（seq = 100）报文（<em>注意！不是重传 SYN，重传的 SYN
 的序列号是一样的</em>）。</p>
 <p>看看三次握手是如何阻止历史连接的：</p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/format,png-20230309230525514.png" alt="三次握手避免历史连接"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/format,png-20230309230525514.png" alt="三次握手避免历史连接"></p>
 <p>客户端连续发送多次
 SYN（都是同一个四元组）建立连接的报文，在<strong>网络拥堵</strong>情况下：</p>
 <ul>
@@ -328,7 +330,7 @@ SYN（都是同一个四元组）建立连接的报文，在<strong>网络拥堵
 </ul>
 <p>上述中的「旧 SYN 报文」称为历史连接，TCP
 使用三次握手建立连接的<strong>最主要原因就是防止「历史连接」初始化了连接</strong>。</p>
-<div class="note flat info simple"><p>如果服务端在<strong>收到 RST 报文之前</strong>，先收到了「新 SYN
+<div class="note  flat info"><p>如果服务端在<strong>收到 RST 报文之前</strong>，先收到了「新 SYN
 报文」，也就是服务端收到客户端报文的顺序是：「旧 SYN 报文」-&gt;「新 SYN
 报文」，此时会发生什么?</p>
 <p>当服务端第一次收到 SYN 报文，也就是收到 「旧 SYN 报文」时，就会回复
@@ -350,17 +352,17 @@ ESTABLISHED
 报文来断开连接，而服务端在第一次握手的时候就进入 ESTABLISHED
 状态，所以它可以发送数据的，但是它并不知道这个是历史连接，它只有在收到
 RST 报文后，才会断开连接。</p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/fe898053d2e93abac950b1637645943f.png" alt="两次握手无法阻止历史连接"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/fe898053d2e93abac950b1637645943f.png" alt="两次握手无法阻止历史连接"></p>
 <p>可以看到，如果采用两次握手建立 TCP
 连接的场景下，服务端在向客户端发送数据前，并没有阻止掉历史连接，导致服务端建立了一个历史连接，又白白发送了数据，妥妥地浪费了服务端的资源。</p>
 <p>因此，<strong>要解决这种现象，最好就是在服务端发送数据前，也就是建立连接之前，要阻止掉历史连接，这样就不会造成资源浪费，而要实现这个功能，就需要三次握手</strong>。</p>
-<div class="note flat info simple"><p>Q：客户端发送三次握手（ack 报文）后就可以发送数据了，而被动方此时还是
+<div class="note  flat info"><p>Q：客户端发送三次握手（ack 报文）后就可以发送数据了，而被动方此时还是
 syn_received 状态，如果 ack
 丢了，那客户端发的数据是不是也白白浪费了？</p>
 <p>不是的，即使服务端还是在 syn_received
 状态，收到了客户端发送的数据，还是可以建立连接的，并且还可以正常收到这个数据包。这是因为数据报文中是有
 ack 标识位，也有确认号，这个确认号就是确认收到了第二次握手。如下图：</p>
-<p><img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/network/tcp/%E7%9B%B8%E5%90%8Cack.png" alt="img"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/network/tcp/%E7%9B%B8%E5%90%8Cack.png" alt="img"></p>
 <p>所以，服务端收到这个数据报文，是可以正常建立连接的，然后就可以正常接收这个数据包了。</p>
 </div>
 <h3 id="原因二同步双方初始序列号">原因二：同步双方初始序列号</h3>
@@ -377,7 +379,7 @@ ack 标识位，也有确认号，这个确认号就是确认收到了第二次�
 <code>SYN</code> 报文的时候，需要服务端回一个 <code>ACK</code>
 应答报文，表示客户端的 SYN
 报文已被服务端成功接收，那当服务端发送「初始序列号」给客户端的时候，依然也要得到客户端的应答回应，<strong>这样一来一回，才能确保双方的初始序列号能被可靠的同步。</strong></p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/format,png-20230309230639121.png" alt="四次握手与三次握手"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/format,png-20230309230639121.png" alt="四次握手与三次握手"></p>
 <p>四次握手其实也能够可靠的同步双方的初始化序号，但由于<strong>第二步和第三步可以优化成一步</strong>，所以就成了「三次握手」。</p>
 <p>而两次握手只保证了一方的初始序列号能被对方成功接收，没办法保证双方的初始序列号都能被确认接收。</p>
 <h3 id="原因三避免资源浪费">原因三：避免资源浪费</h3>
@@ -390,7 +392,7 @@ ack 标识位，也有确认号，这个确认号就是确认收到了第二次�
 <p>如果客户端发送的 <code>SYN</code> 报文在网络中阻塞了，重复发送多次
 <code>SYN</code>
 报文，那么服务端在收到请求后就会<strong>建立多个冗余的无效链接，造成不必要的资源浪费。</strong></p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/format,png-20230309230636571.png" alt="两次握手会造成资源浪费"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/format,png-20230309230636571.png" alt="两次握手会造成资源浪费"></p>
 <p>即两次握手会造成消息滞留情况下，服务端重复接受无用的连接请求
 <code>SYN</code> 报文，而造成重复分配资源。</p>
 <h3 id="小结">小结</h3>
@@ -410,7 +412,7 @@ TCP 连接时，初始化的序列号都要求不一样呢？</h2>
 </ul>
 <p>接下来，详细说说第一点。</p>
 <p>假设每次建立连接，客户端和服务端的初始化序列号都是从 0 开始：</p>
-<p><img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/network/tcp/isn%E7%9B%B8%E5%90%8C.png" alt="img"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/network/tcp/isn%E7%9B%B8%E5%90%8C.png" alt="img"></p>
 <p>过程如下：</p>
 <ul>
 <li>客户端和服务端建立一个 TCP
@@ -421,7 +423,7 @@ RST 报文。</li>
 </ul>
 <p>可以看到，<strong>如果每次建立连接，客户端和服务端的初始化序列号都是一样的话，很容易出现历史报文被下一个相同四元组的连接接收的问题</strong>。</p>
 <p>如果每次建立连接客户端和服务端的初始化序列号都「不一样」，就有大概率因为历史报文的序列号「不在」对方接收窗口，从而很大程度上避免了历史报文，比如下图：</p>
-<p><img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/network/tcp/isn%E4%B8%8D%E7%9B%B8%E5%90%8C.png" alt="img"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/network/tcp/isn%E4%B8%8D%E7%9B%B8%E5%90%8C.png" alt="img"></p>
 <p>相反，如果每次建立连接客户端和服务端的初始化序列号都「一样」，就有大概率遇到历史报文的序列号刚「好在」对方的接收窗口内，从而导致历史报文被新连接成功接收。</p>
 <p>所以，每次初始化序列号不一样很大程度上能够避免历史报文被下一个相同四元组的连接接收，注意是很大程度上，并不是完全避免了（因为序列号会有回绕的问题，所以需要用时间戳的机制来判断历史报文，详细看篇：<a target="_blank" rel="noopener" href="https://xiaolincoding.com/network/3_tcp/isn_deff.html">TCP
 是如何避免历史报文的？ (opens new window)</a>）。</p>
@@ -436,7 +438,7 @@ IP、源端口、目的端口生成一个随机数值。要保证 Hash
 </ul>
 <h2 id="既然-ip-层会分片为什么-tcp-层还需要-mss-呢">既然 IP
 层会分片，为什么 TCP 层还需要 MSS 呢？</h2>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/format,png-20230309230633447.png" alt="MTU 与 MSS"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/format,png-20230309230633447.png" alt="MTU 与 MSS"></p>
 <ul>
 <li><code>MTU</code>：一个网络包的最大长度，以太网中一般为
 <code>1500</code> 字节；</li>
@@ -464,7 +466,7 @@ ACK 给发送方，因为发送方迟迟收不到 ACK
 协议在<strong>建立连接的时候通常要协商双方的 MSS 值</strong>，当 TCP
 层发现数据超过 MSS 时，则就先会进行分片，当然由它形成的 IP
 包的长度也就不会大于 MTU ，自然也就<strong>不用 IP 分片</strong>了。</p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/format,png-20230309230628926.png" alt="握手阶段协商 MSS"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/format,png-20230309230628926.png" alt="握手阶段协商 MSS"></p>
 <p>经过 TCP 层分片后，如果一个 TCP 分片丢失后，<strong>进行重发时也是以
 MSS 为单位</strong>，而不用重传所有的分片，大大增加了重传的效率。</p>
 <h2 id="syn报文什么情况下会被丢弃">SYN报文什么情况下会被丢弃？</h2>
@@ -493,7 +495,7 @@ net.ipv4.tcp_timestamps=1（默认即为 1)）。</p>
 的网络下是不安全的！</strong></font></p>
 <p>对于服务器来说，如果同时开启了recycle 和 timestamps
 选项，则会开启一种称之为「 per-host 的 PAWS 机制」。</p>
-<div class="note flat info simple"><p>什么是 per-host 的 PAWS 机制？</p>
+<div class="note  flat info"><p>什么是 per-host 的 PAWS 机制？</p>
 <p><br></p>
 <p>tcp_timestamps 选项开启之后， PAWS 机制会自动开启，它的作用是防止 TCP
 包中的序列号发生绕回。</p>
@@ -543,24 +545,24 @@ TCP，我信你个鬼，糟老头坏的很！</p>
 SYN+ACK，接着客户端会返回 ACK，服务端收到第三次握手的 ACK
 后，<strong>内核会把连接从半连接队列移除，然后创建新的完全的连接，并将其添加到
 accept 队列，等待进程调用 accept 函数时把连接取出来。</strong></p>
-<div class="tabs" id="syn"><ul class="nav-tabs"><button type="button" class="tab  active" data-href="syn-1">半连接队列满了</button><button type="button" class="tab " data-href="syn-2">全连接队列满了</button></ul><div class="tab-contents"><div class="tab-item-content active" id="syn-1"><p>当服务器造成syn攻击，就有可能导致 <strong>TCP
+<div class="tabs" id="syn"><ul class="nav-tabs"><li class="tab active"><button type="button" data-href="#syn-1">半连接队列满了</button></li><li class="tab"><button type="button" data-href="#syn-2">全连接队列满了</button></li></ul><div class="tab-contents"><div class="tab-item-content active" id="syn-1"><p>当服务器造成syn攻击，就有可能导致 <strong>TCP
 半连接队列满了，这时后面来的 syn 包都会被丢弃</strong>。</p>
 <p>但是，<strong>如果开启了syncookies
 功能，即使半连接队列满了，也不会丢弃syn 包</strong>。</p>
 <p>syncookies 是这么做的：服务器根据当前状态计算出一个值，放在己方发出的
 SYN+ACK 报文中发出，当客户端返回 ACK
 报文时，取出该值验证，如果合法，就认为连接建立成功，如下图所示。</p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/58e01036d1febd0103dd0ec4d5acff05.png" alt="img"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/58e01036d1febd0103dd0ec4d5acff05.png" alt="img"></p>
 <p>syncookies 参数主要有以下三个值：</p>
 <ul>
 <li>0 值，表示关闭该功能；</li>
 <li>1 值，表示仅当 SYN 半连接队列放不下时，再启用它；</li>
 <li>2 值，表示无条件开启功能；</li>
 </ul>
-<p>那么在应对 SYN 攻击时，只需要设置为 1 即可</p></div><div class="tab-item-content" id="syn-2"><p><strong>在服务端并发处理大量请求时，如果 TCP accpet
+<p>那么在应对 SYN 攻击时，只需要设置为 1 即可</p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="solitude st-arrow-up-line"></i></button></div><div class="tab-item-content" id="syn-2"><p><strong>在服务端并发处理大量请求时，如果 TCP accpet
 队列过小，或者应用程序调用 accept() 不及时，就会造成 accpet 队列满了
 ，这时后续的连接就会被丢弃，这样就会出现服务端请求数量上不去的现象。</strong></p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/d1538f8d3b50da26039bc6b171a13ad1.png" alt="img"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/d1538f8d3b50da26039bc6b171a13ad1.png" alt="img"></p>
 <p>要解决这个问题，我们可以：</p>
 <ul>
 <li>调大 accpet 队列的最大长度，调大的方式是通过<strong>调大 backlog
@@ -568,7 +570,7 @@ SYN+ACK 报文中发出，当客户端返回 ACK
 <li>检查系统或者代码为什么调用 accept() 不及时；</li>
 </ul>
 <p>关于 SYN 队列和 accpet 队列，我之前写过一篇很详细的文章：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/2qN0ulyBtO2I67NB_RnJbg">TCP
-半连接队列和全连接队列满了会发生什么？又该如何应对？</a></p></div></div><div class="tab-to-top"><button type="button" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div></div>
+半连接队列和全连接队列满了会发生什么？又该如何应对？</a></p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="solitude st-arrow-up-line"></i></button></div></div></div>
 <h2 id="第一二三次握手丢失了会发生什么">第一/二/三次握手丢失了，会发生什么？</h2>
 <p>会超时重传 SYN/SYN-ACK 报文，而且<strong>重传的 SYN
 报文的序列号都是一样的</strong>。不同版本的操作系统可能超时时间不同，有的
@@ -601,7 +603,7 @@ RST 报文，服务端收到后就会释放连接。</p>
 <p>如果客户端恢复后，发送的 SYN
 报文中的源端口号跟上一次连接的源端口号一样，也就是处于 Established
 状态的服务端收到了这个 SYN 报文。</p>
-<p><img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost4@main/%E7%BD%91%E7%BB%9C/est_syn.png" alt="img"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost4@main/%E7%BD%91%E7%BB%9C/est_syn.png" alt="img"></p>
 <p><strong>处于 Established 状态的服务端，如果收到了客户端的 SYN
 报文（注意此时的 SYN 报文其实是乱序的，因为 SYN
 报文的初始化序列号其实是一个随机数），会回复一个携带了正确序列号和确认号的
@@ -617,10 +619,10 @@ listen，客户端发起连接建立，会发生什么？</h2>
 listen。</p>
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">/*******服务器程序  TCPServer.c ************/</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;errno.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;netdb.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;netinet/in.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> sockfd, ret;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">server_addr</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 服务器端创建 tcp socket 描述符 */</span></span><br><span class="line">    sockfd = socket(AF_INET, SOCK_STREAM, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">if</span>(sockfd &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;Socket error:%s\n\a&quot;</span>, strerror(errno));</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 服务器端填充 sockaddr 结构 */</span></span><br><span class="line">    bzero(&amp;server_addr, <span class="keyword">sizeof</span>(<span class="keyword">struct</span> sockaddr_in));</span><br><span class="line">    server_addr.sin_family = AF_INET;</span><br><span class="line">    server_addr.sin_addr.s_addr = htonl(INADDR_ANY);</span><br><span class="line">    server_addr.sin_port = htons(<span class="number">8888</span>);</span><br><span class="line">  </span><br><span class="line">  <span class="comment">/* 绑定 ip + 端口 */</span></span><br><span class="line">    ret = bind(sockfd, (<span class="keyword">struct</span> sockaddr *)(&amp;server_addr), <span class="keyword">sizeof</span>(<span class="keyword">struct</span> sockaddr));</span><br><span class="line">    <span class="keyword">if</span>(ret &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;Bind error:%s\n\a&quot;</span>, strerror(errno));</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//没有调用 listen</span></span><br><span class="line">    </span><br><span class="line">    sleep(<span class="number">1000</span>);</span><br><span class="line">    close(sockfd);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>然后，我用浏览器访问这个地址：http://121.43.173.240:8888/</p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/5bdb5443db5b97ff724ab94e014af6a5.png" alt="图片"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/5bdb5443db5b97ff724ab94e014af6a5.png" alt="图片"></p>
 <p>报错连接服务器失败。</p>
 <p>同时，我也用抓包工具，抓了这个过程。</p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/a77921ffafbbff86d07983ca0db3e6e0.png" alt="图片"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/a77921ffafbbff86d07983ca0db3e6e0.png" alt="图片"></p>
 <p>可以看到，客户端对服务端发起 SYN 报文后，服务端回了 RST 报文。</p>
 <p>所以，这个问题就有了答案，<strong>服务端如果只 bind 了 IP
 地址和端口，而没有调用 listen
@@ -641,11 +643,11 @@ listen。</p>
 <p><strong>一般正常的情况</strong>下，如果启动服务器，会发现最后程序会<strong>阻塞在</strong><code>accept()</code>里。</p>
 <p>这个问题其实只要在执行<code>accept()</code> 之前执行一个
 <code>sleep(20)</code>，然后立刻执行客户端相关的方法，同时抓个包，就能得出结论。</p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/2cfc1d028f3e37f10c2f81375ddb998a.png" alt="不执行accept时抓包结果"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/2cfc1d028f3e37f10c2f81375ddb998a.png" alt="不执行accept时抓包结果"></p>
 <p>从抓包结果看来，<strong>就算不执行accept()方法，三次握手照常进行，并顺利建立连接。</strong></p>
 <p>更骚气的是，<strong>在服务端执行accept()前，如果客户端发送消息给服务端，服务端是能够正常回复ack确认包的。</strong></p>
 <h3 id="回顾两个队列">回顾两个队列</h3>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/36242c85809865fcd2da48594de15ebb.png" alt="半连接队列和全连接队列"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/36242c85809865fcd2da48594de15ebb.png" alt="半连接队列和全连接队列"></p>
 <ul>
 <li><strong>半连接队列（SYN队列）</strong>，服务端收到<strong>第一次握手</strong>后，会将<code>sock</code>加入到这个队列中，队列内的<code>sock</code>都处于<code>SYN_RECV</code>
 状态。</li>
@@ -669,13 +671,13 @@ listen。</p>
 <li><code>tcp_abort_on_overflow</code>设置为
 0，全连接队列满了之后，会丢弃这个第三次握手ACK包，并且开启定时器，重传第二次握手的SYN+ACK，如果重传超过一定限制次数，还会把对应的<strong>半连接队列里的连接</strong>给删掉。</li>
 </ul>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/874f2fb7108020fd4dcfa021f377ec66.png" alt="tcp_abort_on_overflow为0"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/874f2fb7108020fd4dcfa021f377ec66.png" alt="tcp_abort_on_overflow为0"></p>
 <ul>
 <li><code>tcp_abort_on_overflow</code>设置为
 1，全连接队列满了之后，就直接发RST给客户端，效果上看就是连接断了。</li>
 </ul>
 <p>这个现象是不是很熟悉，服务端<strong>端口未监听</strong>时，客户端尝试去连接，服务端也会回一个RST。这两个情况长一样，所以客户端这时候收到RST之后，其实无法区分到底是<strong>端口未监听</strong>，还是<strong>全连接队列满了</strong>。</p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/6a01c5df74748870a69921da89825d9c.png" alt="tcp_abort_on_overflow为1"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/6a01c5df74748870a69921da89825d9c.png" alt="tcp_abort_on_overflow为1"></p>
 <h3 id="半连接队列满了会怎么样">半连接队列满了会怎么样？</h3>
 <p><strong>一般是丢弃</strong>，但这个行为可以通过
 <code>tcp_syncookies</code>
@@ -687,10 +689,10 @@ Flood攻击</strong>，可以简单理解为，攻击方模拟客户端疯狂发
 <p>那这种情况怎么处理？有没有一种方法可以<strong>绕过半连接队列</strong>？</p>
 <p>有，上面提到的<code>tcp_syncookies</code>派上用场了。</p>
 <p>当它被设置为1的时候，客户端发来<strong>第一次握手</strong>SYN时，服务端<strong>不会将其放入半连接队列中</strong>，而是直接生成一个<code>cookies</code>，这个<code>cookies</code>会跟着<strong>第二次握手</strong>，发回客户端。客户端在发<strong>第三次握手</strong>的时候带上这个<code>cookies</code>，服务端验证到它就是当初发出去的那个，就会建立连接并放入到全连接队列中。可以看出整个过程不再需要半连接队列的参与。</p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/d696b8b345526533bde8fa990e205c32.png" alt="tcp_syncookies=1"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/d696b8b345526533bde8fa990e205c32.png" alt="tcp_syncookies=1"></p>
 <h1 id="tcp连接断开">TCP连接断开</h1>
 <h2 id="tcp四次挥手过程是怎样的">TCP四次挥手过程是怎样的？</h2>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/format,png-20230309230614791.png" alt="客户端主动关闭连接 —— TCP 四次挥手"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/format,png-20230309230614791.png" alt="客户端主动关闭连接 —— TCP 四次挥手"></p>
 <p>每个方向都需要<strong>一个 FIN 和一个
 ACK</strong>，因此通常被称为<strong>四次挥手</strong>。</p>
 <p>这里一点需要注意是：<strong>主动关闭连接的，才有 TIME_WAIT
@@ -744,14 +746,14 @@ TCP 四次挥手，所以我们常说，调用 shutdown 是优雅的关闭。</p
 <h2 id="tcp-四次挥手可以变成三次吗">TCP 四次挥手，可以变成三次吗？</h2>
 <p>在用 wireshark 工具抓包的时候，我们也会常看到 TCP
 挥手过程是三次，而不是四次，如下图：</p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/361207c2e5c34bec8708b79990ba7e99.png" alt="在这里插入图片描述"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/361207c2e5c34bec8708b79990ba7e99.png" alt="在这里插入图片描述"></p>
 <p>当被动关闭方（上图的服务端）在 TCP
 挥手过程中，<strong>「没有数据要发送」并且「开启了 TCP
 延迟确认机制」，那么第二和第三次挥手就会合并传输，这样就出现了三次挥手。</strong></p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/d7b349efa4f94453943b433b704a4ca8.png" alt="在这里插入图片描述"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/d7b349efa4f94453943b433b704a4ca8.png" alt="在这里插入图片描述"></p>
 <p>然后因为 TCP
 延迟确认机制是默认开启的，所以导致我们抓包时，看见三次挥手的次数比四次挥手还多。</p>
-<div class="note flat info simple"><p>什么是 TCP 延迟确认机制？</p>
+<div class="note  flat info"><p>什么是 TCP 延迟确认机制？</p>
 <p><br></p>
 <p>当发送没有携带数据的 ACK，它的网络效率也是很低的，因为它也有 40
 个字节的 IP 头 和 TCP 头，但却没有携带数据报文。 为了解决 ACK
@@ -764,7 +766,7 @@ TCP 四次挥手，所以我们常说，调用 shutdown 是优雅的关闭。</p
 <li>如果在延迟等待发送 ACK
 期间，对方的第二个数据报文又到达了，这时就会立刻发送 ACK</li>
 </ul>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/33f3d2d54a924b0a80f565038327e0e4.png" alt="img"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/33f3d2d54a924b0a80f565038327e0e4.png" alt="img"></p>
 <ul>
 <li>最大延迟确认时间是 200 ms （1000/5）</li>
 <li>最短延迟确认时间是 40 ms （1000/25）</li>
@@ -824,11 +826,11 @@ TCP 接收端的数据流的一个字节，因为 TCP
 </ul>
 <p>给大家抓了一个包，下图中的 Seq
 就是序列号，其中红色框住的分别是客户端和服务端各自生成的初始序列号。</p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/c9ea9b844e87bcd4acd3e320403ecab3.png" alt="TCP 抓包图"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/c9ea9b844e87bcd4acd3e320403ecab3.png" alt="TCP 抓包图"></p>
 <p>通过前面我们知道，<strong>序列号和初始化序列号并不是无限递增的，会发生回绕为初始值的情况，这意味着无法根据序列号来判断新老数据</strong>。</p>
 <p>假设 TIME-WAIT
 没有等待时间或时间过短，被延迟的数据包抵达后会发生什么呢？</p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/6385cc99500b01ba2ef288c27523c1e7-20230309230608128.png" alt="TIME-WAIT 时间过短，收到旧连接的数据报文"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/6385cc99500b01ba2ef288c27523c1e7-20230309230608128.png" alt="TIME-WAIT 时间过短，收到旧连接的数据报文"></p>
 <p>如上图：</p>
 <ul>
 <li>服务端在关闭连接之前发送的 <code>SEQ = 301</code>
@@ -850,14 +852,14 @@ TCP 接收端的数据流的一个字节，因为 TCP
 报文就直接进入 CLOSE 状态，如果该 ACK 报文丢失了，服务端则重传的 FIN
 报文，而这时客户端已经进入到关闭状态了，在收到服务端重传的 FIN
 报文后，就会回 RST 报文。</p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/3a81c23ce57c27cf63fc2b77e34de0ab-20230309230604522.png" alt="TIME-WAIT 时间过短，没有确保连接正常关闭"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/3a81c23ce57c27cf63fc2b77e34de0ab-20230309230604522.png" alt="TIME-WAIT 时间过短，没有确保连接正常关闭"></p>
 <p>服务端收到这个 RST 并将其解释为一个错误（Connection reset by
 peer），这对于一个可靠的协议来说不是一个优雅的终止方式。</p>
 <p>为了防止这种情况出现，客户端必须等待足够长的时间，确保服务端能够收到
 ACK，如果服务端没有收到 ACK，那么就会触发 TCP
 重传机制，服务端会重新发送一个 FIN，这样一去一来刚好两个 MSL
 的时间。</p>
-<p><img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost4/%E7%BD%91%E7%BB%9C/TIME-WAIT%E8%BF%9E%E6%8E%A5%E6%AD%A3%E5%B8%B8%E5%85%B3%E9%97%AD.drawio.png" alt="TIME-WAIT 时间正常，确保了连接正常关闭"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost4/%E7%BD%91%E7%BB%9C/TIME-WAIT%E8%BF%9E%E6%8E%A5%E6%AD%A3%E5%B8%B8%E5%85%B3%E9%97%AD.drawio.png" alt="TIME-WAIT 时间正常，确保了连接正常关闭"></p>
 <p>客户端在收到服务端重传的 FIN 报文时，TIME_WAIT
 状态的等待时间，会重置回 2MSL。</p>
 <h2 id="服务器出现大量-time_wait-状态的原因有哪些">服务器出现大量
@@ -897,7 +899,7 @@ Keep-Alive 机制。</p>
 秒内都没有再发起新的请求，定时器的时间一到，nginx
 就会触发回调函数来关闭该连接，那么此时服务端上就会出现 TIME_WAIT
 状态的连接</strong>。</p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/7e995ecb2e42941342f97256707496c9.png" alt="HTTP 长连接超时"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/7e995ecb2e42941342f97256707496c9.png" alt="HTTP 长连接超时"></p>
 <p>当服务端出现大量 TIME_WAIT
 状态的连接时，如果现象是有大量的客户端建立完 TCP
 连接后，很长一段时间没有发送数据，那么大概率就是因为 HTTP
@@ -975,7 +977,7 @@ window)</a></p>
 close</strong>。</p>
 <h2 id="四次挥手中收到乱序的-fin-包会如何处理">四次挥手中收到乱序的 FIN
 包会如何处理？</h2>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5bCP5p6XY29kaW5n,size_20,color_FFFFFF,t_70,g_se,x_16.png" alt="img"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5bCP5p6XY29kaW5n,size_20,color_FFFFFF,t_70,g_se,x_16.png" alt="img"></p>
 <p>在 FIN_WAIT_2 状态下，是如何处理收到的乱序到 FIN 报文，然后 TCP
 连接又是什么时候才进入到 TIME_WAIT 状态？</p>
 <p>结论：</p>
@@ -985,10 +987,10 @@ close</strong>。</p>
 <p><strong>等再次收到前面被网络延迟的数据包时，会判断乱序队列有没有数据，然后会检测乱序队列中是否有可用的数据，如果能在乱序队列中找到与当前报文的序列号保持的顺序的报文，就会看该报文是否有
 FIN 标志，如果发现有 FIN 标志，这时才会进入 TIME_WAIT
 状态。</strong></p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5bCP5p6XY29kaW5n,size_20,color_FFFFFF,t_70,g_se,x_16-20230309230147654.png" alt="img"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBA5bCP5p6XY29kaW5n,size_20,color_FFFFFF,t_70,g_se,x_16-20230309230147654.png" alt="img"></p>
 <h2 id="在-time_wait-状态的-tcp-连接收到-syn-后会发生什么">在 TIME_WAIT
 状态的 TCP 连接，收到 SYN 后会发生什么？</h2>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/74b53919396dcda634cfd5b5795cbf16.png" alt="图片"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/74b53919396dcda634cfd5b5795cbf16.png" alt="图片"></p>
 <p>针对这个问题，<strong>关键是要看 SYN
 的「序列号和时间戳」是否合法</strong>。</p>
 <ul>
@@ -1008,7 +1010,7 @@ SYN
 状态，接着就能进行建立连接过程</strong>。</p>
 <p>用下图作为例子，双方都启用了 TCP 时间戳机制，TSval
 是发送报文时的时间戳：</p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/39d0d04adf72fe3d37623acff9ae2507.png" alt="图片"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/39d0d04adf72fe3d37623acff9ae2507.png" alt="图片"></p>
 <h3 id="收到非法-syn">收到非法 SYN</h3>
 <p>如果处于 TIME_WAIT 状态的连接收到「非法的 SYN
 」后，就会<strong>再回复一个第四次挥手的 ACK
@@ -1086,7 +1088,7 @@ TCP 连接的状态也不会发生改变。</p>
 终端连接了我的云服务器，然后我通过断开 wifi
 的方式来模拟拔掉网线的场景，此时查看 TCP
 连接的状态没有发生变化，还是处于 ESTABLISHED 状态。</p>
-<p><img src="https://cdn.xiaolincoding.com//mysql/other/fff358407ee92aeea1e17386191a5d18.png" alt="图片"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/fff358407ee92aeea1e17386191a5d18.png" alt="图片"></p>
 <p>通过上面这个实验结果，我们知道了，拔掉网线这个动作并不会影响 TCP
 连接的状态。</p>
 <p>接下来，要看拔掉网线后，双方做了什么动作。</p>
@@ -1138,7 +1140,7 @@ TCP 四次挥手，可以变成三次吗？ | 小林coding (xiaolincoding.com)</
 <p><a target="_blank" rel="noopener" href="https://www.xiaolincoding.com/network/3_tcp/tcp_no_listen.html#做个实验">4.19
 服务端没有 listen，客户端发起连接建立，会发生什么？ | 小林coding
 (xiaolincoding.com)</a></p>
-</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://rean-schwarze.github.io">Rean</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://rean-schwarze.github.io/p/85f11265/">https://rean-schwarze.github.io/p/85f11265/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://rean-schwarze.github.io" target="_blank">Rean's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/TCP/">TCP</a><a class="post-meta__tags" href="/tags/%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B/">三次握手</a><a class="post-meta__tags" href="/tags/%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B/">四次挥手</a><a class="post-meta__tags" href="/tags/Socket/">Socket</a></div><div class="post_share"><div class="social-share" data-image="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture7.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/p/ec2ecf28/" title="【补档】【永夜Minus】最长的旅途 (live)（Cover：单依纯）【Synthesizer V Cover】"><img class="cover" src="/img/%E6%9C%80%E9%95%BF%E7%9A%84%E6%97%85%E9%80%94.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">【补档】【永夜Minus】最长的旅途 (live)（Cover：单依纯）【Synthesizer V Cover】</div></div></a></div><div class="next-post pull-right"><a href="/p/db95e6f5/" title="【LeetCode】25. K 个一组翻转链表 - 个人题解记录"><img class="cover" src="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover2.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">【LeetCode】25. K 个一组翻转链表 - 个人题解记录</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/p/4337b2c0/" title="【TCP】TCP如何优化？"><img class="cover" src="https://npm.elemecdn.com/justlovesmile-photo/235139-15499002994bfe.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-03-27</div><div class="title">【TCP】TCP如何优化？</div></div></a></div><div><a href="/p/d4d6f818/" title="【TCP】重传、滑动窗口、流量控制、拥塞控制"><img class="cover" src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture4.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-03-19</div><div class="title">【TCP】重传、滑动窗口、流量控制、拥塞控制</div></div></a></div><div><a href="/p/ffab2f6b/" title="【网络】键入网址到网页显示，期间发生了什么？"><img class="cover" src="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover2.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-03-05</div><div class="title">【网络】键入网址到网页显示，期间发生了什么？</div></div></a></div></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div><div class="comment-switch"><span class="first-comment">Giscus</span><span id="switch-btn"></span><span class="second-comment">Valine</span></div></div><div class="comment-wrap"><div><div id="giscus-wrap"></div></div><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Rean</div><div class="author-info__description">日常写bug 偶尔调调歌</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">55</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">168</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">17</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/Rean-Schwarze" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="https://space.bilibili.com/6531436" target="_blank" title="bilibili"><i class="fab fa-bilibili"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">随缘更新~（ps：如果加载不完全可以等等或者刷新）</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#tcp%E5%9F%BA%E6%9C%AC%E8%AE%A4%E8%AF%86"><span class="toc-text">TCP基本认识</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#tcp%E5%A4%B4"><span class="toc-text">TCP头</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81tcp%E5%8D%8F%E8%AE%AEtcp%E5%B7%A5%E4%BD%9C%E5%9C%A8%E5%93%AA%E4%B8%80%E5%B1%82"><span class="toc-text">为什么需要TCP协议？TCP工作在哪一层？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFtcp"><span class="toc-text">什么是TCP？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFtcp%E8%BF%9E%E6%8E%A5"><span class="toc-text">什么是TCP连接？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#tcp%E5%92%8Cudp%E7%9A%84%E5%8C%BA%E5%88%AB%E6%98%AF%E5%88%86%E5%88%AB%E7%9A%84%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E6%98%AF"><span class="toc-text">TCP和UDP的区别是？分别的应用场景是？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8C%BA%E5%88%AB"><span class="toc-text">区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-text">应用场景</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#tcp%E5%92%8Cudp%E5%8F%AF%E4%BB%A5%E4%BD%BF%E7%94%A8%E5%90%8C%E4%B8%80%E4%B8%AA%E7%AB%AF%E5%8F%A3%E5%90%97"><span class="toc-text">TCP和UDP可以使用同一个端口吗？</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#tcp%E8%BF%9E%E6%8E%A5%E5%BB%BA%E7%AB%8B"><span class="toc-text">TCP连接建立</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#tcp%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E8%BF%87%E7%A8%8B%E6%98%AF%E6%80%8E%E6%A0%B7%E7%9A%84"><span class="toc-text">TCP三次握手过程是怎样的？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E8%80%8C%E4%B8%8D%E6%98%AF%E4%B8%A4%E6%AC%A1%E5%9B%9B%E6%AC%A1"><span class="toc-text">为什么是三次握手？而不是两次&#x2F;四次？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0%E4%B8%80%E9%81%BF%E5%85%8D%E5%8E%86%E5%8F%B2%E8%BF%9E%E6%8E%A5"><span class="toc-text">原因一：避免历史连接</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0%E4%BA%8C%E5%90%8C%E6%AD%A5%E5%8F%8C%E6%96%B9%E5%88%9D%E5%A7%8B%E5%BA%8F%E5%88%97%E5%8F%B7"><span class="toc-text">原因二：同步双方初始序列号</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0%E4%B8%89%E9%81%BF%E5%85%8D%E8%B5%84%E6%BA%90%E6%B5%AA%E8%B4%B9"><span class="toc-text">原因三：避免资源浪费</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-text">小结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%AF%8F%E6%AC%A1%E5%BB%BA%E7%AB%8B-tcp-%E8%BF%9E%E6%8E%A5%E6%97%B6%E5%88%9D%E5%A7%8B%E5%8C%96%E7%9A%84%E5%BA%8F%E5%88%97%E5%8F%B7%E9%83%BD%E8%A6%81%E6%B1%82%E4%B8%8D%E4%B8%80%E6%A0%B7%E5%91%A2"><span class="toc-text">为什么每次建立
+</article><div class="post-copyright"><div class="post-copyright__author_group"><a class="post-copyright__author_img" href="/about/"><img class="post-copyright__author_img_front" src= "/img/spin.svg" data-lazy-src="/img/avatar.jpg"></a><div class="post-copyright__author_name">Rean's Blog</div><div class="post-copyright__author_desc">Enjoy technology and music</div></div><div class="post-tools" id="post-tools"><div class="post-tools-left"><div id="quit-box" onclick="RemoveRewardMask()"></div></div></div><div class="post-copyright__notice"><span class="post-copyright-info">本文是原创文章，采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0</a>协议，完整转载请注明来自<a href="/">Rean's Blog</a></span></div></div><div class="post-tools-right"><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/TCP/"><span class="tags-punctuation"></span>TCP<span class="tagsPageCount">4</span></a><a class="post-meta__tags" href="/tags/%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B/"><span class="tags-punctuation"></span>三次握手<span class="tagsPageCount">2</span></a><a class="post-meta__tags" href="/tags/%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B/"><span class="tags-punctuation"></span>四次挥手<span class="tagsPageCount">2</span></a><a class="post-meta__tags" href="/tags/Socket/"><span class="tags-punctuation"></span>Socket<span class="tagsPageCount">1</span></a></div></div></div><nav class="needEndHide pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/p/ec2ecf28/"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">【补档】【永夜Minus】最长的旅途 (live)（Cover：单依纯）【Synthesizer V Cover】</div></div></a></div><div class="next-post pull-right"><a href="/p/db95e6f5/"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">【LeetCode】25. K 个一组翻转链表 - 个人题解记录</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="solitude st-star-smile-fill"></i><span>喜欢这篇的人也看了</span><div class="relatedPosts-link"><a onclick="event.preventDefault(); toRandomPost();" href="javascript:void(0);" rel="external nofollow" data-pjax-state="">随便逛逛</a></div></div><div class="relatedPosts-list"><div><a href="/p/4337b2c0/" title="【TCP】TCP如何优化？"><img class="cover" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture5.jpg" alt="cover"><div class="content is-center"><div class="title">【TCP】TCP如何优化？</div></div></a></div><div><a href="/p/d4d6f818/" title="【TCP】重传、滑动窗口、流量控制、拥塞控制"><img class="cover" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture5.jpg" alt="cover"><div class="content is-center"><div class="title">【TCP】重传、滑动窗口、流量控制、拥塞控制</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-content"><div class="card-info-avatar is-center"><div class="author-info__top-group"><div class="author-info__sayhi" id="author-info__sayhi" onclick="sco.changeSayHelloText()">sayhello.morning</div></div></div><div class="avatar-img-group"><img class="avatar-img" alt="头像" src= "/img/spin.svg" data-lazy-src="/img/avatar.jpg"><div class="avatar-sticker"><img class="avatar-sticker-img" src= "/img/spin.svg" data-lazy-src="https://7.isyangs.cn/34/65f2e4e0423cc-34.png" alt="心情贴纸"></div></div><div class="author-info__description_group"><div class="author-info__description">分享自己对编程的<b>热爱</b>，对知识海洋<b>探索历程</b>，随机掉落<b>无参配布</b>以及<b>翻调</b>（主要是音综类，因为版权在B站基本过不了审（。</div><div class="author-info__description2">相信你可以在这里找到对你有用的知识和教程。</div></div><div class="author-info__bottom-group"><a class="author-info__bottom-group-left" href="/about/"><div class="author-info__name">Rean</div><div class="author-info__desc">Enjoy technology and music</div></a><div class="card-info-social-icons is-center"><a class="social-icon" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze" title="Github"><i class="solitude  st-github-line"></i></a><a class="social-icon" target="_blank" rel="noopener" href="https://space.bilibili.com/6531436" title="Bilibili"><i class="solitude  st-bilibili-line"></i></a></div></div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="solitude st-menu-line"></i><span>文章目录</span></div><div class="toc-content" id="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#tcp%E5%9F%BA%E6%9C%AC%E8%AE%A4%E8%AF%86"><span class="toc-text">TCP基本认识</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#tcp%E5%A4%B4"><span class="toc-text">TCP头</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81tcp%E5%8D%8F%E8%AE%AEtcp%E5%B7%A5%E4%BD%9C%E5%9C%A8%E5%93%AA%E4%B8%80%E5%B1%82"><span class="toc-text">为什么需要TCP协议？TCP工作在哪一层？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFtcp"><span class="toc-text">什么是TCP？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFtcp%E8%BF%9E%E6%8E%A5"><span class="toc-text">什么是TCP连接？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#tcp%E5%92%8Cudp%E7%9A%84%E5%8C%BA%E5%88%AB%E6%98%AF%E5%88%86%E5%88%AB%E7%9A%84%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E6%98%AF"><span class="toc-text">TCP和UDP的区别是？分别的应用场景是？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8C%BA%E5%88%AB"><span class="toc-text">区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-text">应用场景</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#tcp%E5%92%8Cudp%E5%8F%AF%E4%BB%A5%E4%BD%BF%E7%94%A8%E5%90%8C%E4%B8%80%E4%B8%AA%E7%AB%AF%E5%8F%A3%E5%90%97"><span class="toc-text">TCP和UDP可以使用同一个端口吗？</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#tcp%E8%BF%9E%E6%8E%A5%E5%BB%BA%E7%AB%8B"><span class="toc-text">TCP连接建立</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#tcp%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E8%BF%87%E7%A8%8B%E6%98%AF%E6%80%8E%E6%A0%B7%E7%9A%84"><span class="toc-text">TCP三次握手过程是怎样的？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E8%80%8C%E4%B8%8D%E6%98%AF%E4%B8%A4%E6%AC%A1%E5%9B%9B%E6%AC%A1"><span class="toc-text">为什么是三次握手？而不是两次&#x2F;四次？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0%E4%B8%80%E9%81%BF%E5%85%8D%E5%8E%86%E5%8F%B2%E8%BF%9E%E6%8E%A5"><span class="toc-text">原因一：避免历史连接</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0%E4%BA%8C%E5%90%8C%E6%AD%A5%E5%8F%8C%E6%96%B9%E5%88%9D%E5%A7%8B%E5%BA%8F%E5%88%97%E5%8F%B7"><span class="toc-text">原因二：同步双方初始序列号</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0%E4%B8%89%E9%81%BF%E5%85%8D%E8%B5%84%E6%BA%90%E6%B5%AA%E8%B4%B9"><span class="toc-text">原因三：避免资源浪费</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-text">小结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%AF%8F%E6%AC%A1%E5%BB%BA%E7%AB%8B-tcp-%E8%BF%9E%E6%8E%A5%E6%97%B6%E5%88%9D%E5%A7%8B%E5%8C%96%E7%9A%84%E5%BA%8F%E5%88%97%E5%8F%B7%E9%83%BD%E8%A6%81%E6%B1%82%E4%B8%8D%E4%B8%80%E6%A0%B7%E5%91%A2"><span class="toc-text">为什么每次建立
 TCP 连接时，初始化的序列号都要求不一样呢？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9D%E5%A7%8B%E5%BA%8F%E5%88%97%E5%8F%B7-isn-%E6%98%AF%E5%A6%82%E4%BD%95%E4%BA%A7%E7%94%9F%E7%9A%84"><span class="toc-text">初始序列号 ISN 是如何产生的？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%97%A2%E7%84%B6-ip-%E5%B1%82%E4%BC%9A%E5%88%86%E7%89%87%E4%B8%BA%E4%BB%80%E4%B9%88-tcp-%E5%B1%82%E8%BF%98%E9%9C%80%E8%A6%81-mss-%E5%91%A2"><span class="toc-text">既然 IP
 层会分片，为什么 TCP 层还需要 MSS 呢？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#syn%E6%8A%A5%E6%96%87%E4%BB%80%E4%B9%88%E6%83%85%E5%86%B5%E4%B8%8B%E4%BC%9A%E8%A2%AB%E4%B8%A2%E5%BC%83"><span class="toc-text">SYN报文什么情况下会被丢弃？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#tcp_tw_recycle-nat"><span class="toc-text">tcp_tw_recycle + NAT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%98%9F%E5%88%97%E6%BB%A1%E4%BA%86"><span class="toc-text">队列满了</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E4%BA%8C%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B%E4%B8%A2%E5%A4%B1%E4%BA%86%E4%BC%9A%E5%8F%91%E7%94%9F%E4%BB%80%E4%B9%88"><span class="toc-text">第一&#x2F;二&#x2F;三次握手丢失了，会发生什么？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B%E8%BF%9E%E6%8E%A5%E5%90%8E%E5%86%8D%E6%94%B6%E5%88%B0syn%E6%8A%A5%E6%96%87%E4%BC%9A%E6%80%8E%E6%A0%B7"><span class="toc-text">建立连接后，再收到SYN报文会怎样？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF%E7%9A%84-syn-%E6%8A%A5%E6%96%87%E9%87%8C%E7%9A%84%E7%AB%AF%E5%8F%A3%E5%8F%B7%E4%B8%8D%E5%90%8C"><span class="toc-text">客户端的 SYN
 报文里的端口号不同</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF%E7%9A%84-syn-%E6%8A%A5%E6%96%87%E9%87%8C%E7%9A%84%E7%AB%AF%E5%8F%A3%E5%8F%B7%E7%9B%B8%E5%90%8C"><span class="toc-text">客户端的 SYN
@@ -1152,149 +1154,61 @@ TIME_WAIT 状态的原因有哪些？</span></a><ol class="toc-child"><li class=
 CLOSE_WAIT 状态的原因有哪些？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B%E4%B8%AD%E6%94%B6%E5%88%B0%E4%B9%B1%E5%BA%8F%E7%9A%84-fin-%E5%8C%85%E4%BC%9A%E5%A6%82%E4%BD%95%E5%A4%84%E7%90%86"><span class="toc-text">四次挥手中收到乱序的 FIN
 包会如何处理？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8-time_wait-%E7%8A%B6%E6%80%81%E7%9A%84-tcp-%E8%BF%9E%E6%8E%A5%E6%94%B6%E5%88%B0-syn-%E5%90%8E%E4%BC%9A%E5%8F%91%E7%94%9F%E4%BB%80%E4%B9%88"><span class="toc-text">在 TIME_WAIT
 状态的 TCP 连接，收到 SYN 后会发生什么？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%B6%E5%88%B0%E5%90%88%E6%B3%95-syn"><span class="toc-text">收到合法 SYN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%B6%E5%88%B0%E9%9D%9E%E6%B3%95-syn"><span class="toc-text">收到非法 SYN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%B6%E5%88%B0-rst"><span class="toc-text">收到 RST</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E6%9E%9C%E5%B7%B2%E7%BB%8F%E5%BB%BA%E7%AB%8B%E4%BA%86%E8%BF%9E%E6%8E%A5%E4%BD%86%E6%98%AF%E5%AE%A2%E6%88%B7%E7%AB%AF%E7%AA%81%E7%84%B6%E5%87%BA%E7%8E%B0%E6%95%85%E9%9A%9C%E4%BA%86%E6%80%8E%E4%B9%88%E5%8A%9E"><span class="toc-text">如果已经建立了连接，但是客户端突然出现故障了怎么办？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E6%9E%9C%E5%B7%B2%E7%BB%8F%E5%BB%BA%E7%AB%8B%E4%BA%86%E8%BF%9E%E6%8E%A5%E4%BD%86%E6%98%AF%E6%9C%8D%E5%8A%A1%E7%AB%AF%E7%9A%84%E8%BF%9B%E7%A8%8B%E5%B4%A9%E6%BA%83%E4%BC%9A%E5%8F%91%E7%94%9F%E4%BB%80%E4%B9%88"><span class="toc-text">如果已经建立了连接，但是服务端的进程崩溃会发生什么？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E6%9E%9C%E6%B2%A1%E6%9C%89%E5%BC%80%E5%90%AF%E4%BF%9D%E6%B4%BB%E6%B2%A1%E6%9C%89%E6%95%B0%E6%8D%AE%E4%BA%A4%E4%BA%92%E4%B8%80%E7%AB%AF%E8%BF%9B%E7%A8%8B%E5%B4%A9%E6%BA%83%E5%92%8C%E6%96%AD%E7%94%B5%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB"><span class="toc-text">如果没有开启保活&amp;没有数据交互，一端进程崩溃和断电有什么区别？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BB%E6%9C%BA%E5%B4%A9%E6%BA%83"><span class="toc-text">主机崩溃</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E5%B4%A9%E6%BA%83"><span class="toc-text">进程崩溃</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8B%94%E6%8E%89%E7%BD%91%E7%BA%BF%E5%90%8E-%E5%8E%9F%E6%9C%AC%E7%9A%84-tcp-%E8%BF%9E%E6%8E%A5%E8%BF%98%E5%AD%98%E5%9C%A8%E5%90%97"><span class="toc-text">拔掉网线后， 原本的 TCP
-连接还存在吗？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8B%94%E6%8E%89%E7%BD%91%E7%BA%BF%E5%90%8E%E6%9C%89%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93"><span class="toc-text">拔掉网线后，有数据传输</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8B%94%E6%8E%89%E7%BD%91%E7%BA%BF%E5%90%8E%E6%B2%A1%E6%9C%89%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93"><span class="toc-text">拔掉网线后，没有数据传输</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="toc-text">参考链接</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/p/4337b2c0/" title="【TCP】TCP如何优化？"><img src="https://npm.elemecdn.com/justlovesmile-photo/235139-15499002994bfe.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【TCP】TCP如何优化？"/></a><div class="content"><a class="title" href="/p/4337b2c0/" title="【TCP】TCP如何优化？">【TCP】TCP如何优化？</a><time datetime="2024-03-27T14:15:18.000Z" title="发表于 2024-03-27 22:15:18">2024-03-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/e042d029/" title="【Hexo】支持LaTeX公式 &amp; 文章加密 教程"><img src="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover1.JPG" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Hexo】支持LaTeX公式 &amp; 文章加密 教程"/></a><div class="content"><a class="title" href="/p/e042d029/" title="【Hexo】支持LaTeX公式 &amp; 文章加密 教程">【Hexo】支持LaTeX公式 &amp; 文章加密 教程</a><time datetime="2024-03-23T14:06:21.000Z" title="发表于 2024-03-23 22:06:21">2024-03-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/9b4a91e5/" title="20240322 | 记录"><img src="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover4.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="20240322 | 记录"/></a><div class="content"><a class="title" href="/p/9b4a91e5/" title="20240322 | 记录">20240322 | 记录</a><time datetime="2024-03-22T14:36:31.000Z" title="发表于 2024-03-22 22:36:31">2024-03-22</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/9d8ce868/" title="【Java】I/O &amp; JVM"><img src="/img/SynthV_banner_Image_BG1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Java】I/O &amp; JVM"/></a><div class="content"><a class="title" href="/p/9d8ce868/" title="【Java】I/O &amp; JVM">【Java】I/O &amp; JVM</a><time datetime="2024-03-21T08:38:56.000Z" title="发表于 2024-03-21 16:38:56">2024-03-21</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/a69f6a48/" title="【Redis】持久化 &amp; 生产问题"><img src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Redis】持久化 &amp; 生产问题"/></a><div class="content"><a class="title" href="/p/a69f6a48/" title="【Redis】持久化 &amp; 生产问题">【Redis】持久化 &amp; 生产问题</a><time datetime="2024-03-21T05:45:20.000Z" title="发表于 2024-03-21 13:45:20">2024-03-21</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture7.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Rean</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(()=>{
-  const getGiscusTheme = theme => {
-    return theme === 'dark' ? 'dark' : 'light'
-  }
+连接还存在吗？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8B%94%E6%8E%89%E7%BD%91%E7%BA%BF%E5%90%8E%E6%9C%89%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93"><span class="toc-text">拔掉网线后，有数据传输</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8B%94%E6%8E%89%E7%BD%91%E7%BA%BF%E5%90%8E%E6%B2%A1%E6%9C%89%E6%95%B0%E6%8D%AE%E4%BC%A0%E8%BE%93"><span class="toc-text">拔掉网线后，没有数据传输</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="toc-text">参考链接</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="solitude st-map-line"></i><span>最近发布</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/p/4337b2c0/" title="【TCP】TCP如何优化？"><img alt="【TCP】TCP如何优化？" src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture5.jpg"></a><div class="content"><a class="title" href="/p/4337b2c0/" title="【TCP】TCP如何优化？">【TCP】TCP如何优化？</a><a class="article-recent_post_categories" href="/p/4337b2c0/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/e042d029/" title="【Hexo】支持LaTeX公式 &amp; 文章加密 教程"><img alt="【Hexo】支持LaTeX公式 &amp; 文章加密 教程" src="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover3.jpg"></a><div class="content"><a class="title" href="/p/e042d029/" title="【Hexo】支持LaTeX公式 &amp; 文章加密 教程">【Hexo】支持LaTeX公式 &amp; 文章加密 教程</a><a class="article-recent_post_categories" href="/p/e042d029/">教程</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/9b4a91e5/" title="20240322 | 记录"><img alt="20240322 | 记录" src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture4.jpg"></a><div class="content"><a class="title" href="/p/9b4a91e5/" title="20240322 | 记录">20240322 | 记录</a><a class="article-recent_post_categories" href="/p/9b4a91e5/">记录</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/9d8ce868/" title="【Java】I/O &amp; JVM"><img alt="【Java】I/O &amp; JVM" src="/img/SynthV_banner_Image_BG1.jpg"></a><div class="content"><a class="title" href="/p/9d8ce868/" title="【Java】I/O &amp; JVM">【Java】I/O &amp; JVM</a><a class="article-recent_post_categories" href="/p/9d8ce868/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/a69f6a48/" title="【Redis】持久化 &amp; 生产问题"><img alt="【Redis】持久化 &amp; 生产问题" src="https://cdn.jsdelivr.net/gh/Justlovesmile/CDN2/post/cover5.JPG"></a><div class="content"><a class="title" href="/p/a69f6a48/" title="【Redis】持久化 &amp; 生产问题">【Redis】持久化 &amp; 生产问题</a><a class="article-recent_post_categories" href="/p/a69f6a48/">学习</a></div></div></div></div></div></div></main><footer id="footer"><div id="st-footer-bar"><div class="footer-logo"><span class="solitude">Rean's Blog</span></div><div class="footer-bar-description">来自Rean's Blog - Enjoy technology and music的文章</div><a class="footer-bar-link" href="/">了解更多</a></div><div id="footer_deal"><a class="deal_link" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze" title="Github"><i class="solitude  st-github-line"></i></a><div class="nolazyload footer_mini_logo" id="footer_mini_logo" title="返回顶部" onclick="sco.toTop()"><img src= "/img/spin.svg" data-lazy-src="/img/avatar.jpg" alt="返回顶部"></div><a class="deal_link" target="_blank" rel="noopener" href="https://space.bilibili.com/6531436" title="Bilibili"><i class="solitude  st-bilibili-line"></i></a></div><div id="st-footer"></div><div id="footer-bar"><div class="footer-bar-links"><div class="footer-bar-left"><div class="copyright">© 2024 By&nbsp;<a class="footer-bar-link" href="/">Rean</a></div></div><div class="footer-bar-right"><a class="footer-bar-link" target="_blank" rel="noopener" href="https://github.com/valor-x/hexo-theme-solitude" title="主题">主题</a><a class="footer-bar-link cc"><i class="solitude st-copyright-line"></i><i class="solitude st-creative-commons-by-line"></i><i class="solitude st-creative-commons-nc-line"></i><i class="solitude st-creative-commons-nd-line"></i></a></div></div></div></footer></div><!-- inject body--><div><script src="/js/main.js?v=1.6.0"></script><script src="/js/utils.js?v=1.6.0"></script><!-- lately--><script src="/js/third_party/lately.min.js?v=1.6.0"></script><div id="rightMenu"><div class="rightMenu-group rightMenu-small"><div class="rightMenu-item" id="menu-backward"><i class="solitude st-arrow-left-line"></i></div><div class="rightMenu-item" id="menu-forward"><i class="solitude st-arrow-right-line"></i></div><div class="rightMenu-item" id="menu-refresh"><i class="solitude st-restart-line"></i></div><div class="rightMenu-item" id="menu-top"><i class="solitude st-arrow-up-line"></i></div></div><div class="rightMenu-group rightMenu-line rightMenuPlugin"><div class="rightMenu-item" id="menu-copytext"><i class="solitude st-copy-fill"></i><span>复制选中文本</span></div><div class="rightMenu-item" id="menu-pastetext"><i class="solitude st-clipboard-fill"></i><span>粘贴文本</span></div><div class="rightMenu-item" id="menu-newwindow"><i class="solitude st-window-fill"></i><span>新窗口打开</span></div><div class="rightMenu-item" id="menu-copylink"><i class="solitude st-link-line"></i><span>复制链接地址</span></div><div class="rightMenu-item" id="menu-copyimg"><i class="solitude st-copy-fill"></i><span>复制此图片</span></div><div class="rightMenu-item" id="menu-downloadimg"><i class="solitude st-download-cloud-fill"></i><span>下载此图片</span></div><div class="rightMenu-item" id="menu-search"><i class="solitude st-search-line"></i><span>站内搜索</span></div><div class="rightMenu-item" id="menu-music-toggle"><i class="solitude st-play-fill"></i><span>播放音乐</span></div><div class="rightMenu-item" id="menu-music-back"><i class="solitude st-skip-back-fill"></i><span>切换到上一首</span></div><div class="rightMenu-item" id="menu-music-forward"><i class="solitude st-skip-forward-fill"></i><span>切换到下一首</span></div><div class="rightMenu-item" id="menu-music-playlist" onclick="window.open('https://music.163.com/#/playlist?id=421801417', '_blank');"><i class="solitude st-play-list-2-line"></i><span>查看所有歌曲</span></div><div class="rightMenu-item" id="menu-music-copyMusicName"><i class="solitude st-copy-fill"></i><span>复制歌名</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><a class="rightMenu-item menu-Link" id="menu-randomPost"><i class="solitude st-signal-tower-fill"></i><span>随便逛逛</span></a><a class="rightMenu-item menu-link" href="/categories/"><i class="solitude st-checkbox-multiple-blank-fill"></i><span>文章分类</span></a><a class="rightMenu-item menu-link" href="/tags/"><i class="solitude st-price-tag-fill"></i><span>文章标签</span></a></div><div class="rightMenu-group rightMenu-line rightMenuOther"><div class="rightMenu-item" id="menu-copy"><i class="solitude st-external-link-fill"></i><span>复制地址</span></div><div class="rightMenu-item" id="menu-darkmode"><i class="solitude st-moon-clear-fill"></i><span class="menu-darkmode-text">深色模式</span></div><div class="rightMenu-item" id="menu-translate"><i class="solitude st-panben-line"></i><span>轉為繁體</span></div></div></div><div id="rightmenu-mask"></div><script src="/js/rightside.js?v=1.6.0"></script><script src="/js/third_party/universe.min.js?v=1.6.0"></script><script>dark()
+</script><script src="/js/tw_cn.js?v=1.6.0"></script><script src="https://cdn.staticfile.net/pjax/0.2.8/pjax.min.js"></script><script src="https://cdn.staticfile.net/vanilla-lazyload/17.8.5/lazyload.iife.min.js"></script><script src="https://cdn.staticfile.net/node-snackbar/0.1.16/snackbar.min.js"></script><script src="https://cdn.staticfile.net/fancyapps-ui/5.0.33/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.staticfile.net/aplayer/1.10.1/APlayer.min.js"></script><script src="https://cdn.staticfile.net/meting/2.0.1/Meting.min.js"></script><script>const meting_api = 'https://meting.qjqq.cn/?server=:server&type=:type&id=:id&auth=:auth&r=:r';
+</script><script>const coverColorConfig = {
+    api: 'https://api.qjqq.cn/api/Imgcolor?img=',
+    time: 43200000,
+}</script><script src="/js/covercolor/api.js?v=1.6.0"></script><script src="/js/third_party/waterfall.min.js?v=1.6.0"></script><script src="/js/music.js?v=1.6.0"></script><script src="https://cdn.staticfile.net/pace/1.2.4/pace.min.js"></script><script src="https://cdn.staticfile.net/lunr.js/2.3.9/lunr.min.js"></script></div><div id="js-pjax"><script async src="https://cdn.staticfile.net/busuanzi/2.3.0/bsz.pure.mini.min.js"></script><script id="config-diff">var PAGE_CONFIG = {
+    is_post: true,
+    is_page: false,
+    is_home: false,
+    page: 'post',
+    toc: true,
+    comment: false,
+}
+</script></div><!-- newest comment--><!-- pjax--><script>let pjaxSelectors = [
+    'title',
+    '#body-wrap',
+    '#site-config',
+    'meta[name="description"]',
+    '#js-pjax',
+    'meta[property^="og:"]',
+]
 
-  const loadGiscus = () => {
-    const config = Object.assign({
-      src: 'https://giscus.app/client.js',
-      'data-repo': 'Rean-Schwarze/rean-schwarze.github.io',
-      'data-repo-id': 'R_kgDOLBrDcw',
-      'data-category-id': 'DIC_kwDOLBrDc84CcRNZ',
-      'data-mapping': 'pathname',
-      'data-theme': getGiscusTheme(document.documentElement.getAttribute('data-theme')),
-      'data-reactions-enabled': '1',
-      crossorigin: 'anonymous',
-      async: true
-    },null)
-
-    const ele = document.createElement('script')
-    for (let key in config) {
-      ele.setAttribute(key, config[key])
-    }
-    document.getElementById('giscus-wrap').appendChild(ele)
-  }
-
-  const changeGiscusTheme = theme => {
-    const sendMessage = message => {
-      const iframe = document.querySelector('iframe.giscus-frame')
-      if (!iframe) return
-      iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app')
-    }
-
-    sendMessage({
-      setConfig: {
-        theme: getGiscusTheme(theme)
-      }
-    });
-  }
-
-  btf.addGlobalFn('themeChange', changeGiscusTheme, 'giscus')
-
-  if ('Giscus' === 'Giscus' || !true) {
-    if (true) btf.loadComment(document.getElementById('giscus-wrap'), loadGiscus)
-    else loadGiscus()
-  } else {
-    window.loadOtherComment= loadGiscus
-  }
-})()</script><script>(() => {
-  const initValine = () => {
-    const valine = new Valine(Object.assign({
-      el: '#vcomment',
-      appId: 'QnAsdrfTiQIDoi3lzCxrt49u-gzGzoHsz',
-      appKey: 'KKrkQZ3iUk9DIotqfHwARyAq',
-      avatar: 'monsterid',
-      serverURLs: 'https://qnasdrft.lc-cn-n1-shared.com',
-      emojiMaps: "",
-      path: window.location.pathname,
-      visitor: false
-    }, null))
-  }
-
-  const loadValine = async () => {
-    if (typeof Valine === 'function') initValine()
-    else {
-      await getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js')
-      initValine()
-    }
-  }
-
-  if ('Giscus' === 'Valine' || !true) {
-    if (true) btf.loadComment(document.getElementById('vcomment'),loadValine)
-    else setTimeout(loadValine, 0)
-  } else {
-    window.loadOtherComment = loadValine
-  }
-})()</script></div><div class="aplayer no-destroy" data-id="421801417" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="false"> </div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
-POWERMODE.shake = false;
-POWERMODE.mobile = true;
-document.body.addEventListener('input', POWERMODE);
-</script><link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/aplayer/1.10.1/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/aplayer/1.10.1/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["link[rel=\"canonical\"]","meta[property=\"og:image\"]","meta[property=\"og:title\"]","meta[property=\"og:url\"]","head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
-
-var pjax = new Pjax({
-  elements: 'a:not([target="_blank"])',
-  selectors: pjaxSelectors,
-  cacheBust: false,
-  analytics: false,
-  scrollRestoration: false
+const pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: pjaxSelectors,
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
 })
 
-document.addEventListener('pjax:send', function () {
-
-  // removeEventListener
-  btf.removeGlobalFnEvent('pjax')
-  btf.removeGlobalFnEvent('themeChange')
-
-  document.getElementById('rightside').classList.remove('rightside-show')
-  
-  if (window.aplayers) {
-    for (let i = 0; i < window.aplayers.length; i++) {
-      if (!window.aplayers[i].options.fixed) {
-        window.aplayers[i].destroy()
-      }
-    }
-  }
-
-  typeof typed === 'object' && typed.destroy()
-
-  //reset readmode
-  const $bodyClassList = document.body.classList
-  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
-
-  typeof disqusjs === 'object' && disqusjs.destroy()
-})
-
-document.addEventListener('pjax:complete', function () {
-  window.refreshFn()
-
-  document.querySelectorAll('script[data-pjax]').forEach(item => {
+document.querySelectorAll('script[data-pjax]').forEach(item => {
     const newScript = document.createElement('script')
     const content = item.text || item.textContent || item.innerHTML || ""
     Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
     newScript.appendChild(document.createTextNode(content))
     item.parentNode.replaceChild(newScript, item)
-  })
-
-  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
-
-  typeof panguInit === 'function' && panguInit()
-
-  // google analytics
-  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
-
-  // baidu analytics
-  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
-
-  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
-
-  // prismjs
-  typeof Prism === 'object' && Prism.highlightAll()
 })
 
-document.addEventListener('pjax:error', e => {
-  if (e.request.status === 404) {
-    pjax.loadUrl('/404.html')
-  }
-})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div><div id="nav-music"><div id="nav-music-hoverTips" onclick="anzhiyu.musicToggle()">播放音乐</div><meting-js id="421801417" server="netease" type="playlist" mutex="true" preload="none" theme="var(--anzhiyu-main)" data-lrctype="0" order="random"></meting-js></div></body></html>
+document.addEventListener('pjax:complete', () => {
+    window.refreshFn()
+})
+
+document.addEventListener('pjax:error', (e) => {
+    if (e.request.status === 404) {
+        pjax.loadUrl('/404.html')
+    }
+})</script><!-- theme--><script>initTheme = () => {
+    let isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const cachedMode = saveToLocal.get('theme');
+    if (cachedMode === undefined) {
+        const nowMode =
+            isDarkMode ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', nowMode);
+    } else {
+        document.documentElement.setAttribute('data-theme', cachedMode);
+    }
+}
+initTheme()</script><!-- google adsense--><!-- search--><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><button class="search-close-button"><i class="solitude st-close-fill"></i></button></nav><div class="search-wrap"><div class="search-box"><input class="search-box-input" id="search-input" type="text" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="输入关键词快速查找"></div><div id="search-results"><div id="search-hits"></div></div><div id="search-pagination"></div><div id="search-tips"></div></div></div><div id="search-mask"></div></div><script src="/js/search/local.js?v=1.6.0"></script><!-- music--><div class="needEndHide" id="nav-music" onclick="sco.musicToggle()"><div id="nav-music-hoverTips">音乐已暂停</div><meting-js id="421801417" server="netease" type="playlist" mutex="true" preload="none" data-lrctype="0" order="random" theme="var(--efu-main)"></meting-js></div></body></html><script>const posts=["p/4337b2c0/","p/e042d029/","p/9b4a91e5/","p/9d8ce868/","p/a69f6a48/","p/74e1a37c/","p/f9b9edb2/","p/cbe55d0/","p/156c59d0/","p/d4d6f818/","p/2574cf15/","p/a0efc292/","p/ec2ecf28/","p/85f11265/","p/db95e6f5/","p/a8296e6d/","p/4cc89a71/","p/d0fe2d0f/","p/ffab2f6b/","p/95d9f91e/","p/7f869365/","p/5b246b1b/","p/a9c92fa9/","p/7d49fec0/","p/a9a25fcd/","p/43bb383e/","p/b9aeb4/","p/52eaf228/","p/4be90d2f/","p/ed500d41/","p/dcfbc8e5/","p/240e5e52/","p/18cda1b3/","p/66a6c396/","p/5f33341/","p/f9bef31e/","p/acac46b/","p/a4189438/","p/ae6b0147/","p/4e982f2d/","p/403e0cac/","p/495b9f0f/","p/8e966ab9/","p/f6e1007e/","p/6f562d19/","p/10eac329/","p/cc53cf58/","p/4f2beac6/","p/73e2aa1/","p/c677e75e/","p/3f13b766/","p/cc30f00/","p/807cab5e/","p/5b5991e4/","p/e941ffc/"];function toRandomPost(){ pjax.loadUrl('/'+posts[Math.floor(Math.random()*posts.length)]); }</script>
