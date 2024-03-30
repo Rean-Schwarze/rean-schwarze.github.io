@@ -7971,8 +7971,12 @@ div#banners .tags-group-all .tags-group-icon-pair a img {
 }
 #article-container a {
   color: var(--efu-fontcolor);
-  padding: 0 4px;
   border-radius: 4px 4px 0 0;
+  border-bottom: 2px dotted var(--efu-lighttext);
+  font-weight: 700;
+}
+#article-container a:not(.fancybox) {
+  padding: 0 4px;
 }
 #article-container a:not(.fancybox):hover {
   border: 0;
@@ -8201,15 +8205,18 @@ div#banners .tags-group-all .tags-group-icon-pair a img {
 #post .post-copyright .post-copyright__notice {
   font-size: 12px;
   margin: 0.5rem 0;
+  display: flex;
+  justify-content: center;
 }
 #post .post-copyright .post-copyright__notice .post-copyright-info {
   padding-left: 0;
   color: var(--efu-secondtext);
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 1;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   text-align: center;
+  max-width: 500px;
 }
 @media screen and (max-width: 768px) {
   #post .post-copyright .post-copyright__notice .post-copyright-info {
@@ -9557,7 +9564,7 @@ figure table td.gutter pre {
   color: var(--efu-secondtext);
   background: var(--efu-secondbg);
   border-right: var(--style-border-always);
-  text-align: right;
+  text-align: center;
 }
 figure table td.code {
   width: 100%;
