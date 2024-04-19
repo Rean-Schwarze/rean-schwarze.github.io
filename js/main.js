@@ -30,19 +30,19 @@ const sidebarFn = () => {
         if (utils.isHidden($toggleMenu)) {
             if ($mobileSidebarMenus.classList.contains('open')) closeMobileSidebar()
         }
+        sco.refreshWaterFall();
     })
 }
 
 const scrollFn = function () {
     const innerHeight = window.innerHeight;
-    const $header = document.getElementById('page-header');
-    if (!$header || document.body.scrollHeight <= innerHeight) return;
-
+    if (document.body.scrollHeight <= innerHeight) return;
     let initTop = 0;
-    window.addEventListener('scroll', utils.throttle(function (e) {
+    const $header = document.getElementById('page-header');
+    const throttledScroll = utils.throttle(function (e) {
+        initThemeColor();
         const currentTop = window.scrollY || document.documentElement.scrollTop;
         const isDown = scrollDirection(currentTop);
-
         if (currentTop > 0) {
             if (isDown) {
                 if ($header.classList.contains('nav-visible')) $header.classList.remove('nav-visible');
@@ -53,10 +53,13 @@ const scrollFn = function () {
         } else {
             $header.classList.remove('nav-fixed', 'nav-visible');
         }
-
-        percent();
-    }, 200));
-
+    }, 200);
+    window.addEventListener('scroll', function(e) {
+        throttledScroll(e);
+        if (window.scrollY === 0) {
+            $header.classList.remove('nav-fixed', 'nav-visible');
+        }
+    });
     function scrollDirection(currentTop) {
         const result = currentTop > initTop;
         initTop = currentTop;
@@ -65,37 +68,41 @@ const scrollFn = function () {
 }
 
 const percent = () => {
-    let scrollTop = document.documentElement.scrollTop || window.pageYOffset
-    let totalHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight, document.body.offsetHeight, document.documentElement.offsetHeight, document.body.clientHeight, document.documentElement.clientHeight) - document.documentElement.clientHeight
-    let scrollPercent = Math.round(scrollTop / totalHeight * 100)
-    let percentElement = document.querySelector("#percent")
-    let viewportBottom = window.scrollY + document.documentElement.clientHeight
-    let remainingScroll = totalHeight - scrollTop
-
-    if ((document.getElementById("post-comment") || document.getElementById("footer")).offsetTop < viewportBottom || scrollPercent > 90) {
-        document.querySelector("#nav-totop").classList.add("long")
-        percentElement.innerHTML = GLOBAL_CONFIG.lang.backtop
+    const docEl = document.documentElement;
+    const body = document.body;
+    const scrollPos = window.pageYOffset || docEl.scrollTop;
+    const scrollHeight = Math.max(body.scrollHeight, docEl.scrollHeight, body.offsetHeight, docEl.offsetHeight, body.clientHeight, docEl.clientHeight);
+    const viewportHeight = docEl.clientHeight;
+    const totalScrollableHeight = scrollHeight - viewportHeight;
+    const scrolledPercent = Math.round((scrollPos / totalScrollableHeight) * 100);
+    const navToTop = document.querySelector("#nav-totop");
+    const percentDisplay = document.querySelector("#percent");
+    const commentOrFooter = document.getElementById("post-comment") || document.getElementById("footer");
+    const isNearEnd = (window.scrollY + viewportHeight) >= commentOrFooter.offsetTop;
+    if (isNearEnd || scrolledPercent > 90) {
+        navToTop.classList.add("long");
+        percentDisplay.textContent = GLOBAL_CONFIG.lang.backtop;
     } else {
-        document.querySelector("#nav-totop").classList.remove("long")
-        if (scrollPercent >= 0) {
-            percentElement.innerHTML = scrollPercent + ""
-        }
+        navToTop.classList.remove("long");
+        percentDisplay.textContent = scrolledPercent;
     }
-
-    let elementsToHide = document.querySelectorAll(".needEndHide")
-    if (remainingScroll < 100) {
-        elementsToHide.forEach(function (element) {
-            element.classList.add("hide")
-        })
-    } else {
-        elementsToHide.forEach(function (element) {
-            element.classList.remove("hide")
-        })
-    }
-
+    const elementsToHide = document.querySelectorAll(".needEndHide");
+    elementsToHide.forEach(item => item.classList.toggle("hide", totalScrollableHeight - scrollPos < 100));
     window.onscroll = percent
 }
 
+const handleThemeChange = mode => {
+    const globalFn = window.globalFn || {}
+    const themeChange = globalFn.themeChange || {}
+    if (!themeChange) {
+        return
+    }
+
+    Object.keys(themeChange).forEach(key => {
+        const themeChangeFn = themeChange[key]
+        themeChangeFn(mode)
+    })
+}
 
 const showTodayCard = () => {
     const el = document.getElementById('todayCard')
@@ -127,6 +134,28 @@ const initObserver = () => {
     if (commentElement && paginationElement) {
         let observer = new IntersectionObserver(handleIntersection);
         observer.observe(commentElement);
+    }
+}
+
+function initThemeColor() {
+    const currentTop = window.scrollY || document.documentElement.scrollTop;
+    let themeColor;
+    if (currentTop > 0) {
+        themeColor = getComputedStyle(document.documentElement).getPropertyValue('--efu-card-bg');
+    } else if (PAGE_CONFIG.is_post) {
+        themeColor = getComputedStyle(document.documentElement).getPropertyValue('--efu-main');
+    } else {
+        themeColor = getComputedStyle(document.documentElement).getPropertyValue('--efu-background');
+    }
+    changeThemeColor(themeColor);
+}
+
+function changeThemeColor(color) {
+    if (null !== document.querySelector('meta[name="theme-color"]') && (document.querySelector('meta[name="theme-color"]').setAttribute("content", color),
+        document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]').setAttribute("content", color)),
+        window.matchMedia("(display-mode: standalone)").matches) {
+        const t = document.body;
+        t ? t.style.backgroundColor = color : console.error("document.body不存在")
     }
 }
 
@@ -204,6 +233,7 @@ class toc {
 
 let lastSayHello = "";
 let wleelw_musicPlaying = false
+let is_rm = typeof rm !== 'undefined'
 
 let sco = {
     hideCookie: function () {
@@ -238,14 +268,17 @@ let sco = {
         const $music = document.querySelector('#nav-music');
         const $meting = document.querySelector('meting-js');
         const $console = document.getElementById('consoleMusic');
-        const $toggleButton = document.getElementById('menu-music-toggle');
+        const $rm_text = document.querySelector('#menu-music-toggle span');
+        const $rm_icon = document.querySelector('#menu-music-toggle i');
         wleelw_musicPlaying = !wleelw_musicPlaying;
         $music.classList.toggle("playing", wleelw_musicPlaying);
         $console.classList.toggle("on", wleelw_musicPlaying);
         if (wleelw_musicPlaying) {
             $meting.aplayer.play();
+            rm?.menuItems.music[0] && ($rm_text.textContent = GLOBAL_CONFIG.right_menu.music.stop) && ($rm_icon.className = 'solitude st-pause-fill')
         } else {
             $meting.aplayer.pause();
+            rm?.menuItems.music[0] && ($rm_text.textContent = GLOBAL_CONFIG.right_menu.music.start) && ($rm_icon.className = 'solitude st-play-fill')
         }
     },
     switchCommentBarrage: function () {
@@ -254,17 +287,19 @@ let sco = {
             if (window.getComputedStyle(commentBarrageElement).display === "flex") {
                 commentBarrageElement.style.display = "none";
                 document.querySelector("#consoleCommentBarrage").classList.remove("on");
-                localStorage.removeItem("commentBarrageSwitch");
+                utils.saveToLocal.set("commentBarrageSwitch", false, .2);
+                rm?.menuItems.barrage && rm.barrage(true)
             } else {
                 commentBarrageElement.style.display = "flex";
                 document.querySelector("#consoleCommentBarrage").classList.add("on");
-                localStorage.setItem("commentBarrageSwitch", "false");
+                utils.saveToLocal.set("commentBarrageSwitch", true, .2);
+                rm?.menuItems.barrage && rm.barrage(false)
             }
         }
     },
     switchHideAside: function () {
         const htmlClassList = document.documentElement.classList;
-        htmlClassList.contains("hide-aside") ? saveToLocal.set("aside-status", "show", 1) : saveToLocal.set("aside-status", "hide", 1)
+        htmlClassList.contains("hide-aside") ? utils.saveToLocal.set("aside-status", "show", 1) : utils.saveToLocal.set("aside-status", "hide", 1)
         htmlClassList.toggle("hide-aside");
         htmlClassList.contains("hide-aside") ? document.querySelector("#consoleHideAside").classList.add("on") : document.querySelector("#consoleHideAside").classList.remove("on");
     },
@@ -300,17 +335,19 @@ let sco = {
             'light'
         if (nowMode === 'light') {
             document.documentElement.setAttribute('data-theme', 'dark')
-            saveToLocal.set('theme', 'dark', 0.02);
+            utils.saveToLocal.set('theme', 'dark', 0.02);
             utils.snackbarShow(GLOBAL_CONFIG.lang.theme.dark, false, 2000)
+            is_rm && rm.mode(true)
         } else {
             document.documentElement.setAttribute('data-theme', 'light')
-            saveToLocal.set('theme', 'light', 0.02);
+            utils.saveToLocal.set('theme', 'light', 0.02);
             utils.snackbarShow(GLOBAL_CONFIG.lang.theme.light, false, 2000)
+            is_rm && rm.mode(false)
         }
+        handleThemeChange(nowMode)
     },
     hideTodayCard: () => document.getElementById('todayCard').classList.add('hide'),
     toTop: () => utils.scrollToDest(0),
-
     showConsole: function () {
         let el = document.getElementById('console')
         if (el && !el.classList.contains('show')) {
@@ -321,21 +358,18 @@ let sco = {
         const el = document.getElementById('console')
         el && el.classList.remove('show')
     },
-    reflashEssayWaterFall: function () {
-        const el = document.getElementById('waterfall')
-        el && (() => {
-            setTimeout(function () {
-                waterfall('#waterfall');
-                el.classList.add('show');
-            }, 500);
-        })();
+    refreshWaterFall: function () {
+        const els = document.querySelectorAll('.waterfall')
+        if (els.length !== 0) {
+            els.forEach(el => waterfall(el) || el.classList.add('show'))
+        }
     },
     addRuntime: function () {
         let el = document.getElementById('runtimeshow')
         el && GLOBAL_CONFIG.runtime && (el.innerText = utils.timeDiff(new Date(GLOBAL_CONFIG.runtime), new Date()) + GLOBAL_CONFIG.lang.time.day)
     },
     toTalk: function (txt) {
-        const inputs = ["#wl-edit", ".el-textarea__inner"]
+        const inputs = ["#wl-edit", ".el-textarea__inner", "#veditor", ".atk-textarea"]
         for (let i = 0; i < inputs.length; i++) {
             let el = document.querySelector(inputs[i])
             if (el != null) {
@@ -349,6 +383,7 @@ let sco = {
                 el.setSelectionRange(-1, -1)
             }
         }
+        utils.snackbarShow(GLOBAL_CONFIG.lang.totalk, !1, 2e3);
     },
     initbbtalk: function () {
         if (document.querySelector('#bber-talk')) {
@@ -387,10 +422,10 @@ let sco = {
             const hours = timeNow.getHours();
             const lang = GLOBAL_CONFIG.aside.sayhello;
             const greetings = [{
-                    start: 0,
-                    end: 5,
-                    text: lang.goodnight
-                },
+                start: 0,
+                end: 5,
+                text: lang.goodnight
+            },
                 {
                     start: 6,
                     end: 10,
@@ -452,17 +487,13 @@ let sco = {
             categoryBarItems.forEach(item => {
                 item.classList.remove("select");
             });
-        }
-        if (decodedPath === "/") {
-            if (categoryBar) {
+            if (decodedPath === "/") {
                 const homeItem = document.getElementById("category-bar-home");
                 homeItem.classList.add("select");
-            }
-        } else {
-            if (/\/categories\/.*?\//.test(decodedPath)) {
-                let category = decodedPath.split("/").slice(-2, -1)[0];
-                category = category.charAt(0).toUpperCase() + category.slice(1);
-                if (categoryBar) {
+            } else {
+                if (/\/categories\/.*?\//.test(decodedPath)) {
+                    let category = decodedPath.split("/").slice(-2, -1)[0];
+                    category = category.charAt(0).toUpperCase() + category.slice(1);
                     const categoryItem = document.getElementById(category);
                     if (categoryItem) {
                         categoryItem.classList.add("select");
@@ -548,16 +579,14 @@ let sco = {
         });
     },
     addNavBackgroundInit: function () {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
-        if (scrollTop !== 0) {
-            const pageHeader = document.getElementById("page-header");
-            if (pageHeader) {
-                pageHeader.classList.add("nav-fixed", "nav-visible");
-            }
-            const cookiesWindow = document.getElementById("cookies-window");
-            if (cookiesWindow) {
-                cookiesWindow.style.display = 'none';
-            }
+        let e = 0
+            , t = 0;
+        document.body && (e = document.body.scrollTop),
+        document.documentElement && (t = document.documentElement.scrollTop),
+        0 !== (e - t > 0 ? e : t) && (document.getElementById("page-header").classList.add("nav-fixed"), document.getElementById("page-header").classList.add("nav-visible"))
+        const cookiesWindow = document.getElementById("cookies-window");
+        if (cookiesWindow) {
+            cookiesWindow.style.display = 'none';
         }
     },
     initAdjust: function (change = false) {
@@ -604,8 +633,7 @@ let sco = {
             document.getElementById("toPageButton").href = targetPageUrl;
         }
     },
-    owoBig() {
-        const owoSelectors = GLOBAL_CONFIG.comment.owo
+    owoBig(owoSelector) {
 
         let owoBig = document.getElementById('owo-big');
         if (!owoBig) {
@@ -628,8 +656,8 @@ let sco = {
 
         const showOwoBig = (event) => {
             const target = event.target;
-            const owoItem = target.closest(owoSelectors.item);
-            if (owoItem && target.closest(owoSelectors.body)) {
+            const owoItem = target.closest(owoSelector.item);
+            if (owoItem && target.closest(owoSelector.body)) {
                 const imgSrc = owoItem.querySelector('img')?.src;
                 if (imgSrc) {
                     owoBig.innerHTML = `<img src="${imgSrc}" style="max-width: 100%; height: auto;">`;
@@ -640,7 +668,7 @@ let sco = {
         };
 
         const hideOwoBig = (event) => {
-            if (event.target.closest(owoSelectors.item) && event.target.closest(owoSelectors.body)) {
+            if (event.target.closest(owoSelector.item) && event.target.closest(owoSelector.body)) {
                 owoBig.style.display = 'none';
             }
         };
@@ -660,19 +688,28 @@ let sco = {
             item.textContent = utils.diffDate(timeVal, true)
             item.style.display = 'inline'
         })
-    }
+    },
+    switchComments() {
+        const switchBtn = document.getElementById('switch-btn')
+        if (!switchBtn) return
+        let switchDone = false
+        const commentContainer = document.getElementById('post-comment')
+        const handleSwitchBtn = () => {
+            commentContainer.classList.toggle('move')
+            if (!switchDone && typeof loadTwoComment === 'function') {
+                switchDone = true
+                loadTwoComment()
+            }
+        }
+        utils.addEventListenerPjax(switchBtn, 'click', handleSwitchBtn)
+    },
 }
 
 const addHighlight = () => {
     const highlight = GLOBAL_CONFIG.highlight;
     if (!highlight) return;
 
-    const {
-        copy,
-        expand,
-        limit,
-        syntax
-    } = highlight;
+    const {copy, expand, limit, syntax} = highlight;
     const $isPrismjs = syntax === 'prismjs';
     const $isShowTool = highlight.enable || copy || expand || limit;
     const expandClass = !expand === true ? 'closed' : ''
@@ -773,13 +810,7 @@ const addHighlight = () => {
 
 const addCopyright = () => {
     if (!GLOBAL_CONFIG.copyright) return
-    const {
-        limit,
-        author,
-        link,
-        source,
-        info
-    } = GLOBAL_CONFIG.copyright
+    const {limit, author, link, source, info} = GLOBAL_CONFIG.copyright
     const handleCopy = (e) => {
         e.preventDefault()
         const copyText = window.getSelection(0).toString()
@@ -794,6 +825,17 @@ const addCopyright = () => {
         }
     }
     document.body.addEventListener('copy', handleCopy)
+}
+
+const asideStatus = () => {
+    const asideStatus = utils.saveToLocal.get('aside-status')
+    if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+            document.documentElement.classList.add('hide-aside')
+        } else {
+            document.documentElement.classList.remove('hide-aside')
+        }
+    }
 }
 
 class tabs {
@@ -834,17 +876,15 @@ class tabs {
 }
 
 window.refreshFn = () => {
-    if (PAGE_CONFIG.is_home) {
-        sco.changeTimeFormat(document.querySelectorAll('#recent-posts time'))
+    document.body.setAttribute('data-type', PAGE_CONFIG.page)
+    if (PAGE_CONFIG.is_home || PAGE_CONFIG.is_page) {
+        sco.changeTimeFormat(document.querySelectorAll('#recent-posts time, .webinfo-item time'))
         GLOBAL_CONFIG.runtime && sco.addRuntime()
     } else {
         sco.changeTimeFormat(document.querySelectorAll('#post-meta time'))
     }
-
-    sco.initAdjust()
     scrollFn()
     sidebarFn()
-    initObserver()
     sco.hideCookie()
     sco.addPhotoFigcaption()
     sco.setTimeState()
@@ -852,24 +892,27 @@ window.refreshFn = () => {
     sco.categoriesBarActive()
     sco.listenToPageInputPress()
     sco.addNavBackgroundInit()
+    sco.refreshWaterFall()
     GLOBAL_CONFIG.lazyload.enable && utils.lazyloadImg()
-    GLOBAL_CONFIG.lightbox && utils.lightbox(document.querySelectorAll("#article-container img:not(.flink-avatar)"))
+    GLOBAL_CONFIG.lightbox && utils.lightbox(document.querySelectorAll("#article-container img:not(.flink-avatar,.gallery-group img)"))
     GLOBAL_CONFIG.randomlink && randomLinksList()
-    PAGE_CONFIG.comment && initComment()
     PAGE_CONFIG.toc && toc.init();
     (PAGE_CONFIG.is_post || PAGE_CONFIG.is_page) && ((addHighlight()) || tabs.init())
-    addCopyright()
     PAGE_CONFIG.is_home && showTodayCard()
     GLOBAL_CONFIG.covercolor.enable && coverColor()
-    sco.initConsoleState()
-    GLOBAL_CONFIG.comment.commentBarrage && PAGE_CONFIG.comment && initializeCommentBarrage()
-    document.body.setAttribute('data-type', PAGE_CONFIG.page)
     PAGE_CONFIG.page === "music" && scoMusic.init()
-    GLOBAL_CONFIG.post_ai && PAGE_CONFIG.page === "post" && efu_ai.init()
+    GLOBAL_CONFIG.post_ai && PAGE_CONFIG.is_post && efu_ai.init()
+    sco.switchComments()
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    sco.initAdjust()
+    initObserver()
+    addCopyright()
+    sco.initConsoleState()
     window.refreshFn()
+    asideStatus()
+    percent()
 })
 
 window.onkeydown = function (e) {

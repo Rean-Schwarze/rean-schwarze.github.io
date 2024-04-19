@@ -29,7 +29,7 @@ const localColor = (path) => {
         setThemeColors(value, r, g, b);
     };
     img.onerror = function () {
-        console.error('图片加载失败');
+        console.error('Image Error');
     };
     img.src = path;
 }
@@ -137,25 +137,5 @@ function setThemeColors(value, r = null, g = null, b = null) {
         document.documentElement.style.setProperty('--efu-main-op-deep', 'var(--efu-theme-op-deep)');
         document.documentElement.style.setProperty('--efu-main-none', 'var(--efu-theme-none)');
         initThemeColor();
-    }
-}
-
-function initThemeColor() {
-    const currentTop = window.scrollY || document.documentElement.scrollTop;
-    let themeColor;
-    if (currentTop > 0) {
-        themeColor = getComputedStyle(document.documentElement).getPropertyValue('--efu-card-bg');
-    } else if (PAGE_CONFIG.is_post) {
-        themeColor = getComputedStyle(document.documentElement).getPropertyValue('--efu-main');
-    } else {
-        themeColor = getComputedStyle(document.documentElement).getPropertyValue('--efu-background');
-    }
-    changeThemeColor(themeColor);
-}
-
-function changeThemeColor(color) {
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) {
-        meta.setAttribute('content', color);
     }
 }
