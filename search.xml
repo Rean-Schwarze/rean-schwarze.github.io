@@ -4,6 +4,37 @@
   
     
     <entry>
+      <title>SpringBoot 项目部署云服务器</title>
+      <link href="/p/e6fa9b9/"/>
+      <url>/p/e6fa9b9/</url>
+      
+        <content type="html"><![CDATA[<h1 id="项目打包"><a class="headerlink" href="#项目打包"></a>项目打包</h1><h2 id="修改application-yml（可选）"><a class="headerlink" href="#修改application-yml（可选）"></a>修改application.yml（可选）</h2><p>将<code>datasource</code>里面的<code>username</code>和<code>password</code>改为待会部署后要用的，当然也可以保持不动</p><p>注意密码的安全性！</p><h2 id="打包"><a class="headerlink" href="#打包"></a>打包</h2><p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/image-20240421233211710.png" alt="image-20240421233211710" loading="lazy"></p><p>双击<code>package</code>即可打包，打包完成后即可在项目的<code>target</code>文件夹中找到打包好的<code>jar</code>文件</p><h2 id="导出数据库"><a class="headerlink" href="#导出数据库"></a>导出数据库</h2><p>打开<code>Workbench</code>，进入数据库，点击<code>Data Export</code></p><p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/image-20240421234045330.png" alt="image-20240421234045330" loading="lazy"></p><p>选择要导出的数据库，选择导出到单个文件</p><p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/image-20240421234151202.png" alt="image-20240421234151202" loading="lazy"></p><p>然后导出就可以了</p><h1 id="部署到云服务器"><a class="headerlink" href="#部署到云服务器"></a>部署到云服务器</h1><h2 id="添加网站"><a class="headerlink" href="#添加网站"></a>添加网站</h2><p>首先在宝塔的文件中，一个合适的位置（<code>/www/wwwroot/项目名</code>）上传打包好的<code>jar</code>文件</p><p>来到宝塔面板的<code>网站</code>，选择<code>Java项目</code>，添加</p><p>初次使用时，需要先安装<code>JDK</code>，安装对应版本即可</p><p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/image-20240421224234894.png" alt="image-20240421224234894" loading="lazy"></p><p>安装完之后重新打开添加面板，选择<code>jar</code>路径，填写端口（别忘了在防火墙放行）</p><p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/image-20240421224446732.png" alt="image-20240421224446732" loading="lazy"></p><p>以及别忘了安装<code>Redis</code>（如果项目中用到了的话）</p><h2 id="导入数据库"><a class="headerlink" href="#导入数据库"></a>导入数据库</h2><p>宝塔中MySQL版本需要和我们实际用的版本一致（比如8.0），默认安装时是5.7，如果不一致，可以卸载重装（极速安装（好吧一点也不极速 慢死了！）</p><p>放一个网上的方法（没试过行不行），在服务器的远程控制台中执行：</p><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">wget http://download.bt.cn/install/1/mysql.sh;</span><br><span class="line">bash mysql.sh install 5.7</span><br></pre></td></tr></table></figure><p>请注意：如果你已经安装了数据库，上面的命令会卸载删除当前数据库及数据</p><p>添加数据库（数据库名、用户名和密码要和项目设置<code>application.yml</code>保持一致）</p><p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/image-20240421224656951.png" alt="image-20240421224656951" loading="lazy"></p><p>注意密码/权限！有朋友数据库被黑过的！</p><p>然后就是上传，导入（数据库版本不一致可能会导入失败！）</p><p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/image-20240421224844222.png" alt="image-20240421224844222" loading="lazy"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 教程 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 部署 </tag>
+            
+            <tag> 云服务器 </tag>
+            
+            <tag> 宝塔 </tag>
+            
+            <tag> SpringBoot </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>【奥斯卡/永夜Minus】《如果可以》我想和你回到那天相遇（Cover：韦礼安/蔡依林）【Synthesizer V Cover】</title>
       <link href="/p/866abf45/"/>
       <url>/p/866abf45/</url>
