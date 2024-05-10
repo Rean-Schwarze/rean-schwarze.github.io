@@ -1,12 +1,13 @@
 /**
  * Music Player
- * author: @efu
- * date: 2024-03-19
- * update: 2024-03-19
+ * @description Initialize the music player and add event listeners to control the player
  */
-
 class ScoMusicPlayer {
+    constructor() {
+        this.init();
+    }
     init() {
+        document.documentElement.style.setProperty('--vh', `${window.innerHeight}px`);
         this.getCustomPlayList();
         this.addEventListenerToDocument();
         this.addButtonListEventListener();
@@ -106,6 +107,16 @@ class ScoMusicPlayer {
                 break;
         }
     }
+    destroy() {
+        document.removeEventListener("keydown", this.handleKeydown);
+    }
 }
 
-const scoMusic = new ScoMusicPlayer();
+/**
+ * Initialize the music player
+ */
+function initializeMusicPlayer() {
+    let exitingMusic = window.scoMusic;
+    if (exitingMusic) exitingMusic.destroy();
+    window.scoMusic = new ScoMusicPlayer();
+}
