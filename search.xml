@@ -4650,9 +4650,19 @@ or <code>TfidVectorizer(stop_words=[a, and, the])</code> to filter these three w
 <p>配置<code>vite.config.ts</code>：</p>
 <figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="attr">optimizeDeps</span>: &#123;</span><br><span class="line">    <span class="attr">exclude</span>: [<span class="string">&#x27;@ffmpeg/ffmpeg&#x27;</span>, <span class="string">&#x27;@ffmpeg/util&#x27;</span>]</span><br><span class="line">  &#125;,</span><br></pre></td></tr></table></figure>
 <h1 id="使用"><a class="headerlink" href="#使用"></a>使用</h1>
-<h2 id="初始化"><a class="headerlink" href="#初始化"></a>初始化</h2>
+<p>2024/06/16 更新</p>
+<h2 id="初始化（在线加载）"><a class="headerlink" href="#初始化（在线加载）"></a>初始化（在线加载）</h2>
 <figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; <span class="title class_">FFmpeg</span> &#125; <span class="keyword">from</span> <span class="string">&#x27;@ffmpeg/ffmpeg&#x27;</span></span><br><span class="line"><span class="keyword">import</span> <span class="keyword">type</span> &#123; <span class="title class_">LogEvent</span> &#125; <span class="keyword">from</span> <span class="string">&#x27;@ffmpeg/ffmpeg/dist/esm/types&#x27;</span></span><br><span class="line"><span class="keyword">import</span> &#123; fetchFile, toBlobURL &#125; <span class="keyword">from</span> <span class="string">&#x27;@ffmpeg/util&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> baseURL = <span class="string">&#x27;https://unpkg.com/@ffmpeg/core-mt@0.12.6/dist/esm&#x27;</span></span><br><span class="line"><span class="keyword">const</span> ffmpeg = <span class="keyword">new</span> <span class="title class_">FFmpeg</span>();</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">initFFMpeg</span>=<span class="keyword">async</span> (<span class="params"></span>)=&gt;&#123;</span><br><span class="line">        ffmpeg.<span class="title function_">on</span>(<span class="string">&#x27;log&#x27;</span>, <span class="function">(<span class="params">e</span>) =&gt;</span> &#123;</span><br><span class="line">            <span class="variable language_">console</span>.<span class="title function_">log</span>(e.<span class="property">message</span>);</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">await</span> ffmpeg.<span class="title function_">load</span>(&#123;</span><br><span class="line">            <span class="attr">coreURL</span>: <span class="keyword">await</span> <span class="title function_">toBlobURL</span>(<span class="string">`<span class="subst">$&#123;baseURL&#125;</span>/ffmpeg-core.js`</span>, <span class="string">&#x27;text/javascript&#x27;</span>),</span><br><span class="line">            <span class="attr">wasmURL</span>: <span class="keyword">await</span> <span class="title function_">toBlobURL</span>(<span class="string">`<span class="subst">$&#123;baseURL&#125;</span>/ffmpeg-core.wasm`</span>, <span class="string">&#x27;application/wasm&#x27;</span>),</span><br><span class="line">            <span class="attr">workerURL</span>: <span class="keyword">await</span> <span class="title function_">toBlobURL</span>(<span class="string">`<span class="subst">$&#123;baseURL&#125;</span>/ffmpeg-core.worker.js`</span>, <span class="string">&#x27;text/javascript&#x27;</span>)</span><br><span class="line">        &#125;)</span><br><span class="line">        <span class="title class_">ElMessage</span>.<span class="title function_">success</span>(<span class="string">&#x27;FFMpeg 已加载&#x27;</span>)</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<p>其中这里是通过网络加载<code>FFMpeg</code>的核心等等，完全离线的方法可以使用<code>vite-plugin-static-copy</code>（还没试，以后试了在更新（（</p>
+<p>其中这里是通过网络加载<code>FFMpeg</code>的核心等等，开发环境下配置<code>vite.config.ts</code>可以正常加载，但是生产环境（打包后）将会<strong>无法加载</strong></p>
+<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="attr">server</span>: &#123;</span><br><span class="line">    <span class="attr">headers</span>: &#123;</span><br><span class="line">      <span class="string">&#x27;Cross-Origin-Opener-Policy&#x27;</span>: <span class="string">&#x27;same-origin&#x27;</span>,</span><br><span class="line">      <span class="string">&#x27;Cross-Origin-Embedder-Policy&#x27;</span>: <span class="string">&#x27;require-corp&#x27;</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>原因：这里面要获取的<code>wasm</code>比较大（ps：获取两个js没问题），需要用到<code>SharedArrayBuffer</code>，而<code>SharedArrayBuffer</code>需要<strong>开启了跨域隔离</strong>才能正常使用（在控制台中输入 <code>crossOriginIsolated</code> 回车，为 false，则说明并没有开启跨域隔离），而上面的设置仅对开发环境有效，生产环境不起作用。或许在<code>Nginx</code>里面配置可以解决，但是这里不作研究了，因为我这里要做的是一个桌面应用程序，而不是网站</p>
+<h2 id="初始化（静态资源加载）"><a class="headerlink" href="#初始化（静态资源加载）"></a>初始化（静态资源加载）</h2>
+<p>把加载过程中用到的三个文件放到<code>public</code>文件夹</p>
+<p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/841106e2f7ed4f6da5f194a5b36f589b.png" alt="img" loading="lazy"></p>
+<p>然后加载就可以了</p>
+<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; <span class="title class_">FFmpeg</span> &#125; <span class="keyword">from</span> <span class="string">&#x27;@ffmpeg/ffmpeg&#x27;</span></span><br><span class="line"><span class="keyword">import</span> <span class="keyword">type</span> &#123; <span class="title class_">LogEvent</span> &#125; <span class="keyword">from</span> <span class="string">&#x27;@ffmpeg/ffmpeg/dist/esm/types&#x27;</span></span><br><span class="line"><span class="keyword">import</span> &#123; fetchFile, toBlobURL &#125; <span class="keyword">from</span> <span class="string">&#x27;@ffmpeg/util&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> ffmpeg = <span class="keyword">new</span> <span class="title class_">FFmpeg</span>();</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">initFFMpeg</span>=<span class="keyword">async</span> (<span class="params"></span>)=&gt;&#123;</span><br><span class="line">        ffmpeg.<span class="title function_">on</span>(<span class="string">&#x27;log&#x27;</span>, <span class="function">(<span class="params">e</span>) =&gt;</span> &#123;</span><br><span class="line">            <span class="variable language_">console</span>.<span class="title function_">log</span>(e.<span class="property">message</span>);</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">await</span> ffmpeg.<span class="title function_">load</span>(&#123;</span><br><span class="line">            <span class="attr">coreURL</span>: <span class="keyword">await</span> <span class="title function_">toBlobURL</span>(<span class="string">`./ffmpeg-core.js`</span>, <span class="string">&#x27;text/javascript&#x27;</span>),</span><br><span class="line">            <span class="attr">wasmURL</span>: <span class="keyword">await</span> <span class="title function_">toBlobURL</span>(<span class="string">`./ffmpeg-core.wasm`</span>, <span class="string">&#x27;application/wasm&#x27;</span>),</span><br><span class="line">            <span class="attr">workerURL</span>: <span class="keyword">await</span> <span class="title function_">toBlobURL</span>(<span class="string">`./ffmpeg-core.worker.js`</span>, <span class="string">&#x27;text/javascript&#x27;</span>)</span><br><span class="line">        &#125;)</span><br><span class="line">        <span class="title class_">ElMessage</span>.<span class="title function_">success</span>(<span class="string">&#x27;FFMpeg 已加载&#x27;</span>)</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>这么做的话开发环境和生产环境都没问题，只是打包后体积会变大一点</p>
+<p>还有一个缺点的话，亲测如果非要部署到服务器上当一个网站来用，加载的时候会<strong>非 常 慢</strong>（但也总比获取不了<code>wasm</code>好（（（</p>
 <h2 id="使用-2"><a class="headerlink" href="#使用-2"></a>使用</h2>
 <figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="attr">raw</span>:<span class="title class_">File</span>=audioList.<span class="property">value</span>.<span class="title function_">find</span>(<span class="function"><span class="params">obj</span>=&gt;</span>obj.<span class="property">name</span>===row.<span class="property">name</span>)?.<span class="property">raw</span></span><br><span class="line"><span class="keyword">await</span> ffmpeg.<span class="title function_">writeFile</span>(row.<span class="property">name</span>, <span class="keyword">await</span> <span class="title function_">fetchFile</span>(raw))</span><br><span class="line"><span class="keyword">await</span> ffmpeg.<span class="title function_">exec</span>([<span class="string">&#x27;-i&#x27;</span>,row.<span class="property">name</span>,<span class="string">&#x27;-ar&#x27;</span>,row.<span class="property">sample</span>,<span class="string">&#x27;-acodec&#x27;</span>,row.<span class="property">bit</span>,exportName])</span><br><span class="line"><span class="keyword">const</span> data=<span class="keyword">await</span> ffmpeg.<span class="title function_">readFile</span>(exportName)</span><br><span class="line"><span class="keyword">const</span> exportPath=<span class="variable constant_">URL</span>.<span class="title function_">createObjectURL</span>(<span class="keyword">new</span> <span class="title class_">Blob</span>([(data <span class="keyword">as</span> <span class="title class_">Uint8Array</span>).<span class="property">buffer</span>],&#123;<span class="attr">type</span>:<span class="string">&#x27;audio/wav&#x27;</span>&#125;))</span><br></pre></td></tr></table></figure>
 <p><code>fetchFile</code>里面可以传入File对象，也可以传入一个URL</p>
@@ -4767,6 +4777,7 @@ or <code>TfidVectorizer(stop_words=[a, and, the])</code> to filter these three w
 <p><a href="https://ruanyifeng.com/blog/2020/01/ffmpeg.html">FFmpeg 视频处理入门教程 - 阮一峰的网络日志 (ruanyifeng.com)</a></p>
 <p><a href="https://blog.csdn.net/ETalien_/article/details/102931065">ffmpeg：码率控制模式、编码方式_ffmpeg bitrate-CSDN博客</a></p>
 <p>[<a href="https://www.cnblogs.com/frost-yen/p/5848781.html">FFmpeg] ffmpeg 常用命令 - 晏过留痕 - 博客园 (cnblogs.com)</a></p>
+<p><a href="https://blog.csdn.net/qq_45902692/article/details/135032429">FFmpeg——在Vue项目中使用FFmpeg（安装、配置、使用、SharedArrayBuffer、跨域隔离、避坑…）_vue ffmpeg-CSDN博客</a></p>
 ]]></content>
       <categories>
         <category>教程</category>
@@ -9950,6 +9961,63 @@ SP：天津唐人影视股份有限公司 、北京千亩稻田文化传播有�
         <tag>歌手2024</tag>
         <tag>呼吸决定</tag>
         <tag>Fine乐团</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SyncTV &amp; AList 配置教程</title>
+    <url>/p/b3641215/</url>
+    <content><![CDATA[<p>此处默认宝塔已安装，不会的朋友可以翻翻我前面不知道多少篇教程（</p>
+<h1 id="前期准备"><a class="headerlink" href="#前期准备"></a>前期准备</h1>
+<p>确保端口<code>8080</code>没有被别的什么东西占用！！！有的话改成别的！</p>
+<p>因为<code>SyncTV</code>会默认占用<code>8080</code>端口，而且也找不到哪里可以改（</p>
+<p>全网肯定找不到第二篇说这个的，三连吧还等什么（不是</p>
+<h1 id="安装Docker"><a class="headerlink" href="#安装Docker"></a>安装Docker</h1>
+<p>点击宝塔面板左侧的<code>Docker</code>，如果还没安装过，直接点击安装即可</p>
+<h1 id="创建容器"><a class="headerlink" href="#创建容器"></a>创建容器</h1>
+<h2 id="拉取镜像"><a class="headerlink" href="#拉取镜像"></a>拉取镜像</h2>
+<p>然后点击<code>镜像</code>-<code>搜索镜像</code></p>
+<p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/image-20240616232728976.png" alt="image-20240616232728976" loading="lazy"></p>
+<p>搜索：<code>synctvorg/synctv</code>，点击<code>拉取</code>即可</p>
+<h2 id="创建容器-2"><a class="headerlink" href="#创建容器-2"></a>创建容器</h2>
+<p>点击<code>容器</code>-<code>创建容器</code>，名称随便输，镜像选择刚刚拉取的，端口添加一组映射：自定义端口→8080</p>
+<p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/image-20240616233516700.png" alt="image-20240616233516700" loading="lazy"></p>
+<p>别忘了开放自定义端口！</p>
+<h1 id="访问SyncTV"><a class="headerlink" href="#访问SyncTV"></a>访问SyncTV</h1>
+<p>然后就可以访问了</p>
+<p>默认的账密都是<code>root</code></p>
+<h2 id="注册相关"><a class="headerlink" href="#注册相关"></a>注册相关</h2>
+<p>注册的话目前没找到可以从哪里点进去，但是是有这么一个页面的，可以输地址访问（<code>.../web/auth/register</code>）</p>
+<p>然后相应的设置也别忘了开</p>
+<p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/image-20240616234013521.png" alt="image-20240616234013521" loading="lazy"></p>
+<p>不过小范围用的话没必要了，直接后台添加就可以</p>
+<h2 id="播放相关"><a class="headerlink" href="#播放相关"></a>播放相关</h2>
+<h3 id="视频直链"><a class="headerlink" href="#视频直链"></a>视频直链</h3>
+<p>需要保证链接是自己可以通过地址栏输入访问到的，但是因为大部分都有防盗链的，这个基本没啥用</p>
+<p>而且自定义header也是摆设，加不了一点，官方的回复是：有些header会被浏览器限制的，使用代理功能</p>
+<p>然而使用代理也无法避免403的问题，所以这个功能很难评 我祝他成功吧</p>
+<h3 id="直播流"><a class="headerlink" href="#直播流"></a>直播流</h3>
+<p>目前测试下来，播B站的会有比较<strong>频繁</strong>的卡住的问题，需要取消再播放才可以，也约等于摆设。。。</p>
+<p>其他的直播源未测试</p>
+<h1 id="AList配置"><a class="headerlink" href="#AList配置"></a>AList配置</h1>
+<p>直接在宝塔的软件商店里面搜索<code>alist</code>安装即可</p>
+<p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/image-20240616234838980.png" alt="image-20240616234838980" loading="lazy"></p>
+<p>点击设置里面的链接即可访问（别忘了开放端口）</p>
+<p>登录后点击左侧的<code>存储</code>-<code>添加</code>，选择对应的盘添加即可，详细看官方文档吧，很详细</p>
+<p><a href="https://alist.nn.ci/zh/guide/drivers/local.html">本地存储 | AList文档 (nn.ci)</a></p>
+<h2 id="使用AList"><a class="headerlink" href="#使用AList"></a>使用AList</h2>
+<p>在<code>SyncTV</code>个人中心处绑定后即可使用</p>
+<p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/image-20240616235335619.png" alt="image-20240616235335619" loading="lazy"></p>
+<h1 id="参考链接"><a class="headerlink" href="#参考链接"></a>参考链接</h1>
+<p><a href="http://it.zaojiamao.vip/index.php/2024/06/13/synctv%E5%92%8C%E4%BD%A0%E7%9A%84%E5%BC%82%E5%9C%B0%E6%81%8B%E5%B0%8F%E5%A5%B3%E5%8F%8B%E7%9C%8B%E5%B0%8F%E8%A7%86%E9%A2%91%E7%9A%84%E7%B3%BB%E7%BB%9F/">SyncTV和你的异地恋小女友看小视频的系统-狗哥论坛-网络技术 (zaojiamao.vip)</a></p>
+]]></content>
+      <categories>
+        <category>配置</category>
+      </categories>
+      <tags>
+        <tag>宝塔</tag>
+        <tag>SyncTV</tag>
+        <tag>AList</tag>
+        <tag>Docker</tag>
       </tags>
   </entry>
 </search>
