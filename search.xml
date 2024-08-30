@@ -19324,4 +19324,374 @@ BOSS-碧臂螂：集齐大圣套装的头冠、胸甲、腿甲后，回到土地
         <tag>数据库</tag>
       </tags>
   </entry>
+  <entry>
+    <title>【MySQL】锁</title>
+    <url>/p/25d2b878/</url>
+    <content><![CDATA[<h2 id="MySQL-中有哪些锁类型？"><a class="headerlink" href="#MySQL-中有哪些锁类型？"></a>MySQL 中有哪些锁类型？</h2>
+<p>这个答案比较长，也是从演进的角度来讲解 MySQL 中比较关键的几个锁，这样记忆和理解会更深刻，减少出现看过没多久就忘了的情况。</p>
+<h3 id="共享锁和排他锁"><a class="headerlink" href="#共享锁和排他锁"></a>共享锁和排他锁</h3>
+<p>在 MySQL 中锁可以分为两大类，分别是 shared (S) locks 和 exclusive (X) locks。</p>
+<ul>
+<li>S锁，称为共享锁，事务在读取记录的时候获取 S 锁，它允许多个事务同时获取 S 锁，互相之间不会冲突。</li>
+<li>X锁，称为独占锁（排他锁），事务在修改记录的时候获取 X 锁，且只允许一个事务获取 X 锁，其它事务需要阻塞等待。</li>
+</ul>
+<p>S 锁之间不冲突，X 锁则为独占锁，所以 X 之间会冲突， X 和 S 也会冲突。</p>
+<table>
+<thead>
+<tr>
+<th>冲突</th>
+<th>S</th>
+<th>X</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S</td>
+<td>不冲突</td>
+<td>冲突</td>
+</tr>
+<tr>
+<td>X</td>
+<td>冲突</td>
+<td>冲突</td>
+</tr>
+</tbody>
+</table>
+<p><code>SELECT ... LOCK IN SHARE MODE;</code> 这种读取需要对记录上 S 锁。</p>
+<p><code>SELECT ... FOR UPDATE;</code> 需要对记录上 X 锁。</p>
+<p>MyISAM 引擎仅支持表锁，而 Innodb 即支持表锁也支持行锁。</p>
+<ul>
+<li><code>LOCK TABLES yes READ</code> 是对 yes 这个表上 S 锁。</li>
+<li><code>LOCK TABLES yes WRITE</code> 是对 yes 这个表上 X 锁。</li>
+</ul>
+<p>不过一般情况下，我们不会使用表锁，因为平日的 UPDATE 、SELECT 要用也是用行锁了，不可能用粒度粗的表锁，不然性能太低。</p>
+<p>唯一能想到用上表锁的就是 DDL 语句了，比如 ALTER TABLE 的时候，应该锁定整个表，防止查询和修改，但是这个 server 已经提供了一个叫 MDL 的锁，即 <code>Metadata Locks</code>（元数据锁）。</p>
+<h3 id="元数据锁（MDL）"><a class="headerlink" href="#元数据锁（MDL）"></a>元数据锁（MDL）</h3>
+<p>元数据锁也分为读锁和写锁：</p>
+<p>1）读锁 (MDL_SHARED)：</p>
+<p>当一个事务需要读取表的元数据时（如执行 SELECT 操作），会获取读锁。 多个事务可以同时持有读锁，不会互相阻塞。</p>
+<p>2）写锁 (MDL_EXCLUSIVE)：</p>
+<p>当一个事务需要修改表的元数据时（如执行 ALTER TABLE 操作），会获取写锁。 写锁会阻塞其他任何读锁和写锁，确保独占访问。</p>
+<p>元数据锁的主要作用如下：</p>
+<p>1）防止并发的 DDL 操作和 DML 操作冲突：</p>
+<ul>
+<li>当一个事务对表进行结构性更改（如 ALTER TABLE），元数据锁（写锁）会阻止其他事务对该表进行操作，直到结构更改完成。</li>
+<li>当一个事务对表进行数据操作（如 SELECT、INSERT、UPDATE、DELETE），元数据锁（读锁）会阻止其他事务对该表进行结构性更改。</li>
+</ul>
+<p>2）保护元数据一致性：</p>
+<ul>
+<li>确保在执行 DDL 操作（如 CREATE TABLE、DROP TABLE、ALTER TABLE）时，元数据不会被其他事务同时修改。</li>
+</ul>
+<p>假设业务上真用到了表锁，那么表锁和行锁之间肯定会冲突，当 InnoDB 加表锁的时候，如何判断表里面是否已经有行锁？难道得一条记录一条记录遍历过去找吗？</p>
+<p>显然这样的效率太低了！</p>
+<h3 id="意向锁"><a class="headerlink" href="#意向锁"></a>意向锁</h3>
+<p>所以有了个叫意向锁（Intention Locks）的东西。</p>
+<ul>
+<li>IS（Intention Shared Lock），共享意向锁。</li>
+<li>IX（Intention Exclusive Lock），独占意向锁。</li>
+</ul>
+<p>这两个锁是表级别的锁，当需要对表中的某条记录上 S 锁的时候，先在表上加个 IS 锁，表明此时表内有 S 锁。当需要对表中的某条记录上 X 锁的时候，先在表上加个 IX 锁，表明此时表内有 X 锁。</p>
+<p>这样操作之后，如果要加表锁，就不需要遍历所有记录去找了，直接看看表上面有没有 IS 和 IX 锁。</p>
+<p>比如，此时要上表级别的 S 锁，如果表上没有 IX ，说明表中没有记录有独占锁，其实就可以直接上表级 S 锁。</p>
+<p>如果此时要上表级别的 X 锁，如果表上没有 IX 和 IS ，说明表中的所有记录都没加锁，其实就可以直接上表级 X 锁。</p>
+<p><strong>因此 IS 和 IX 的作用就是在上表级锁的时候，可以快速判断是否可以上锁，而不需要遍历表中的所有记录</strong>。</p>
+<p>所以 IS 和 IX 互相之间是不会冲突的，因为它们的作用只是打个标记，来丰富一下上面的表格：</p>
+<table>
+<thead>
+<tr>
+<th>冲突</th>
+<th>S</th>
+<th>X</th>
+<th>IS</th>
+<th>IX</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S</td>
+<td>不冲突</td>
+<td>冲突</td>
+<td>不冲突</td>
+<td>冲突</td>
+</tr>
+<tr>
+<td>X</td>
+<td>冲突</td>
+<td>冲突</td>
+<td>冲突</td>
+<td>冲突</td>
+</tr>
+<tr>
+<td>IS</td>
+<td>不冲突</td>
+<td>冲突</td>
+<td>不冲突</td>
+<td>不冲突</td>
+</tr>
+<tr>
+<td>IX</td>
+<td>冲突</td>
+<td>冲突</td>
+<td>不冲突</td>
+<td>不冲突</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Auto-Inc-Lock"><a class="headerlink" href="#Auto-Inc-Lock"></a>Auto-Inc Lock</h3>
+<p>Auto-Inc Lock 是一个特殊的<strong>表级锁</strong>，用于自增列插入数据时使用。 在插入一条数据的时候，需要在表上加个 Auto-Inc Lock，然后为自增列分配递增的值，在语句插入结束之后，再释放 Auto-Inc Lock。</p>
+<p>在 MySQL 5.1.22 版本之后，又弄了个互斥量来进行自增减的累加。互斥量的性能高于 Auto-Inc Lock，因为 Auto-Inc Lock是语句插入完毕之后才释放锁，而互斥量是在语句插入的时候，<strong>获得递增值之后，就可以释放锁</strong>，所以性能更好。</p>
+<p>但是我们还需要考虑主从的情况，由于<strong>并发插入</strong>的情况，基于 statement -based binlog 复制时，自增的值顺序无法把控，可能会导致主从数据不一致。</p>
+<p>所以 MySQL 有个 innodb_autoinc_lock_mode 配置，一共有三个值：</p>
+<ul>
+<li>0，只用 Auto-Inc Lock。</li>
+<li>1，<strong>默认值</strong>，对于插入前已知插入行数的插入，用互斥量，对于插入前不知道具体插入数的插入，用 Auto-Inc Lock，这样即使基于 statement -based binlog 复制也是安全的。</li>
+<li>2，只用互斥量。</li>
+</ul>
+<p>至此，已经理解了共享锁、独占锁、表锁相关的知识，接下来再来看看 MySQL 中的行锁有哪几种。</p>
+<p>主要有三种：</p>
+<ul>
+<li>记录锁（Record Locks）</li>
+<li>间隙锁（Gap Locks）</li>
+<li>临键锁（Next-Key Locks）</li>
+</ul>
+<h3 id="记录锁"><a class="headerlink" href="#记录锁"></a>记录锁</h3>
+<p>记录锁顾名思义就是锁住当前的记录，它是<strong>作用到索引上</strong>的。我们都知道 innodb 是肯定有索引的，即使没有主键也会创建隐藏的聚簇索引，所以<strong>记录锁总是锁定索引记录</strong>。</p>
+<p>比如，此时一个事务 A 执行 <code>SELECT * FROM yes WHERE name = 'xx' FOR UPDATE;</code> 那么 name = xx 这条记录就被锁定了，其他事务无法插入、删除、修改 name = xx 的记录。</p>
+<p>此时事务 A 还未提交，另一个事务 B 要执行 <code>insert into yes (name) values ('xx')</code>，此时会被阻塞，这个很好理解。</p>
+<p>但是，如果另一个事务 C 执行了 <code>insert into yes (name) values ('aa')</code>，这个语句会被阻塞吗？</p>
+<p><strong>看情况</strong>。</p>
+<p><strong>如果 name 没有索引</strong>。前面提到记录锁是加到索引上的，但是 name 没索引啊，那只能去找聚簇索引，但聚簇索引上面只有主键啊，它哪知道各自的 name 是什么，所以咋办？都锁了呗！</p>
+<p>因此，<strong>如果 name 没有索引，那么事务 C 会被阻塞，如果有索引，则不会被阻塞</strong>！</p>
+<p>所以这里要注意，没索引的列不要轻易的锁，不要以为有行锁就可以为所欲为，并不是这样的。</p>
+<h3 id="间隙锁和临键锁"><a class="headerlink" href="#间隙锁和临键锁"></a>间隙锁和临键锁</h3>
+<p>前面说了，记录锁需要加到记录上，但是如果<strong>要给此时还未存在的记录加锁怎么办</strong>？也就是要预防幻读的出现！</p>
+<p>这时候间隙锁就派上用场了，它是给间隙加上锁。</p>
+<p>比如此时有 1、3、5、10 这四条记录，之前的文章分析过，数据页中还有两条虚拟的记录，分别是 <code>Infimum</code> 和 <code>Supremum</code>。</p>
+<p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/TJoGOsWO_image.png" alt loading="lazy"></p>
+<p>可以看到，记录之前都有间隙，<strong>那间隙锁呢，锁的就是这个间隙</strong>！</p>
+<p>比如我把 3 和 5 之间的间隙锁了，此时要插入 id = 4 的记录，就会被这个间隙锁给阻塞了，这样就避免了幻读的产生！也就实现了锁定未插入的记录的需求！</p>
+<p>还有个 <code>Next-Key Locks</code> 就是记录锁+间隙锁，像上面间隙锁的举例，只能锁定(3,5) 这个区间，而 <code>Next-Key Locks</code> 是一个前开后闭的区间(3,5]，这样能防止查询 id=5 的这个幻读。</p>
+<p>间隙锁之间不会冲突，<strong>间隙锁的唯一目的就是防止其他事务插入数据到间隙中</strong> ，所以即使两个间隙锁要锁住相同的间隙也没有关系，因为它们的目的是一致的。</p>
+<p>间隙锁可以显式禁用，它是在事务隔离级别为可重复读的时候生效的，如果将事务隔离级别更改为 READ COMMITTED，就会禁用了，此时，间隙锁对于搜索和索引扫描是禁用的，仅用于外键约束检查和重复键检查。</p>
+<h3 id="插入意向锁"><a class="headerlink" href="#插入意向锁"></a>插入意向锁</h3>
+<p>插入意向锁，即 Insert Intention Locks，<strong>它也是一类间隙锁</strong>，但是它<strong>不是锁定间隙，而是等待某个间隙</strong>。比如上面举例的 id = 4 的那个事务 C ，由于被间隙锁给阻塞了，所以事务 C 会生成一个插入意向锁，表明等待这个间隙锁的释放。</p>
+<p>并且插入意向锁之间不会阻塞，因为它们的目的也是只等待这个间隙被释放，所以插入意向锁之间没有冲突。</p>
+<p>它的目的不在于锁定资源防止别人访问，我个人觉得更像是为了遵循 MySQL 的锁代码实现而为之。</p>
+<p><strong>锁其实就是内存里面的一个结构</strong>，每个事务为某个记录或者间隙上锁就是创建一个锁对象来争抢资源。</p>
+<p>如果某个事务没有抢到资源，那也会生成一个锁对象，只是状态是等待的，而当拥有资源的事务释放锁之后，就会寻找正在等待当前资源的锁结构，然后选一个让它获得资源并唤醒对应的事务使之得以执行。</p>
+<p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/W99AP5cD_image.png" alt loading="lazy"></p>
+<p>所以按照这么个逻辑，<strong>那些在等待间隙锁的插入事务，也需要对应的建立一个锁结构，然后锁类型是插入意向锁</strong>。</p>
+<p>这样一来，间隙锁的事务在释放间隙锁的时候，才能得以找到那些等待插入的事务，然后进行唤醒，而由锁的类型也可以得知是插入意向锁，之间不需要阻塞，所以可以一起执行插入。</p>
+<p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/VwKY3SBK_image.png" alt loading="lazy"></p>
+<h2 id="update-没加索引会锁全表？"><a class="headerlink" href="#update-没加索引会锁全表？"></a>update 没加索引会锁全表？</h2>
+<p>大概就是，在线上执行一条 update 语句修改数据库数据的时候，where 条件没有带上索引，导致业务直接崩了</p>
+<p>这次我们就来看看：</p>
+<ul>
+<li>为什么会发生这种的事故？</li>
+<li>又该如何避免这种事故的发生？</li>
+</ul>
+<p>说个前提，接下来说的案例都是基于 InnoDB 存储引擎，且事务的隔离级别是可重复读。</p>
+<h3 id="为什么会发生这种的事故？"><a class="headerlink" href="#为什么会发生这种的事故？"></a>为什么会发生这种的事故？</h3>
+<p>InnoDB 存储引擎的默认事务隔离级别是「可重复读」，但是在这个隔离级别下，在多个事务并发的时候，会出现幻读的问题，所谓的幻读是指在同一事务下，连续执行两次同样的查询语句，第二次的查询语句可能会返回之前不存在的行。</p>
+<p>因此 InnoDB 存储引擎自己实现了行锁，通过 next-key 锁（记录锁和间隙锁的组合）来锁住记录本身和记录之间的“间隙”，防止其他事务在这个记录之间插入新的记录，从而避免了幻读现象。</p>
+<p>当我们执行 update 语句时，实际上是会对记录加独占锁（X 锁）的，如果其他事务对持有独占锁的记录进行修改时是会被阻塞的。另外，这个锁并不是执行完 update 语句就会释放的，而是会等事务结束时才会释放。</p>
+<p>在 InnoDB 事务中，对记录加锁带基本单位是 next-key 锁，但是会因为一些条件会退化成间隙锁，或者记录锁。加锁的位置准确的说，锁是加在索引上的而非行上。</p>
+<p>比如，在 update 语句的 where 条件使用了唯一索引，那么 next-key 锁会退化成记录锁，也就是只会给一行记录加锁。</p>
+<p>这里举个例子，这里有一张数据库表，其中 id 为主键索引。</p>
+<p><img src="https://camo.githubusercontent.com/31051da723dc122a903085bff0d8dd7639eb168bff38b533d10ad5acb8730064/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f696d675f636f6e766572742f33633361663136653761393438383333636362363430396538623531646166382e706e67" alt loading="lazy"></p>
+<p>假设有两个事务的执行顺序如下：</p>
+<p><img src="https://camo.githubusercontent.com/951e8b366ad166a8f6e6f71df709883e51d78003875dbda2022ae65730b6782f/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f64323332366639386362623334666330396361343031333730333235313530312e706e67" alt loading="lazy"></p>
+<p>可以看到，事务 A 的 update 语句中 where 是等值查询，并且 id 是唯一索引，所以只会对 id = 1 这条记录加锁，因此，事务 B 的更新操作并不会阻塞。</p>
+<p>但是，<strong>在 update 语句的 where 条件没有使用索引，就会全表扫描，于是就会对所有记录加上 next-key 锁（记录锁 + 间隙锁），相当于把整个表锁住了</strong>。</p>
+<p>假设两个事务变一下：</p>
+<p><img src="https://camo.githubusercontent.com/074593f4a554e8176cec2141dbbed7328d5133129fc3e4adf97c628fe1f00b6a/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f696d675f636f6e766572742f31616138383666653935653762633739316332393665326433343266613433352e706e67" alt loading="lazy"></p>
+<p>可以看到，这次事务 B 的 update 语句被阻塞了。</p>
+<p>这是因为事务 A 的 update 语句中 where 条件没有索引列，触发了<strong>全表扫描</strong>，在扫描过程中会对索引加锁，所以全表扫描的场景下，<strong>所有记录都会被加锁，也就是这条 update 语句产生了 4 个记录锁和 5 个间隙锁，相当于锁住了全表</strong>。</p>
+<p>那 update 语句的 where 带上索引就能避免全表记录加锁了吗？</p>
+<p>并不是。</p>
+<p><strong>关键还得看这条语句在执行过程种，优化器最终选择的是索引扫描，还是全表扫描，如果走了全表扫描，就会对全表的记录加锁了</strong>。</p>
+<div class="note  flat info"><p>网上很多资料说，update 没加锁索引会加表锁，这是不对的。</p>
+<p>Innodb 源码里面在扫描记录的时候，都是针对索引项这个单位去加锁的，update 不带索引就是全表扫扫描，也就是表里的索引项都加锁，相当于锁了整张表，所以大家误以为加了表锁。</p>
+</div>
+<h3 id="如何避免这种事故的发生？"><a class="headerlink" href="#如何避免这种事故的发生？"></a>如何避免这种事故的发生？</h3>
+<p>我们可以将 MySQL 里的 <code>sql_safe_updates</code> 参数设置为 1，开启安全更新模式。</p>
+<p>当 sql_safe_updates 设置为 1 时，update 语句必须满足如下条件之一才能执行成功：</p>
+<ul>
+<li>使用 where，并且 where 条件中必须有索引列；</li>
+<li>使用 limit；</li>
+<li>同时使用 where 和 limit，此时 where 条件中可以没有索引列；</li>
+</ul>
+<p>delete 语句必须满足以下条件能执行成功：</p>
+<ul>
+<li>同时使用 where 和 limit，此时 where 条件中可以没有索引列；</li>
+</ul>
+<p>如果 where 条件带上了索引列，但是优化器最终扫描选择的是全表，而不是索引的话，我们可以使用 <code>force index([index_name])</code> 可以告诉优化器使用哪个索引，以此避免有几率锁全表带来的隐患。</p>
+<h2 id="MySQL-记录锁-间隙锁可以防止删除操作而导致的幻读吗？"><a class="headerlink" href="#MySQL-记录锁-间隙锁可以防止删除操作而导致的幻读吗？"></a>MySQL 记录锁+间隙锁可以防止删除操作而导致的幻读吗？</h2>
+<p><img src="https://camo.githubusercontent.com/c2fcb30d3e75edd855300164199b152a74377ca04257be16796a1e5937fbf902/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f34633438666538613032333734373534623163663932353931616538643362342e706e67" alt loading="lazy"></p>
+<p>面试官反问的大概意思是，<strong>MySQL 记录锁 + 间隙锁可以防止删除操作而导致的幻读吗？</strong></p>
+<p>答案是可以的。</p>
+<p>首先回顾一下：</p>
+<h3 id="什么是幻读？"><a class="headerlink" href="#什么是幻读？"></a>什么是幻读？</h3>
+<p>当同一个查询在不同的时间产生不同的结果集时，事务中就会出现所谓的幻象问题。例如，如果 SELECT 执行了两次，但第二次返回了第一次没有返回的行，则该行是“幻像”行。</p>
+<p>MySQL InnoDB 引擎的默认隔离级别虽然是「可重复读」，但是它很大程度上避免幻读现象（并不是完全解决了，详见这篇<a href="https://xiaolincoding.com/mysql/transaction/phantom.html">文章</a>），解决的方案有两种：</p>
+<ul>
+<li>针对<strong>快照读</strong>（普通 select 语句），是<strong>通过 MVCC 方式解决了幻读</strong>，因为可重复读隔离级别下，事务执行过程中看到的数据，一直跟这个事务启动时看到的数据是一致的，即使中途有其他事务插入了一条数据，是查询不出来这条数据的，所以就很好了避免幻读问题。</li>
+<li>针对<strong>当前读</strong>（select … for update 等语句），是<strong>通过 next-key lock（记录锁 + 间隙锁）方式解决了幻读</strong>，因为当执行 select … for update 语句的时候，会加上 next-key lock，如果有其他事务在 next-key lock 锁范围内插入了一条记录，那么这个插入语句就会被阻塞，无法成功插入，所以就很好了避免幻读问题。</li>
+</ul>
+<h3 id="实验"><a class="headerlink" href="#实验"></a>实验</h3>
+<p>现在有一张用户表（t_user），表里<strong>只有一个主键索引</strong>，表里有以下行数据：</p>
+<p><img src="https://camo.githubusercontent.com/286278a3dabc584a3f6d800ba92b78041bdfc087ef00cfa6ea77f48c086d03fa/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f37356335633530336437646634616430393162666333353730386463653663342e706e67" alt loading="lazy"></p>
+<p>现在有一个 A 事务执行了一条查询语句，查询到年龄大于 20 岁的用户共有 6 条行记录。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">select * from t_user where age &gt; 20 for update;</span><br></pre></td></tr></table></figure>
+<p><img src="https://camo.githubusercontent.com/651156ee0be8150ab256d767079dc4b781956085369479e8a40132fa3479b5e1/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f36386464383966633935616134326366396230633432353164346539323236632e706e67" alt loading="lazy"></p>
+<p>然后，B 事务执行了一条删除 id = 2 的语句：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">delete from t_user where id=2;</span><br></pre></td></tr></table></figure>
+<p><img src="https://camo.githubusercontent.com/c8ce42e72cc3caafffa1e0ef0cd9f5dc99b3f0d52c621b7b667ac568709b96d7/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f32333332666164353862633534386563393137626137656134346430396433302e706e67" alt loading="lazy"></p>
+<p>此时，B 事务的删除语句就陷入了<strong>等待状态</strong>，说明是无法进行删除的。</p>
+<p>因此，MySQL 记录锁 + 间隙锁<strong>可以防止</strong>删除操作而导致的幻读问题。</p>
+<h3 id="加锁分析"><a class="headerlink" href="#加锁分析"></a>加锁分析</h3>
+<p>参考上一个问题，事务 A 的这条查询语句，where 条件没有使用索引，就会全表扫描，于是就会对所有记录加上 next-key 锁（记录锁 + 间隙锁），相当于把整个表锁住了，<strong>锁是在遍历索引的时候加上的，并不是针对输出的结果加锁</strong>。</p>
+<div class="note  flat info"><p>如果对 age 建立索引，事务 A 这条查询会加什么锁呢？</p>
+</div>
+<p><strong>因为表中有两个索引，分别是主键索引和 age 索引，所以会分别对这两个索引加锁。</strong></p>
+<p>主键索引会加如下的锁：</p>
+<ul>
+<li>X 型的记录锁，锁住 id = 2 的记录；</li>
+<li>X 型的记录锁，锁住 id = 3 的记录；</li>
+<li>X 型的记录锁，锁住 id = 5 的记录；</li>
+<li>X 型的记录锁，锁住 id = 6 的记录；</li>
+<li>X 型的记录锁，锁住 id = 7 的记录；</li>
+<li>X 型的记录锁，锁住 id = 8 的记录；</li>
+</ul>
+<p>分析 age 索引加锁的范围时，要先对 age 字段进行排序。</p>
+<p>age 索引加的锁：</p>
+<ul>
+<li>X 型的 next-key lock，锁住 age 范围 (19, 21] 的记录；</li>
+<li>X 型的 next-key lock，锁住 age 范围 (21, 21] 的记录；</li>
+<li>X 型的 next-key lock，锁住 age 范围 (21, 23] 的记录；</li>
+<li>X 型的 next-key lock，锁住 age 范围 (23, 23] 的记录；</li>
+<li>X 型的 next-key lock，锁住 age 范围 (23, 39] 的记录；</li>
+<li>X 型的 next-key lock，锁住 age 范围 (39, 43] 的记录；</li>
+<li>X 型的 next-key lock，锁住 age 范围 (43, +∞] 的记录；</li>
+</ul>
+<p>化简一下，<strong>age 索引 next-key 锁的范围是 (19, +∞]。</strong></p>
+<p>总结一下，在对 age 字段建立索引后，事务 A 在执行下面这条查询语句后，主键索引和 age 索引会加下图中的锁。</p>
+<p><img src="https://camo.githubusercontent.com/81258bbb313c966ee49dcd2c8a9d40b52a406ba671acfd0486daee32099959ca/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f35623961326437613263643234306665613437623933383336346630623736612e706e67" alt loading="lazy"></p>
+<p>事务 A 加上锁后，事务 B、C、D、E 在执行以下语句都会被阻塞。</p>
+<p><img src="https://camo.githubusercontent.com/04883c10d01e09e3aa03391f60b93f2e83abc704ee37afaba8d29459fb20b3ce/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f34366339623434313432663134323137623339626439373338363865373332652e706e67" alt loading="lazy"></p>
+<h2 id="MySQL-死锁了，怎么办？"><a class="headerlink" href="#MySQL-死锁了，怎么办？"></a>MySQL 死锁了，怎么办？</h2>
+<p>出现 MySQL 死锁的主要原因是<strong>资源的循环依赖</strong>。</p>
+<p>像 MyISAM 引擎只有表锁，基本上不会产生死锁，而 InnoDB 有行锁，锁的粒度比较低，因此可能会产生死锁。</p>
+<p>不过 MySQL InnoDB 有一个自动检测的功能（innodb_deadlock_detect），如果发生死锁会回退事务从而释放锁，也有锁等待超时的参数（innodb_lock_wait_timeout），当获取锁的等待时间超过阈值时，就释放锁进行回滚。</p>
+<p>如果线上遇到死锁的情况，可以通过 <code>SHOW ENGINE INNODB STATUS</code> 来获取死锁的日志信息，从而定位到死锁发生的原因。</p>
+<h3 id="死锁的发生"><a class="headerlink" href="#死锁的发生"></a>死锁的发生</h3>
+<p>本次案例使用存储引擎 Innodb，隔离级别为可重复读（RR）。</p>
+<p>这里建了一张订单表，其中 id 字段为主键索引，order_no 字段普通索引，也就是非唯一索引。然后， <code>t_order</code> 表里现在已经有了 6 条记录：</p>
+<p><img src="https://camo.githubusercontent.com/dbbb8871b7d55fc97102598c6ee22001ccd2f02d4b649be84f3a9e286aa0cc98/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f696d675f636f6e766572742f35346663303066396638376136306162376235626139326438323461383932642e706e67" alt loading="lazy"></p>
+<p>假设这时有两事务，一个事务要插入订单 1007，另外一个事务要插入订单 1008，因为需要对订单做幂等性校验，所以两个事务先要查询该订单是否存在，不存在才插入记录，过程如下：</p>
+<p><img src="https://camo.githubusercontent.com/ce4e6f1cf60cba002f3a68086e6ce808e11504f38eefbfea36932188d4f6856f/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f696d675f636f6e766572742f39306331653031643033343564653633396533343236636561303339306538302e706e67" alt loading="lazy"></p>
+<p>可以看到，两个事务都陷入了等待状态（前提没有打开死锁检测），也就是发生了死锁，因为都在相互等待对方释放锁。</p>
+<p>这里在查询记录是否存在的时候，使用了 <code>select ... for update</code> 语句，目的为了防止事务执行的过程中，有其他事务插入了记录，而出现幻读的问题。</p>
+<p>如果没有使用 <code>select ... for update</code> 语句，而使用了单纯的 select 语句，如果是两个订单号一样的请求同时进来，就会出现两个重复的订单，有可能出现幻读，如下图：</p>
+<p><img src="https://camo.githubusercontent.com/d467f366e50c71ce5ed110ea3de126e75686c081767185e1acf0f91e4b22404d/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f696d675f636f6e766572742f38616531386631306631613839616163356539336630653937393465343639652e706e67" alt loading="lazy"></p>
+<h3 id="为什么会产生死锁？"><a class="headerlink" href="#为什么会产生死锁？"></a>为什么会产生死锁？</h3>
+<p>可重复读隔离级别下，是存在幻读的问题。</p>
+<p><strong>Innodb 引擎为了解决「可重复读」隔离级别下的幻读问题，就引出了 next-key 锁</strong>，它是记录锁和间隙锁的组合。</p>
+<ul>
+<li>Record Lock，记录锁，锁的是记录本身；</li>
+<li>Gap Lock，间隙锁，锁的就是两个值之间的空隙，以防止其他事务在这个空隙间插入新的数据，从而避免幻读现象。</li>
+</ul>
+<p>行锁的释放时机是在<strong>事务提交（commit）后</strong>，锁就会被释放，并不是一条语句执行完就释放行锁。</p>
+<p>回到上面的例子，<strong>此时事务 A 在二级索引（INDEX_NAME : index_order）上加的是 X 型的 next-key 锁，锁范围是<code>(1006, +∞]</code></strong>。当事务 B 往事务 A next-key 锁的范围 (1006, +∞] 里插入 id = 1008 的记录就会被锁住。</p>
+<div class="note  flat info"><p>next-key 锁的范围 (1006, +∞]，是怎么确定的？</p>
+</div>
+<p>根据我的经验，如果 LOCK_MODE 是 next-key 锁或者间隙锁，那么 LOCK_DATA 就表示锁的范围最右值，此次的事务 A 的 LOCK_DATA 是 supremum pseudo-record，表示的是 +∞。然后锁范围的最左值是 t_order 表中最后一个记录的 index_order 的值，也就是 1006。因此，next-key 锁的范围 (1006, +∞]。</p>
+<div class="note  flat info"><p>为什么上面事务 A 的 next-key lock 并没有退化为间隙锁？</p>
+</div>
+<p>如果表中最后一个记录的 order_no 为 1005，那么等值查询 order_no = 1006（不存在），就是 next key lock，如上面事务 A 的情况。</p>
+<p>如果表中最后一个记录的 order_no 为 1010，那么等值查询 order_no = 1006（不存在），就是间隙锁。</p>
+<p>再回到两个事务当中，当我们执行插入语句时，会在插入间隙上获取插入意向锁，<strong>而插入意向锁与间隙锁是冲突的，所以当其它事务持有该间隙的间隙锁时，需要等待其它事务释放间隙锁之后，才能获取到插入意向锁。而间隙锁与间隙锁之间是兼容的，所以所以两个事务中 <code>select ... for update</code> 语句并不会相互影响</strong>。</p>
+<p>案例中的事务 A 和事务 B 在执行完后 <code>select ... for update</code> 语句后都持有范围为<code>(1006,+∞]</code>的 next-key 锁，而接下来的插入操作为了获取到插入意向锁，都在等待对方事务的间隙锁释放，于是就造成了循环等待，导致死锁。</p>
+<p>有一点要注意，<strong>next-key lock 是包含间隙锁 + 记录锁的，如果一个事务获取了 X 型的 next-key lock，那么另外一个事务在获取相同范围的 X 型的 next-key lock 时，是会被阻塞的</strong>。</p>
+<p>比如，一个事务持有了范围为 (1, 10] 的 X 型的 next-key lock，那么另外一个事务在获取相同范围的 X 型的 next-key lock 时，就会被阻塞。</p>
+<p>虽然相同范围的间隙锁是多个事务相互兼容的，但对于记录锁，我们是要考虑 X 型与 S 型关系。X 型的记录锁与 X 型的记录锁是冲突的，比如一个事务执行了 select … where id = 1 for update，后一个事务在执行这条语句的时候，就会被阻塞的。</p>
+<p>但是还要注意！对于这种范围为 (1006, +∞] 的 next-key lock，<strong>两个事务是可以同时持有的，不会冲突</strong>。因为 +∞ 并不是一个真实的记录，自然就不需要考虑 X 型与 S 型关系。</p>
+<h3 id="Insert-语句是怎么加行级锁的？"><a class="headerlink" href="#Insert-语句是怎么加行级锁的？"></a>Insert 语句是怎么加行级锁的？</h3>
+<p>Insert 语句在正常执行时是不会生成锁结构的，它是靠聚簇索引记录自带的 trx_id 隐藏列来作为<strong>隐式锁</strong>来保护记录的。</p>
+<div class="note  flat info"><p>什么是隐式锁？</p>
+</div>
+<p>当事务需要加锁的时，如果这个锁不可能发生冲突，InnoDB 会跳过加锁环节，这种机制称为隐式锁。隐式锁是 InnoDB 实现的一种延迟加锁机制，其特点是只有在可能发生冲突时才加锁，从而减少了锁的数量，提高了系统整体性能。</p>
+<p>隐式锁就是在 Insert 过程中不加锁，只有在特殊情况下，才会将隐式锁转换为显式锁，这里我们列举两个场景。</p>
+<ul>
+<li>如果记录之间加有间隙锁，为了避免幻读，此时是不能插入记录的；</li>
+<li>如果 Insert 的记录和已有记录存在唯一键冲突，此时也不能插入记录；</li>
+</ul>
+<h4 id="记录之间加有间隙锁"><a class="headerlink" href="#记录之间加有间隙锁"></a>记录之间加有间隙锁</h4>
+<p>每插入一条新记录，都需要看一下待插入记录的下一条记录上是否已经被加了间隙锁，如果已加间隙锁，此时会生成一个插入意向锁，然后锁的状态设置为等待状态（<em>PS：MySQL 加锁时，是先生成锁结构，然后设置锁的状态，如果锁状态是等待状态，并不是意味着事务成功获取到了锁，只有当锁状态为正常状态时，才代表事务成功获取到了锁</em>），现象就是 Insert 语句会被阻塞。</p>
+<h4 id="遇到唯一键冲突"><a class="headerlink" href="#遇到唯一键冲突"></a>遇到唯一键冲突</h4>
+<p>如果在插入新记录时，插入了一个与「已有的记录的主键或者唯一二级索引列值相同」的记录（不过可以有多条记录的唯一二级索引列的值同时为 NULL，这里不考虑这种情况），此时插入就会失败，然后对于这条记录加上了 <strong>S 型的锁</strong>。</p>
+<p>至于是行级锁的类型是记录锁，还是 next-key 锁，跟是「主键冲突」还是「唯一二级索引冲突」有关系。</p>
+<p>如果主键索引重复：</p>
+<ul>
+<li>当隔离级别为<strong>读已提交</strong>时，插入新记录的事务会给已存在的主键值重复的聚簇索引记录<strong>添加 S 型记录锁</strong>。</li>
+<li>当隔离级别是<strong>可重复读</strong>（默认隔离级别），插入新记录的事务会给已存在的主键值重复的聚簇索引记录<strong>添加 S 型记录锁</strong>。</li>
+</ul>
+<p>如果唯一二级索引列重复：</p>
+<ul>
+<li><strong>不论是哪个隔离级别</strong>，插入新记录的事务都会给已存在的二级索引列值重复的二级索引记录<strong>添加 S 型 next-key 锁</strong>。对的，没错，即使是读已提交隔离级别也是加 next-key 锁，这是读已提交隔离级别中为数不多的给记录添加间隙锁的场景。至于为什么要加 next-key 锁，我也没找到合理的解释。</li>
+</ul>
+<p><img src="https://camo.githubusercontent.com/b1cad449c5ffae7c583b7e879088acc5e881d3b6e2f897ad9880c06952a41962/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f6d7973716c2f2545392539342538312f2545352539342541462545342542382538302545372542342541322545352542432539352545352538412541302545392539342538312e64726177696f2e706e67" alt loading="lazy"></p>
+<p>两个事务的加锁过程：</p>
+<ul>
+<li>事务 A 先插入 order_no 为 1006 的记录，可以插入成功，此时对应的唯一二级索引记录被「隐式锁」保护，此时还没有实际的锁结构（执行完这里的时候，你可以看查 performance_schema.data_locks 信息，可以看到这条记录是没有加任何锁的）；</li>
+<li>接着，事务 B 也插入 order_no 为 1006 的记录，由于事务 A 已经插入 order_no 值为 1006 的记录，所以事务 B 在插入二级索引记录时会遇到重复的唯一二级索引列值，此时事务 B 想获取一个 S 型 next-key 锁，但是事务 A 并未提交，<strong>事务 A 插入的 order_no 值为 1006 的记录上的「隐式锁」会变「显示锁」且锁类型为 X 型的记录锁，所以事务 B 向获取 S 型 next-key 锁时会遇到锁冲突，事务 B 进入阻塞状态</strong>。</li>
+</ul>
+<p>如果 order_no 不是唯一二级索引，那么两个事务，前后执行相同的 Insert 语句，是不会发生阻塞的，就如前面的这个例子。</p>
+<p><img src="https://camo.githubusercontent.com/d467f366e50c71ce5ed110ea3de126e75686c081767185e1acf0f91e4b22404d/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f696d675f636f6e766572742f38616531386631306631613839616163356539336630653937393465343639652e706e67" alt loading="lazy"></p>
+<h3 id="如何避免死锁？"><a class="headerlink" href="#如何避免死锁？"></a>如何避免死锁？</h3>
+<p>死锁的四个必要条件：<strong>互斥、占有且等待、不可强占用、循环等待</strong>。只要系统发生死锁，这些条件必然成立，但是只要破坏任意一个条件就死锁就不会成立。</p>
+<p>在数据库层面，有两种策略通过「打破循环等待条件」来解除死锁状态：</p>
+<ul>
+<li><strong>设置事务等待锁的超时时间</strong>。当一个事务的等待时间超过该值后，就对这个事务进行回滚，于是锁就释放了，另一个事务就可以继续执行了。在 InnoDB 中，参数 <code>innodb_lock_wait_timeout</code> 是用来设置超时时间的，默认值时 50 秒。</li>
+<li><strong>开启主动死锁检测</strong>。主动死锁检测在发现死锁后，主动回滚死锁链条中的某一个事务，让其他事务得以继续执行。将参数 <code>innodb_deadlock_detect</code> 设置为 on，表示开启这个逻辑，默认就开启。</li>
+</ul>
+<p>我们可以回归业务的角度来预防死锁，对订单做幂等性校验的目的是为了保证不会出现重复的订单，那我们可以直接将 order_no 字段设置为唯一索引列，利用它的唯一性来保证订单表不会出现重复的订单，不过有一点不好的地方就是在我们插入一个已经存在的订单记录时就会抛出异常。</p>
+<h2 id="字节面试：加了什么锁，导致死锁的？"><a class="headerlink" href="#字节面试：加了什么锁，导致死锁的？"></a>字节面试：加了什么锁，导致死锁的？</h2>
+<p><img src="https://camo.githubusercontent.com/cfb4352d24094f97415f2ca7994498a43177a436e0835f2dd872652abf57a86a/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f6d7973716c2f2545392539342538312f2545352541442539372545382538412538326d7973716c2545392539442541322545382541462539352545392541322539382e706e67" alt loading="lazy"></p>
+<p>如果对 MySQL 加锁机制比较熟悉的同学，应该一眼就能看出<strong>会发生死锁</strong>，但是具体加了什么锁而导致死锁，是需要我们具体分析的。</p>
+<p>（其实看完上一个问题，这里是多看两眼就能看出来了）</p>
+<h3 id="为什么会发生死锁？"><a class="headerlink" href="#为什么会发生死锁？"></a>为什么会发生死锁？</h3>
+<h4 id="Time-1-阶段加锁分析"><a class="headerlink" href="#Time-1-阶段加锁分析"></a>Time 1 阶段加锁分析</h4>
+<p>Time 1 阶段，事务 A 执行语句后，执行 <code>select * from performance_schema.data_locks\G;</code> 这条语句，查看事务 A 此时加了什么锁。</p>
+<p><img src="https://camo.githubusercontent.com/07f47dda4724b33847d7a8fb285071af9a8fad2664f081c074ad5e0776815a6a/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f6d7973716c2f2545392539342538312f254534254241253842254535253841254131612545372539412538342545392539342538312e706e67" alt loading="lazy"></p>
+<p><strong>因此，此时事务 A 在主键索引（INDEX_NAME : PRIMARY）上加的是间隙锁，锁范围是<code>(20, 30)</code></strong>。</p>
+<h4 id="Time-2-阶段加锁分析"><a class="headerlink" href="#Time-2-阶段加锁分析"></a>Time 2 阶段加锁分析</h4>
+<p><img src="https://camo.githubusercontent.com/96011c19567e52c55651831d0c6b9002187c627cb36e4fcbe529919fc0e0008a/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f34343237376366656662643634343664623836316266623831613165346135392e706e67" alt loading="lazy"></p>
+<p>从上图可以看到，行锁是 X 类型的间隙锁，间隙锁的范围是<code>(20, 30)</code>。</p>
+<div class="note  flat info"><p>事务 A 和 事务 B 的间隙锁范围都是一样的，为什么不会冲突？</p>
+</div>
+<p><strong>间隙锁的意义只在于阻止区间被插入</strong>，因此是可以共存的。<strong>一个事务获取的间隙锁不会阻止另一个事务获取同一个间隙范围的间隙锁</strong>，共享（S 型）和排他（X 型）的间隙锁是没有区别的，他们相互不冲突，且功能相同。</p>
+<h4 id="Time-3-阶段加锁分析"><a class="headerlink" href="#Time-3-阶段加锁分析"></a>Time 3 阶段加锁分析</h4>
+<p><img src="https://camo.githubusercontent.com/7e472218a59e291d46d1a449eca1b6d8d7cb67a97ac3d4d89c3ea2b252aeeced/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f6d7973716c2f2545392539342538312f254534254241253842254535253841254131612545372541442538392545352542452538352545342542382541442e706e67" alt loading="lazy"></p>
+<p>可以看到，事务 A 的状态为等待状态（LOCK_STATUS: WAITING），因为向事务 B 生成的间隙锁（范围 <code>(20, 30)</code>）中插入了一条记录，所以事务 A 的插入操作生成了一个插入意向锁（<code>LOCK_MODE:INSERT_INTENTION</code>）。</p>
+<p>插入意向锁与间隙锁的另一个非常重要的差别是：<strong>尽管「插入意向锁」也属于间隙锁，但两个事务却不能在同一时间内，一个拥有间隙锁，另一个拥有该间隙区间内的插入意向锁（当然，插入意向锁如果不在间隙锁区间内则是可以的）。所以，插入意向锁和间隙锁之间是冲突的</strong>。</p>
+<h4 id="Time-4-阶段加锁分析"><a class="headerlink" href="#Time-4-阶段加锁分析"></a>Time 4 阶段加锁分析</h4>
+<p>同理，事务 B 在生成插入意向锁时而导致被阻塞，这是因为事务 B 向事务 A 生成的范围为 (20, 30) 的间隙锁插入了一条记录，而插入意向锁和间隙锁是冲突的，所以事务 B 在获取插入意向锁时就陷入了等待状态。</p>
+<h3 id="总结"><a class="headerlink" href="#总结"></a>总结</h3>
+<p>本次案例中，事务 A 和事务 B 在执行完后 update 语句后都持有范围为<code>(20, 30）</code>的间隙锁，而接下来的插入操作为了获取到<strong>插入意向锁</strong>，都在等待对方事务的间隙锁释放，于是就造成了<strong>循环等待</strong>，满足了死锁的四个条件：<strong>互斥、占有且等待、不可强占用、循环等待</strong>，因此发生了死锁。</p>
+<h2 id="参考链接"><a class="headerlink" href="#参考链接"></a>参考链接</h2>
+<p><a href="https://xiaolincoding.com/mysql/lock/mysql_lock.html#%E5%85%A8%E5%B1%80%E9%94%81">MySQL 有哪些锁？ | 小林coding (xiaolincoding.com)</a></p>
+<p><a href="https://xiaolincoding.com/mysql/lock/update_index.html#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E5%8F%91%E7%94%9F%E8%BF%99%E7%A7%8D%E7%9A%84%E4%BA%8B%E6%95%85">update 没加索引会锁全表？ | 小林coding (xiaolincoding.com)</a></p>
+<p><a href="https://xiaolincoding.com/mysql/lock/lock_phantom.html">MySQL 记录锁+间隙锁可以防止删除操作而导致的幻读吗？ | 小林coding (xiaolincoding.com)</a></p>
+<p><a href="https://xiaolincoding.com/mysql/lock/deadlock.html">MySQL 死锁了，怎么办？ | 小林coding (xiaolincoding.com)</a></p>
+<p><a href="https://xiaolincoding.com/mysql/lock/show_lock.html">字节面试：加了什么锁，导致死锁的？ | 小林coding (xiaolincoding.com)</a></p>
+]]></content>
+      <categories>
+        <category>学习</category>
+        <category>数据库</category>
+      </categories>
+      <tags>
+        <tag>数据库</tag>
+      </tags>
+  </entry>
 </search>
