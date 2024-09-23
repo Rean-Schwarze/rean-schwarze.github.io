@@ -6631,7 +6631,7 @@ or <code>TfidVectorizer(stop_words=[a, and, the])</code> to filter these three w
 <li>Hash 索引</li>
 <li>Full-text 索引</li>
 </ul>
-<p><img src="https://camo.githubusercontent.com/b127bfb0e6f322de930d224b9a54fc5799743a6f29be5d7177094d13f0a9b63e/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f6d7973716c2f2545372542342541322545352542432539352f2545372542342541322545352542432539352545352538382538362545372542312542422e64726177696f2e706e67" alt loading="lazy"></p>
+<p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20240923210708.png" alt loading="lazy"></p>
 <p>在创建表时，InnoDB 存储引擎会根据不同的场景选择不同的列作为索引：</p>
 <ul>
 <li>如果有主键，默认会使用主键作为聚簇索引的索引键（key）；</li>
@@ -6641,12 +6641,12 @@ or <code>TfidVectorizer(stop_words=[a, and, the])</code> to filter these three w
 <p>其它索引都属于辅助索引（Secondary Index），也被称为二级索引或非聚簇索引。<strong>创建的主键索引和二级索引默认使用的是 B+Tree 索引</strong>。</p>
 <h3 id="B-B-树索引"><a class="headerlink" href="#B-B-树索引"></a>B / B+ 树索引</h3>
 <p>看上一篇文章：<a href="https://rean-schwarze.github.io/p/cbe55d0">【数据结构】树 | Rean’s Blog (rean-schwarze.github.io)</a></p>
-<p><img src="https://camo.githubusercontent.com/93205ca9cdfa81d65d1f45d7fdcfc5993a52667ba4515472a45f4c413ae84cdb/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f38323463343362383031633634653831616362306139623034326435303331312e706e67" alt loading="lazy"></p>
+<p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20240923210829.png" alt loading="lazy"></p>
 <p>这些行数据，存储在 B+Tree 索引时是长什么样子的？</p>
 <p>B+Tree 是一种多叉树，叶子节点才存放数据，非叶子节点只存放索引，而且每个节点里的数据是<strong>按主键顺序存放</strong>的。每一层父节点的索引值都会出现在下层子节点的索引值中，因此在叶子节点中，包括了所有的索引值信息，并且每一个叶子节点都指向下一个叶子节点，形成一个链表。</p>
 <h4 id="通过主键查询数据"><a class="headerlink" href="#通过主键查询数据"></a>通过主键查询数据</h4>
 <p>主键索引的 B+Tree 如图所示：</p>
-<p><img src="https://camo.githubusercontent.com/dd1221834ae340998bfc88d9e8349eb95f59dda4c0fd2897e50e79b1ec59348a/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f6d7973716c2f2545372542342541322545352542432539352f62747265652e64726177696f2e706e67" alt="主键索引 B+Tree" loading="lazy"></p>
+<p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20240923210853.png" alt="主键索引 B+Tree" loading="lazy"></p>
 <p>B+Tree 存储千万级的数据只需要 3-4 层高度就可以满足，这意味着从千万级的表查询目标数据最多需要 3-4 次磁盘 I/O，所以<strong>B+Tree 相比于 B 树和二叉树来说，最大的优势在于查询效率很高，因为即使在数据量很大的情况，查询一个数据的磁盘 I/O 依然维持在 3-4 次。</strong></p>
 <h4 id="通过二级索引查询数据"><a class="headerlink" href="#通过二级索引查询数据"></a>通过二级索引查询数据</h4>
 <p>主键索引的 B+Tree 和二级索引的 B+Tree 区别如下：</p>
@@ -6655,9 +6655,9 @@ or <code>TfidVectorizer(stop_words=[a, and, the])</code> to filter these three w
 <li>二级索引的 B+Tree 的<strong>叶子节点存放的是主键值</strong>，而不是实际数据。</li>
 </ul>
 <p>我这里将前面的商品表中的 product_no（商品编码）字段设置为二级索引，那么二级索引的 B+Tree 如下图，其中非叶子的 key 值是 product_no（图中橙色部分），叶子节点存储的数据是主键值（图中绿色部分）。</p>
-<p><img src="https://camo.githubusercontent.com/928dc64222306148472f6bcb8c7ab819d4e1c53c1f21d080cdd8d9152fb209b3/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f6d7973716c2f2545372542342541322545352542432539352f25453425424125384325453725424125413725453725423425413225453525424325393562747265652e64726177696f2e706e67" alt="二级索引 B+Tree" loading="lazy"></p>
+<p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20240923210940.png" alt="二级索引 B+Tree" loading="lazy"></p>
 <p>会先检查二级索引中的 B+Tree 的索引值（商品编码，product_no），找到对应的叶子节点，然后获取主键值，然后再通过主键索引中的 B+Tree 查询到对应的叶子节点，然后获取整行数据。<strong>这个过程叫「回表」，也就是说要查两个 B+Tree 才能查到数据</strong>。如下图：</p>
-<p><img src="https://camo.githubusercontent.com/20acf9e9a443143a30fdb2239296e69f1f8684e24c7ce0a113c27d3a714fba4a/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f6d7973716c2f2545372542342541322545352542432539352f2545352539422539452545382541312541382e64726177696f2e706e67" alt="回表" loading="lazy"></p>
+<p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20240923210958.png" alt="回表" loading="lazy"></p>
 <p>不过，当查询的数据是能在二级索引的 B+Tree 的叶子节点里查询到，这时就不用再去主键索引中查寻了。</p>
 <p><strong>这种在二级索引的 B+Tree 就能查询到结果的过程就叫作「覆盖索引」，也就是只需要查一个 B+Tree 就能找到数据</strong>。</p>
 <h4 id="为什么-InnoDB-选择-B-tree-作为索引的数据结构？"><a class="headerlink" href="#为什么-InnoDB-选择-B-tree-作为索引的数据结构？"></a>为什么 InnoDB 选择 B+tree 作为索引的数据结构？</h4>
@@ -6734,7 +6734,7 @@ or <code>TfidVectorizer(stop_words=[a, and, the])</code> to filter these three w
 <p>比如，将商品表中的 product_no 和 name 字段组合成联合索引<code>(product_no, name)</code>，创建联合索引的方式如下：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">CREATE INDEX index_product_no_name ON product(product_no, name);</span><br></pre></td></tr></table></figure>
 <p>联合索引<code>(product_no, name)</code> 的 B+Tree 示意图如下：</p>
-<p><img src="https://camo.githubusercontent.com/bc96019b2006a7b7597cf23d3f4f1db1dd484026ce01a8dc6df1d3214f97584c/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f6d7973716c2f2545372542342541322545352542432539352f2545382538312539342545352539302538382545372542342541322545352542432539352e64726177696f2e706e67" alt="联合索引" loading="lazy"></p>
+<p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20240923211026.png" alt="联合索引" loading="lazy"></p>
 <p>可以看到，联合索引的非叶子节点用两个字段的值作为 B+Tree 的 key 值。当在联合索引查询数据时，先按 product_no 字段比较，在 product_no 相同的情况下再按 name 字段比较。</p>
 <p>也就是说，联合索引查询的 B+Tree 是先按 product_no 进行排序，然后再 product_no 相同的情况再按 name 字段排序。</p>
 <p>因此，使用联合索引时，存在<strong>最左匹配原则</strong>，也就是按照最左优先的方式进行索引的匹配。在使用联合索引进行查询的时候，如果不遵循「最左匹配原则」，联合索引会失效，这样就无法利用到索引快速查询的特性了。</p>
@@ -6853,7 +6853,7 @@ or <code>TfidVectorizer(stop_words=[a, and, the])</code> to filter these three w
 <p>为了更好的利用索引，索引列要设置为 NOT NULL 约束。有两个原因：</p>
 <ul>
 <li>第一原因：索引列存在 NULL 就会导致优化器在做索引选择的时候更加复杂，更加难以优化，因为可为 NULL 的列会使索引、索引统计和值比较都更复杂，比如进行索引统计时，count 会省略值为 NULL 的行。</li>
-<li>第二个原因：NULL 值是一个没意义的值，但是它会占用物理空间，所以会带来的存储空间的问题，会导致更多的存储空间占用，因为 InnoDB 默认行存储格式<code>COMPACT</code>，会用 1 字节空间存储 NULL 值列表，如下图的黄色部分：<img src="https://camo.githubusercontent.com/0638e1a7e455715ea326c5a59d63db418d185db584fc2290d4926490e869b701/68747470733a2f2f747661312e73696e61696d672e636e2f6c617267652f30303865476d5a4567793167703670626f367864376a333076363032753379712e6a7067" alt="img" loading="lazy"></li>
+<li>第二个原因：NULL 值是一个没意义的值，但是它会占用物理空间，所以会带来的存储空间的问题，会导致更多的存储空间占用，因为 InnoDB 默认行存储格式<code>COMPACT</code>，会用 1 字节空间存储 NULL 值列表，如下图的黄色部分：<img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20240923211054.png" alt loading="lazy"></li>
 </ul>
 <br>
 <h1 id="请详细描述-MySQL-的-B-树中查询数据的全过程"><a class="headerlink" href="#请详细描述-MySQL-的-B-树中查询数据的全过程"></a>请详细描述 MySQL 的 B+ 树中查询数据的全过程</h1>
@@ -7433,10 +7433,6 @@ or <code>TfidVectorizer(stop_words=[a, and, the])</code> to filter these three w
       </categories>
       <tags>
         <tag>无参</tag>
-        <tag>vsqx</tag>
-        <tag>midi</tag>
-        <tag>svp</tag>
-        <tag>音乐</tag>
       </tags>
   </entry>
   <entry>
@@ -10478,9 +10474,6 @@ PGM：杨阳<br>
       </categories>
       <tags>
         <tag>明日方舟</tag>
-        <tag>巴别塔</tag>
-        <tag>单核</tag>
-        <tag>低配</tag>
       </tags>
   </entry>
   <entry>
@@ -21494,6 +21487,76 @@ BOSS-碧臂螂：集齐大圣套装的头冠、胸甲、腿甲后，回到土地
 <figure class="highlight ini"><table><tr><td class="code"><pre><span class="line"><span class="section">[mysqld]</span></span><br><span class="line"><span class="attr">slow_query_log</span> = <span class="number">1</span>                    <span class="comment"># 启用慢查询日志</span></span><br><span class="line"><span class="attr">slow_query_log_file</span> = /var/log/mysql/mysql-slow.log  <span class="comment"># 指定慢查询日志文件路径</span></span><br><span class="line"><span class="attr">long_query_time</span> = <span class="number">2.0</span>                 <span class="comment"># 设置慢查询的阈值时间（单位：秒）</span></span><br><span class="line"><span class="attr">log_queries_not_using_indexes</span> = <span class="number">1</span>     <span class="comment"># 记录未使用索引的查询</span></span><br></pre></td></tr></table></figure>
 <p>也可以通过 SQL 命令动态设置：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SET GLOBAL slow_query_log = &#x27;ON&#x27;;</span><br><span class="line">SET GLOBAL slow_query_log_file = &#x27;/var/log/mysql/mysql-slow.log&#x27;;</span><br><span class="line">SET GLOBAL long_query_time = 2.0;</span><br><span class="line">SET GLOBAL log_queries_not_using_indexes = &#x27;ON&#x27;;</span><br></pre></td></tr></table></figure>
+<h2 id="如何使用-MySQL-的-EXPLAIN-语句进行查询分析？"><a class="headerlink" href="#如何使用-MySQL-的-EXPLAIN-语句进行查询分析？"></a>如何使用 MySQL 的 EXPLAIN 语句进行查询分析？</h2>
+<p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20240923212054.png" alt loading="lazy"></p>
+<p>参数有：</p>
+<ul>
+<li>possible_keys 字段表示可能用到的索引；</li>
+<li>key 字段表示实际用的索引，如果这一项为 NULL，说明没有使用索引；</li>
+<li>key_len 表示索引的长度；</li>
+<li>rows 表示扫描的数据行数。</li>
+<li><strong>type</strong> 表示数据扫描类型，我们需要重点看这个。</li>
+</ul>
+<p>type 字段就是描述了找到所需数据时使用的扫描方式是什么，常见扫描类型的<strong>执行效率从低到高的顺序为</strong>：</p>
+<ul>
+<li>All（全表扫描）；</li>
+<li>index（全索引扫描）；</li>
+<li>range（索引范围扫描）；</li>
+<li>ref（非唯一索引扫描）；</li>
+<li>eq_ref（唯一索引扫描）；</li>
+<li>const（结果只有一条的主键或唯一索引扫描）。</li>
+</ul>
+<h3 id="例子"><a class="headerlink" href="#例子"></a>例子</h3>
+<p>1）创建 employees 表</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> employees (</span><br><span class="line">    employee_id <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">    first_name <span class="type">VARCHAR</span>(<span class="number">50</span>),</span><br><span class="line">    last_name <span class="type">VARCHAR</span>(<span class="number">50</span>),</span><br><span class="line">    department_id <span class="type">INT</span>,</span><br><span class="line">    salary <span class="type">DECIMAL</span>(<span class="number">10</span>, <span class="number">2</span>),</span><br><span class="line">    hire_date <span class="type">DATE</span>,</span><br><span class="line">    INDEX (department_id)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>我们要执行以下查询来查找部门 ID 为 5 且薪水在 50000 到 100000 之间的员工，并按薪水降序排序：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> employee_id, first_name, last_name, salary</span><br><span class="line"><span class="keyword">FROM</span> employees</span><br><span class="line"><span class="keyword">WHERE</span> department_id <span class="operator">=</span> <span class="number">5</span> <span class="keyword">AND</span> salary <span class="keyword">BETWEEN</span> <span class="number">50000</span> <span class="keyword">AND</span> <span class="number">100000</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> salary <span class="keyword">DESC</span>;</span><br></pre></td></tr></table></figure>
+<p>2）我们先使用 explain 分析计划进行分析：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">EXPLAIN <span class="keyword">SELECT</span> employee_id, first_name, last_name, salary</span><br><span class="line"><span class="keyword">FROM</span> employees</span><br><span class="line"><span class="keyword">WHERE</span> department_id <span class="operator">=</span> <span class="number">5</span> <span class="keyword">AND</span> salary <span class="keyword">BETWEEN</span> <span class="number">50000</span> <span class="keyword">AND</span> <span class="number">100000</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> salary <span class="keyword">DESC</span>;</span><br></pre></td></tr></table></figure>
+<p>输出结果如下：</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>select_type</th>
+<th>table</th>
+<th>partitions</th>
+<th>type</th>
+<th>possible_keys</th>
+<th>key</th>
+<th>key_len</th>
+<th>ref</th>
+<th>rows</th>
+<th>filtered</th>
+<th>Extra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>SIMPLE</td>
+<td>employees</td>
+<td>NULL</td>
+<td>ref</td>
+<td>department_id</td>
+<td>department_id</td>
+<td>4</td>
+<td>const</td>
+<td>5000</td>
+<td>20.00</td>
+<td>Using where; Using filesort</td>
+</tr>
+</tbody>
+</table>
+<p>3）分析执行计划</p>
+<p>从执行计划中看出，<code>type</code> 为 <code>ref</code>，表示使用了 <code>department_id</code> 索引，这是个非唯一索引。<code>key </code> 为 <code>department_id</code> 这个索引，而且 <code>rows</code> 为 5000，表示扫描了 5000 行匹配的 <code>department_id = 5</code> 的条件。从 <code>Extra</code> 看出在应用 <code>WHERE</code> 条件后，还需要进行文件排序来满足 <code>ORDER BY</code> 子句。</p>
+<p>4）找出问题</p>
+<p>尽管查询使用了索引，但由于索引不完全覆盖查询的条件和排序，查询需要进行额外的文件排序。这可能会导致性能瓶颈，特别是在结果集较大时。</p>
+<p>5）优化解决它！</p>
+<p><strong>创建复合索引</strong></p>
+<p>创建一个包含 <code>department_id</code> 和 <code>salary</code> 的复合索引，这样可以覆盖查询的 <code>WHERE</code> 和 <code>ORDER BY</code> 条件：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX idx_department_salary <span class="keyword">ON</span> employees (department_id, salary);</span><br></pre></td></tr></table></figure>
+<p>复合索引可以使查询在扫描 <code>department_id</code> 列时，同时按 <code>salary</code> 列排序，避免额外的文件排序。</p>
 <h2 id="如何处理-MySQL-的主从同步延迟？"><a class="headerlink" href="#如何处理-MySQL-的主从同步延迟？"></a>如何处理 MySQL 的主从同步延迟？</h2>
 <p>首先需要明确一个点<strong>延迟是必然存在的</strong>，无论怎么优化都无法避免延迟的存在。</p>
 <p>如果主从延迟过大，可能出现一个用户刚注册，然后登陆报该用户不存在的，这个体验对用户而言就太差了。</p>
@@ -21548,6 +21611,45 @@ BOSS-碧臂螂：集齐大圣套装的头冠、胸甲、腿甲后，回到土地
 <p>单表直接通过 order by 进行排序即可，分库分表后直接利用数据库是无法实现排序的。要么利用分库分表中间件的能力进行汇总排序，要么自己在业务代码中排序，要么利用 ES 存储全量数据排序查询。</p>
 <p>5）count 问题</p>
 <p>其实和排序问题类似，单表可以直接 count，分库分表后无法支持，只能多表 count 然后业务代码中累加，或者单独搞一个地方来维护总数，要么还是利用 ES。</p>
+<h2 id="分库分表的中间件有哪些？"><a class="headerlink" href="#分库分表的中间件有哪些？"></a>分库分表的中间件有哪些？</h2>
+<h3 id="ShardingSphere"><a class="headerlink" href="#ShardingSphere"></a>ShardingSphere</h3>
+<ul>
+<li>ShardingSphere是一款开源的分布式数据库中间件，提供了分库分表、读写分离、分布式事务等功能。</li>
+<li>它支持多种数据库，如MySQL、PostgreSQL、Oracle、SQL Server等，并且可以与现有的数据库系统无缝集成。</li>
+</ul>
+<h4 id="架构与原理"><a class="headerlink" href="#架构与原理"></a>架构与原理</h4>
+<p>ShardingSphere由Sharding-JDBC、Sharding-Proxy和Sharding-Sidecar三个主要组件组成。</p>
+<ul>
+<li>Sharding-JDBC：用于实现分库分表功能的模块，它可以在应用层通过简单的配置实现透明的分库分表操作。</li>
+<li>Sharding-Proxy：用于实现数据库代理功能的模块，它可以将数据库请求路由到不同的数据库节点上，实现读写分离和负载均衡。</li>
+<li>Sharding-Sidecar（规划中）：定位为Kubernetes的云原生数据库代理，以Sidecar的形式代理所有对数据库的访问。</li>
+</ul>
+<p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/167509-20240727115652944-82462320.png" alt loading="lazy"></p>
+<p>其原理是通过数据分片和路由来实现分库分表。数据分片是将数据划分为多个片段，每个片段存储在不同的数据库实例或数据表中；路由则是根据数据的分片规则将请求路由到对应的数据库实例或数据表上。</p>
+<h4 id="优势与适用场景"><a class="headerlink" href="#优势与适用场景"></a>优势与适用场景</h4>
+<ul>
+<li>灵活的扩展性：支持水平扩展和垂直扩展，可以根据业务需求灵活调整数据库的规模和性能。</li>
+<li>高可用性：支持主从复制和多活架构，提供高可用的数据库访问和数据保护。</li>
+<li>简化开发和维护：提供了简单易用的接口和配置，可以减少开发人员的工作量和维护成本。</li>
+<li>适用于高并发访问、大数据量存储、跨地域部署等场景。</li>
+</ul>
+<h3 id="MyCAT"><a class="headerlink" href="#MyCAT"></a>MyCAT</h3>
+<ul>
+<li>MyCAT是一个开源的分布式数据库中间件，基于Java编写，支持MySQL协议，可以作为MySQL的代理服务器使用。</li>
+<li>它支持分库分表、读写分离、全局序列号等功能，并且具有跨语言、跨平台、跨数据库的通用性。</li>
+</ul>
+<h4 id="架构与原理-2"><a class="headerlink" href="#架构与原理-2"></a>架构与原理</h4>
+<ul>
+<li>MyCAT采用代理模式来实现数据库的路由和分片。</li>
+<li>它包括MyCAT-Server和MyCAT-DataNode两个主要部分。MyCAT-Server用于接收客户端的数据库请求，并将请求路由到不同的数据库节点上；MyCAT-DataNode则用于实际存储数据的数据库节点。</li>
+</ul>
+<p><img src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/167509-20240727121533110-1588061359.png" alt loading="lazy"></p>
+<h4 id="优势与使用场景"><a class="headerlink" href="#优势与使用场景"></a>优势与使用场景</h4>
+<ul>
+<li>易于部署和使用：对于项目来说是透明的，如果遇到升级之类的操作，只需要在中间件层面进行即可。</li>
+<li>适用于大规模MySQL集群的管理和扩展问题。</li>
+<li>但是，MyCAT的SQL支持相对较弱，可能需要对SQL语句进行一定的改写和优化。</li>
+</ul>
 <h2 id="MySQL-中如何解决深度分页的问题？"><a class="headerlink" href="#MySQL-中如何解决深度分页的问题？"></a>MySQL 中如何解决深度分页的问题？</h2>
 <p>所谓的深度分页是指数据量很大的时候，按照分页访问后面的数据，例如 <code>limit 99999990，10</code>，这会使得数据库扫描前面的 99999990 条数据，才能得到最终的 10 条数据，大批量的扫描数据会增加数据库的负载，影响性能。</p>
 <p>优化方式可以有三种：</p>
@@ -21631,6 +21733,8 @@ BOSS-碧臂螂：集齐大圣套装的头冠、胸甲、腿甲后，回到土地
 <p>不说其他复杂的情况，就拿删除数据使用逻辑删除的情况，数据库的外键就无法满足级联修改，还是需要开发人员编写业务代码手动控制。</p>
 <p>2）分库分表</p>
 <p>数据库的外键约束只能控制一个数据库实例，跨实例的情况下无法满足。</p>
+<h2 id="参考链接"><a class="headerlink" href="#参考链接"></a>参考链接</h2>
+<p><a href="https://www.cnblogs.com/wzh2010/p/18031229">数据库系列: 主流分库分表中间件介绍(图文总结) - Hello-Brand - 博客园 (cnblogs.com)</a></p>
 ]]></content>
       <categories>
         <category>学习</category>
