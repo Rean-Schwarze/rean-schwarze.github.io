@@ -1,0 +1,601 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><title>【操作系统】进程管理 | Rean's Blog</title><noscript>开启JavaScript才能访问本站哦~</noscript><link rel="icon" href="/img/favicon.png"><!-- index.css--><link rel="stylesheet" href="/css/index.css?v=1.8.10"><!-- inject head--><link rel="stylesheet" href="https://cdn2.codesign.qq.com/icons/7pOrz0WXB5ZWJPX/latest/iconfont.css"><!-- aplayer--><link rel="stylesheet" href="https://cdn.staticfile.net/aplayer/1.10.1/APlayer.min.css"><!-- swiper--><link rel="stylesheet" href="https://cdn.staticfile.net/Swiper/11.0.5/swiper-bundle.min.css"><!-- fancybox ui--><link rel="stylesheet" href="https://cdn.staticfile.net/fancyapps-ui/5.0.36/fancybox/fancybox.min.css"><!-- katex--><!-- Open Graph--><meta name="description" content="用户态和内核态内核态和用户态是操作系统中的两种运行模式。它们的主要区别在于权限和可执行的操作： 内核态（Kernel Mode）：在内核态下，CPU可以执行所有的指令和访问所有的硬件资源。这种模式下的操作具有更高的权限，主要用于操作系统内核的运行。 用户态（User Mode）：在用户态下，CPU只"><!-- pwa--><meta name="apple-mobile-web-app-capable" content="Rean's Blog"><meta name="theme-color" content="var(--efu-main)"><meta name="apple-mobile-web-app-status-bar-style" content="var(--efu-main)"><link rel="bookmark" href="/img/favicon.png"><link rel="apple-touch-icon" href="/img/favicon.png" sizes="180x180"><script>console.log(
+    "%c Program: Hexo %c Theme: Solitude %c Version: v1.8.10",
+    "border-radius:5px 0 0 5px;padding: 5px 10px;color:white;background:#ff3842;",
+    "padding: 5px 10px;color:white;background:#3e9f50;",
+    "padding: 5px 10px;color:white;background:#0084ff;",
+)
+</script><script>(()=>{
+        const saveToLocal = {
+            set: function setWithExpiry(key, value, ttl) {
+                if (ttl === 0)
+                    return
+                const now = new Date()
+                const expiryDay = ttl * 86400000
+                const item = {
+                    value: value,
+                    expiry: now.getTime() + expiryDay
+                }
+                localStorage.setItem(key, JSON.stringify(item))
+            },
+            get: function getWithExpiry(key) {
+                const itemStr = localStorage.getItem(key)
+    
+                if (!itemStr) {
+                    return undefined
+                }
+                const item = JSON.parse(itemStr)
+                const now = new Date()
+    
+                if (now.getTime() > item.expiry) {
+                    localStorage.removeItem(key)
+                    return undefined
+                }
+                return item.value
+            }
+        };
+        window.utils = {
+            saveToLocal: saveToLocal,
+            getCSS: (url, id = false) => new Promise((resolve, reject) => {
+              const link = document.createElement('link')
+              link.rel = 'stylesheet'
+              link.href = url
+              if (id) link.id = id
+              link.onerror = reject
+              link.onload = link.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                link.onload = link.onreadystatechange = null
+                resolve()
+              }
+              document.head.appendChild(link)
+            }),
+            getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+              const script = document.createElement('script')
+              script.src = url
+              script.async = true
+              script.onerror = reject
+              script.onload = script.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                script.onload = script.onreadystatechange = null
+                resolve()
+              }
+    
+              Object.keys(attr).forEach(key => {
+                script.setAttribute(key, attr[key])
+              })
+    
+              document.head.appendChild(script)
+            }),
+            addGlobalFn: (key, fn, name = false, parent = window) => {
+                const globalFn = parent.globalFn || {}
+                const keyObj = globalFn[key] || {}
+        
+                if (name && keyObj[name]) return
+        
+                name = name || Object.keys(keyObj).length
+                keyObj[name] = fn
+                globalFn[key] = keyObj
+                parent.globalFn = globalFn
+            },
+        }
+    })()</script><!-- global head--><script>const GLOBAL_CONFIG = {
+    root: '/',
+    algolia: undefined,
+    localsearch: {"preload":false,"path":"/search.xml"},
+    runtime: '2024-01-05 00:00:00',
+    lazyload: {
+        enable: true,
+        error: '/img/error_load.png'
+    },
+    copyright: {"limit":50,"author":"作者: Rean","link":"链接: ","source":"来源: Rean's Blog","info":"著作权归作者所有。 商业转载请联系作者获得授权，非商业转载请注明出处。"},
+    highlight: {
+        enable: true,
+        limit: 200,
+        expand: true,
+        copy: true,
+        syntax: 'highlight.js'
+    },
+    randomlink: false,
+    lang: {"theme":{"dark":"已切换至深色模式","light":"已切换至浅色模式"},"copy":{"success":"复制成功","error":"复制失败"},"backtop":"返回顶部","time":{"day":"天前","hour":"小时前","just":"刚刚","min":"分钟前","month":"个月前"},"f12":"开发者模式已打开，请遵循GPL协议。","totalk":"无需删除空行，直接输入评论即可","search":{"empty":"找不到你查询的内容：${query}","hit":"找到 ${hits} 条结果，用时 ${time} 毫秒","placeholder":"输入关键词快速查找","count":"共 <b>${count}</b> 条结果。"}},
+    aside: {
+        sayhello: {
+            morning: '一日之计在于晨',
+            noon: '吃饱了才有力气干活',
+            afternoon: '集中精力，攻克难关',
+            night: '不要太劳累了，早睡更健康',
+            goodnight: '睡个好觉，保证精力充沛',
+        },
+        sayhello2: ["🤖️ 数码科技爱好者","🔍 分享与热心帮助","🔨 设计开发一条龙","🎮 游戏爱好者"],
+    },
+    covercolor: {
+        enable: true
+    },
+    comment: false,
+    lightbox: 'fancybox',
+    post_ai: false,
+    right_menu: {"mode":{"dark":"深色模式","light":"浅色模式"},"img_error":"此图片无法复制与下载","music":{"start":"播放音乐","stop":"暂停音乐"},"translate":{"translateDelay":0,"defaultEncoding":2}},
+};</script><!-- page-config head--><script id="config-diff">var PAGE_CONFIG = {
+    is_post: true,
+    is_page: false,
+    is_home: false,
+    page: '',
+    toc: true,
+    comment: false,
+    ai_text: false,
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body id="body"><!-- universe--><canvas id="universe"></canvas><!-- loading--><!-- console--><div id="console"><div class="close-btn" onclick="sco.hideConsole()"><i class="solitude st-close-fill"></i></div><div class="button-group"><div class="console-btn-item"><span class="darkmode_switchbutton" onclick="sco.switchDarkMode()" title="昼夜切换"><i class="solitude st-moon-clear-fill"></i></span></div><div class="console-btn-item" id="consoleHideAside"><span class="asideSwitch" onclick="sco.switchHideAside()" title="边栏显示控制"><i class="solitude st-side-bar-fill"></i></span></div><div class="console-btn-item" id="consoleMusic" onclick="sco.musicToggle()"><span class="music-switch" title="音乐开关"><i class="solitude st-disc-fill"></i></span></div></div><div class="console-mask" onclick="sco.hideConsole()"></div></div><!-- sidebar--><div id="sidebar" style="zoom: 1;"><div id="menu-mask" style="display: none;"></div><div id="sidebar-menus"><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">172</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">11</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">155</div></a></div></div></div><span class="sidebar-menu-item-title">功能</span><div class="sidebar-menu-item"><span class="darkmode_switchbutton menu-child" onclick="sco.switchDarkMode()"><i class="solitude st-moon-clear-fill"></i><span>显示模式</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文章</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  st-folder-fill"></i><span>文章列表</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  st-checkbox-multiple-blank-fill"></i><span>分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  st-price-tag-fill"></i><span>标签</span></a></li><li><a class="site-page child" href="/study/"><i class="solitude  st-gift-fill"></i><span>学习</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>我的</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="solitude  st-disc-fill"></i><span>音乐馆</span></a></li><li><a class="site-page child" href="/essay/"><span>即刻短文</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>关于本站</span></a></li></ul></div></div><span class="sidebar-menu-item-title">标签</span><div class="card-widget card-tags card-archives card-webinfo card-allinfo"><div class="card-tag-cloud"><a href="/tags/%E8%85%BE%E8%AE%AF/">腾讯<sup>1</sup></a><a href="/tags/%E5%90%8E%E5%8F%B0%E5%BC%80%E5%8F%91/">后台开发<sup>1</sup></a><a href="/tags/Markdown/">Markdown<sup>1</sup></a><a href="/tags/Butterfly/">Butterfly<sup>2</sup></a><a href="/tags/PyCharm/">PyCharm<sup>1</sup></a><a href="/tags/IDEA/">IDEA<sup>1</sup></a><a href="/tags/Git/">Git<sup>2</sup></a><a href="/tags/Halo/">Halo<sup>1</sup></a><a href="/tags/GitHub/">GitHub<sup>1</sup></a><a href="/tags/JavaFx/">JavaFx<sup>2</sup></a><a href="/tags/SpringBoot/">SpringBoot<sup>7</sup></a><a href="/tags/Java/">Java<sup>18</sup></a><a href="/tags/MyBatis/">MyBatis<sup>4</sup></a><a href="/tags/Hexo/">Hexo<sup>3</sup></a><a href="/tags/SyncTV/">SyncTV<sup>1</sup></a><a href="/tags/AList/">AList<sup>1</sup></a><a href="/tags/%E5%AE%9D%E5%A1%94/">宝塔<sup>3</sup></a><a href="/tags/Vue/">Vue<sup>18</sup></a><a href="/tags/Vite/">Vite<sup>6</sup></a><a href="/tags/JavaScript/">JavaScript<sup>4</sup></a><a href="/tags/TypeScript/">TypeScript<sup>3</sup></a><a href="/tags/Electron/">Electron<sup>4</sup></a><a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习<sup>1</sup></a><a href="/tags/scikit-learn/">scikit-learn<sup>1</sup></a><a href="/tags/vocalremover/">vocalremover<sup>1</sup></a><a href="/tags/BPM/">BPM<sup>1</sup></a><a href="/tags/%E9%BB%91%E7%A5%9E%E8%AF%9D%EF%BC%9A%E6%82%9F%E7%A9%BA/">黑神话：悟空<sup>1</sup></a><a href="/tags/HTTP/">HTTP<sup>5</sup></a><a href="/tags/HTTPS/">HTTPS<sup>2</sup></a><a href="/tags/%E7%9F%AD%E9%93%BE/">短链<sup>1</sup></a><a href="/tags/%E8%A7%86%E9%A2%91/">视频<sup>1</sup></a><a href="/tags/HTTP-1-1/">HTTP/1.1<sup>1</sup></a><a href="/tags/LaTex/">LaTex<sup>1</sup></a><a href="/tags/%E5%8A%A0%E5%AF%86/">加密<sup>1</sup></a><a href="/tags/IP/">IP<sup>2</sup></a><a href="/tags/ICMP/">ICMP<sup>1</sup></a><a href="/tags/I-O/">I/O<sup>2</sup></a><a href="/tags/JVM/">JVM<sup>2</sup></a><a href="/tags/Springboot/">Springboot<sup>1</sup></a><a href="/tags/ThreadLocal/">ThreadLocal<sup>1</sup></a><a href="/tags/UUID/">UUID<sup>1</sup></a><a href="/tags/%E5%B9%B6%E5%8F%91/">并发<sup>4</sup></a><a href="/tags/%E7%BA%A2%E9%BB%91%E6%A0%91/">红黑树<sup>2</sup></a><a href="/tags/%E9%93%BE%E8%A1%A8/">链表<sup>1</sup></a><a href="/tags/%E5%8A%9B%E6%89%A3/">力扣<sup>1</sup></a><a href="/tags/LeetCode/">LeetCode<sup>1</sup></a><a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库<sup>8</sup></a><a href="/tags/NLP/">NLP<sup>6</sup></a><a href="/tags/spaCy/">spaCy<sup>4</sup></a><a href="/tags/Python/">Python<sup>1</sup></a><a href="/tags/Redis/">Redis<sup>10</sup></a><a href="/tags/RDB/">RDB<sup>1</sup></a><a href="/tags/AOF/">AOF<sup>1</sup></a><a href="/tags/%E7%BA%BF%E7%A8%8B/">线程<sup>2</sup></a><a href="/tags/I-O%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">I/O多路复用<sup>2</sup></a><a href="/tags/Spring/">Spring<sup>5</sup></a><a href="/tags/TCP/">TCP<sup>7</sup></a><a href="/tags/UDP/">UDP<sup>1</sup></a><a href="/tags/Socket/">Socket<sup>1</sup></a><a href="/tags/FFMpeg/">FFMpeg<sup>1</sup></a><a href="/tags/%E6%A0%B7%E5%BC%8F/">样式<sup>1</sup></a><a href="/tags/ECMAScript/">ECMAScript<sup>2</sup></a><a href="/tags/Element/">Element<sup>3</sup></a><a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">分布式锁<sup>1</sup></a><a href="/tags/%E5%91%A8%E6%B7%B1/">周深<sup>5</sup></a><a href="/tags/%E5%BE%B5%E7%BE%BD%E6%91%A9%E6%9F%AF/">徵羽摩柯<sup>1</sup></a><a href="/tags/%E9%9F%B3%E4%B9%90%E7%BC%98%E8%AE%A1%E5%88%92/">音乐缘计划<sup>1</sup></a><a href="/tags/%E5%A5%A5%E6%96%AF%E5%8D%A1/">奥斯卡<sup>3</sup></a><a href="/tags/%E5%BC%A0%E6%9D%B0/">张杰<sup>2</sup></a><a href="/tags/%E5%A3%B0%E7%94%9F%E4%B8%8D%E6%81%AF%C2%B7%E5%AE%9D%E5%B2%9B%E5%AD%A3/">声生不息·宝岛季<sup>3</sup></a><a href="/tags/%E5%BE%90%E4%BD%B3%E8%8E%B9/">徐佳莹<sup>1</sup></a><a href="/tags/SynthV/">SynthV<sup>15</sup></a><a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统<sup>4</sup></a><a href="/tags/%E6%B0%B8%E5%A4%9CMinus/">永夜Minus<sup>4</sup></a><a href="/tags/%E9%9F%A6%E7%A4%BC%E5%AE%89/">韦礼安<sup>1</sup></a><a href="/tags/%E8%94%A1%E4%BE%9D%E6%9E%97/">蔡依林<sup>1</sup></a><a href="/tags/%E6%97%A0%E5%8F%82/">无参<sup>45</sup></a><a href="/tags/%E5%8F%A4%E9%A3%8E/">古风<sup>11</sup></a><a href="/tags/%E4%B8%89%E6%97%A0Marblue/">三无Marblue<sup>1</sup></a><a href="/tags/%E7%B4%A2%E5%BC%95/">索引<sup>1</sup></a><a href="/tags/B%E6%A0%91/">B树<sup>1</sup></a><a href="/tags/B-%E6%A0%91/">B+树<sup>1</sup></a><a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构<sup>1</sup></a><a href="/tags/%E6%A0%91/">树<sup>1</sup></a><a href="/tags/%E4%BA%8C%E5%8F%89%E6%A0%91/">二叉树<sup>1</sup></a><a href="/tags/%E8%AE%B8%E9%92%A7/">许钧<sup>1</sup></a><a href="/tags/%E6%AD%8C%E6%89%8B2024/">歌手2024<sup>37</sup></a><a href="/tags/Chante-Moore/">Chanté Moore<sup>2</sup></a><a href="/tags/%E9%BB%84%E5%AE%A3/">黄宣<sup>1</sup></a><a href="/tags/Faouzia/">Faouzia<sup>4</sup></a><a href="/tags/Lenka/">Lenka<sup>1</sup></a><a href="/tags/%E5%BC%A0%E9%92%B0%E7%90%AA/">张钰琪<sup>1</sup></a><a href="/tags/%E9%82%A3%E8%8B%B1/">那英<sup>9</sup></a><a href="/tags/%E5%B0%A4%E9%95%BF%E9%9D%96/">尤长靖<sup>2</sup></a><a href="/tags/%E5%AD%99%E6%A5%A0/">孙楠<sup>5</sup></a><a href="/tags/%E8%B0%AD%E7%BB%B4%E7%BB%B4/">谭维维<sup>3</sup></a><a href="/tags/%E5%B4%A9%E5%9D%8F%EF%BC%9A%E6%98%9F%E7%A9%B9%E9%93%81%E9%81%93/">崩坏：星穹铁道<sup>4</sup></a><a href="/tags/%E8%B5%A4%E7%BE%BD/">赤羽<sup>1</sup></a><a href="/tags/%E6%B1%AA%E8%8B%8F%E6%B3%B7/">汪苏泷<sup>4</sup></a><a href="/tags/%E5%A3%B0%E7%94%9F%E4%B8%8D%E6%81%AF%C2%B7%E5%AE%B6%E5%B9%B4%E5%8D%8E/">声生不息·家年华<sup>2</sup></a><a href="/tags/%E9%99%88%E6%A5%9A%E7%94%9F/">陈楚生<sup>2</sup></a><a href="/tags/%E9%99%88%E4%BA%A6%E6%B4%BA/">陈亦洺<sup>1</sup></a><a href="/tags/%E5%B0%9A%E8%BE%B0/">尚辰<sup>1</sup></a><a href="/tags/%E5%BF%98%E5%B7%9D%E9%A3%8E%E5%8D%8E%E5%BD%95/">忘川风华录<sup>2</sup></a><a href="/tags/%E4%B9%90%E6%AD%A3%E9%BE%99%E7%89%99/">乐正龙牙<sup>1</sup></a><a href="/tags/%E6%98%9F%E5%B0%98Infinity/">星尘Infinity<sup>1</sup></a><a href="/tags/%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F/">明日方舟<sup>2</sup></a><a href="/tags/%E7%A5%96%E5%A8%85%E7%BA%B3%E6%83%9C/">祖娅纳惜<sup>1</sup></a><a href="/tags/%E7%94%B5%E5%AD%90/">电子<sup>1</sup></a><a href="/tags/%E6%98%9F%E5%B0%98/">星尘<sup>3</sup></a><a href="/tags/%E5%BC%A0%E4%BF%A1%E5%93%B2/">张信哲<sup>2</sup></a><a href="/tags/%E9%93%B6%E4%B8%B4/">银临<sup>1</sup></a><a href="/tags/%E6%9D%8E%E5%B8%B8%E8%B6%85/">李常超<sup>1</sup></a><a href="/tags/%E5%B1%B1%E8%89%B2%E6%9C%89%E6%97%A0%E4%B8%AD/">山色有无中<sup>1</sup></a><a href="/tags/%E5%91%A8%E6%9D%B0%E4%BC%A6/">周杰伦<sup>1</sup></a><a href="/tags/%E9%BB%84%E9%9C%84%E9%9B%B2/">黄霄雲<sup>1</sup></a><a href="/tags/%E5%AE%B9%E7%A5%96%E5%84%BF/">容祖儿<sup>1</sup></a><a href="/tags/%E6%88%91%E6%98%AF%E6%AD%8C%E6%89%8B%C2%B7%E7%AC%AC%E5%9B%9B%E5%AD%A3/">我是歌手·第四季<sup>1</sup></a><a href="/tags/%E6%9D%8E%E5%85%8B%E5%8B%A4/">李克勤<sup>1</sup></a><a href="/tags/%E7%B2%A4%E8%AF%AD/">粤语<sup>2</sup></a><a href="/tags/%E9%BB%84%E4%B8%BD%E7%8E%B2/">黄丽玲<sup>1</sup></a><a href="/tags/G-E-M-%E9%82%93%E7%B4%AB%E6%A3%8B/">G.E.M.邓紫棋<sup>6</sup></a><a href="/tags/T-I-M-E/">T.I.M.E.<sup>4</sup></a><a href="/tags/%E6%97%B6%E5%85%89%E9%9F%B3%E4%B9%90%E4%BC%9A%C2%B7%E8%80%81%E5%8F%8B%E8%AE%B0/">时光音乐会·老友记<sup>4</sup></a><a href="/tags/%E5%BC%A0%E5%AD%A6%E5%8F%8B/">张学友<sup>1</sup></a><a href="/tags/%E6%9D%A8%E4%B8%9E%E7%90%B3/">杨丞琳<sup>1</sup></a><a href="/tags/%E6%B1%AA%E5%B3%B0/">汪峰<sup>1</sup></a><a href="/tags/%E6%9C%AA%E5%AE%9A%E4%BA%8B%E4%BB%B6%E7%B0%BF/">未定事件簿<sup>1</sup></a><a href="/tags/%E5%BC%A0%E8%BF%9C/">张远<sup>1</sup></a><a href="/tags/%E5%AD%99%E7%87%95%E5%A7%BF/">孙燕姿<sup>1</sup></a><a href="/tags/%E6%B5%B7%E6%9D%A5%E9%98%BF%E6%9C%A8/">海来阿木<sup>1</sup></a><a href="/tags/%E6%9B%B9%E6%9D%A8/">曹杨<sup>2</sup></a><a href="/tags/%E4%B8%8B%E4%B8%80%E6%88%98%E6%AD%8C%E6%89%8B/">下一战歌手<sup>2</sup></a><a href="/tags/Fine%E4%B9%90%E5%9B%A2/">Fine乐团<sup>1</sup></a><a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络<sup>4</sup></a><a href="/tags/DNS/">DNS<sup>1</sup></a><a href="/tags/MAC/">MAC<sup>1</sup></a><a href="/tags/Adam-Lambert/">Adam Lambert<sup>1</sup></a><a href="/tags/%E4%BA%9A%E5%BD%93%C2%B7%E5%85%B0%E4%BC%AF%E7%89%B9/">亚当·兰伯特<sup>1</sup></a><a href="/tags/Hayden/">Hayden<sup>1</sup></a><a href="/tags/%E6%9A%AE%E5%A4%9C/">暮夜<sup>1</sup></a><a href="/tags/ACE-Studio/">ACE Studio<sup>2</sup></a><a href="/tags/%E5%B0%9A%E9%9B%AF%E5%A9%95/">尚雯婕<sup>1</sup></a><a href="/tags/%E4%B8%9C%E6%96%B9%E6%A0%80%E5%AD%90/">东方栀子<sup>2</sup></a><a href="/tags/%E9%BB%84%E7%BB%AE%E7%8F%8A/">黄绮珊<sup>1</sup></a><a href="/tags/%E5%8D%8E%E6%99%A8%E5%AE%87/">华晨宇<sup>1</sup></a><a href="/tags/JUN/">JUN<sup>1</sup></a><a href="/tags/%E6%9E%97%E5%BF%86%E8%8E%B2/">林忆莲<sup>1</sup></a><a href="/tags/UTAU/">UTAU<sup>1</sup></a><a href="/tags/Sheena/">Sheena<sup>1</sup></a><a href="/tags/%E5%89%A7%E5%A5%BD%E5%90%AC%E7%9A%84%E6%AD%8C/">剧好听的歌<sup>1</sup></a><a href="/tags/Syncthing/">Syncthing<sup>1</sup></a><a href="/tags/%E5%90%8C%E6%AD%A5/">同步<sup>1</sup></a><a href="/tags/%E6%94%AF%E4%BB%98%E5%AE%9D/">支付宝<sup>1</sup></a><a href="/tags/Apifox/">Apifox<sup>2</sup></a></div></div></div></div><!-- keyboard--><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav class="show" id="nav"><div id="nav-group"><div id="blog_name"><a id="site-name" href="/" title="返回博客主页"><span class="title">Rean's Blog</span></a></div><div id="page-name-mask"><div id="page-name"><a id="page-name-text" onclick="sco.toTop()">【操作系统】进程管理</a></div></div><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文章</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  st-folder-fill"></i><span>文章列表</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  st-checkbox-multiple-blank-fill"></i><span>分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  st-price-tag-fill"></i><span>标签</span></a></li><li><a class="site-page child" href="/study/"><i class="solitude  st-gift-fill"></i><span>学习</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>我的</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="solitude  st-disc-fill"></i><span>音乐馆</span></a></li><li><a class="site-page child" href="/essay/"><span>即刻短文</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>关于本站</span></a></li></ul></div></div></div><div id="nav-left"></div><div id="nav-right"><div class="nav-button" id="randomPost_button"><a class="site-page" onclick="toRandomPost()" title="随机一篇文章" href="javascript:void(0);"><i class="solitude st-signal-tower-fill"></i></a></div><div class="nav-button" id="search-button"><a class="site-page social-icon search" href="javascript:void(0);" title="搜索"><i class="solitude st-search-line"></i></a></div><div class="nav-button" id="nav-console"><a class="console_switchbutton" onclick="sco.showConsole()" title="中控台" href="javascript:void(0);"><i class="solitude st-dashboard-fill"></i></a></div><div class="nav-button" id="nav-totop" onclick="sco.toTop()"><a class="totopbtn"><i class="solitude st-arrow-up-line"></i><span id="percent">0</span></a></div><div id="toggle-menu"><a class="site-page"><i class="solitude st-menu-line"></i></a></div></div></div></nav><div class="coverdiv" id="coverdiv"><img class="nolazyload" id="post-cover" src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture5.jpg" alt="【操作系统】进程管理"></div><div id="post-info"><div id="post-firstinfo"><div class="meta-firstline"><a class="post-meta-original" title="该文章为原创文章，注意版权协议">原创</a><span class="post-meta-categories"><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a></span><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E7%BA%BF%E7%A8%8B/"><span class="tags-name tags-punctuation">线程</span></a><a class="post-meta__tags" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"><span class="tags-name tags-punctuation">操作系统</span></a></div></div></div></div><h1 class="post-title">【操作系统】进程管理</h1><div id="post-meta"><div class="meta-secondline"><span class="post-meta-date" title="发布于 2024-08-09 17:25:35"><i class="post-meta-icon solitude st-calendar-todo-fill"></i><time datetime="2024-08-09T09:25:35.000Z">2024-08-09T09:25:35.000Z</time></span><span class="post-meta-date" title="最后更新于 2024-08-12 15:45:14"><i class="post-meta-icon solitude st-refresh-line"></i><time datetime="2024-08-12T07:45:14.103Z">2024-08-12T07:45:14.103Z</time></span><span class="post-meta-wordcount"><i class="post-meta-icon solitude st-word-fill" title="文章字数"></i><span class="word-count">9.8k</span><span class="post-meta-separator"></span><i class="post-meta-icon solitude st-clock-fill" title="阅读耗时"></i><span>33 min</span></span><a class="post-meta-pv" href="/p/2516f5f2/" title="文章热度"><i class="post-meta-icon solitude st-fire-fill"></i><span id="busuanzi_page_pv"><i class="solitude st-loading-line"></i></span></a></div></div></div><section class="main-hero-waves-area waves-area"><svg class="waves-svg" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto"><defs><path id="gentle-wave" d="M -160 44 c 30 0 58 -18 88 -18 s 58 18 88 18 s 58 -18 88 -18 s 58 18 88 18 v 44 h -352 Z"></path></defs><g class="parallax"><use href="#gentle-wave" x="48" y="0"></use><use href="#gentle-wave" x="48" y="3"></use><use href="#gentle-wave" x="48" y="5"></use><use href="#gentle-wave" x="48" y="7"></use></g></svg></section></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="用户态和内核态"><a href="#用户态和内核态" class="headerlink" title="用户态和内核态"></a>用户态和内核态</h1><p>内核态和用户态是操作系统中的两种运行模式。它们的主要区别在于权限和可执行的操作：</p>
+<p><strong>内核态（Kernel Mode）</strong>：在内核态下，CPU可以执行所有的指令和访问所有的硬件资源。这种模式下的操作具有更高的权限，主要用于操作系统内核的运行。</p>
+<p><strong>用户态（User Mode）</strong>：在用户态下，CPU只能执行部分指令集，无法直接访问硬件资源。这种模式下的操作权限较低，主要用于运行用户程序。</p>
+<p>内核态的底层操作主要包括：内存管理、进程管理、设备驱动程序控制、系统调用等。这些操作涉及到操<br>作系统的核心功能，需要较高的权限来执行。</p>
+<p>分为内核态和用户态的原因主要有以下几点：</p>
+<ul>
+<li><strong>安全性</strong>：通过对权限的划分，用户程序无法直接访问硬件资源，从而避免了恶意程序对系统资源的破坏。</li>
+<li><strong>稳定性</strong>：用户态程序出现问题时，不会影响到整个系统，避免了程序故障导致系统崩溃的风险。</li>
+<li><strong>隔离性</strong>：内核态和用户态的划分使得操作系统内核与用户程序之间有了明确的边界，有利于系统的模块化和维护。</li>
+</ul>
+<br>
+
+<h1 id="什么是进程和线程？"><a href="#什么是进程和线程？" class="headerlink" title="什么是进程和线程？"></a>什么是进程和线程？</h1><p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//picgo/1712907111634-f541e01f-2da1-426f-b7a8-ce769346a93d.webp" alt="进程&amp;线程"></p>
+<h2 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h2><p>资源分配和调度的一个独立单位（<strong>资源分配的最小单位</strong>），进程切换耗费资源比线程切换大。</p>
+<p>进程是程序的一次执行过程，是系统运行程序的基本单位，因此进程是动态的。进程有独立的进程地址空间。</p>
+<h3 id="进程的控制结构"><a href="#进程的控制结构" class="headerlink" title="进程的控制结构"></a>进程的控制结构</h3><p>在操作系统中，是用<strong>进程控制块</strong>（<em>process control block，PCB</em>）数据结构来描述进程的。<strong>PCB 是进程存在的唯一标识</strong>，这意味着一个进程的存在，必然会有一个 PCB，如果进程消失了，那么 PCB 也会随之消失。</p>
+<div class="note  flat"><p>PCB 具体包含什么信息呢？</p>
+</div>
+
+<p><strong>进程描述信息：</strong></p>
+<ul>
+<li>进程标识符：标识各个进程，每个进程都有一个并且唯一的标识符；</li>
+<li>用户标识符：进程归属的用户，用户标识符主要为共享和保护服务；</li>
+</ul>
+<p><strong>进程控制和管理信息：</strong></p>
+<ul>
+<li>进程当前状态，如 new、ready、running、waiting 或 blocked 等；</li>
+<li>进程优先级：进程抢占 CPU 时的优先级；</li>
+</ul>
+<p><strong>资源分配清单：</strong></p>
+<ul>
+<li>有关内存地址空间或虚拟地址空间的信息，所打开文件的列表和所使用的 I&#x2F;O 设备信息。</li>
+</ul>
+<p><strong>CPU 相关信息：</strong></p>
+<ul>
+<li>CPU 中各个寄存器的值，当进程被切换时，CPU 的状态信息都会被保存在相应的 PCB 中，以便进程重新执行时，能从断点处继续执行。</li>
+</ul>
+<p>每个PCB通常是通过<strong>链表</strong>的方式进行组织，把具有<strong>相同状态的进程链在一起，组成各种队列</strong>。比如：</p>
+<ul>
+<li>将所有处于就绪状态的进程链在一起，称为<strong>就绪队列</strong>；</li>
+<li>把所有因等待某事件而处于等待状态的进程链在一起就组成各种<strong>阻塞队列</strong>；</li>
+</ul>
+<h2 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h2><p>线程是进程中的一个实体，是 <strong>CPU 调度的基本单位</strong>，是比进程更小的能独立运行的基本单位。线程自己不拥有系统资源，只拥有运行中必不可少的资源（如程序计数器、寄存器、栈）。</p>
+<p>在同一个进程内，可以有多个线程，多个线程共享同一个进程的资源，每个线程具有自己的线程栈。线程没有独立的线程地址空间，多个线程共享同一个进程地址空间。</p>
+<p>进程间不会相互影响。一个进程内某个线程挂掉将导致整个进程挂掉。</p>
+<h3 id="多线程比单线程的优势，劣势？"><a href="#多线程比单线程的优势，劣势？" class="headerlink" title="多线程比单线程的优势，劣势？"></a>多线程比单线程的优势，劣势？</h3><ul>
+<li><strong>优势</strong>：提高程序的运行效率，可以充分利用多核处理器的资源，同时处理多个任务，加快程序的执行速度。</li>
+<li><strong>劣势</strong>：存在多线程数据竞争访问的问题，需要通过锁机制来保证线程安全，增加了加锁的开销，并且还会有死锁的风险。多线程会消耗更多系统资源，如CPU和内存，因为每个线程都需要占用一定的内存和处理时间。</li>
+</ul>
+<h3 id="为什么要用多线程？"><a href="#为什么要用多线程？" class="headerlink" title="为什么要用多线程？"></a>为什么要用多线程？</h3><p>先从总体上来说：</p>
+<ul>
+<li><strong>从计算机底层来说：</strong> 线程可以比作是轻量级的进程，是程序执行的最小单位,线程间的切换和调度的成本远远小于进程。另外，多核 CPU 时代意味着多个线程可以同时运行，这减少了线程上下文切换的开销。</li>
+<li><strong>从当代互联网发展趋势来说：</strong> 现在的系统动不动就要求百万级甚至千万级的并发量，而多线程并发编程正是开发高并发系统的基础，利用好多线程机制可以大大提高系统整体的并发能力以及性能。</li>
+</ul>
+<p>再深入到计算机底层来探讨：</p>
+<ul>
+<li><strong>单核时代</strong>：在单核时代多线程主要是为了提高单进程利用 CPU 和 IO 系统的效率。 假设只运行了一个 Java 进程的情况，当我们请求 IO 的时候，如果 Java 进程中只有一个线程，此线程被 IO 阻塞则整个进程被阻塞。CPU 和 IO 设备只有一个在运行，那么可以简单地说系统整体效率只有 50%。当使用多线程的时候，一个线程被 IO 阻塞，其他线程还可以继续使用 CPU。从而提高了 Java 进程利用系统资源的整体效率。</li>
+<li><strong>多核时代</strong>: 多核时代多线程主要是为了提高进程利用多核 CPU 的能力。举个例子：假如我们要计算一个复杂的任务，我们只用一个线程的话，不论系统有几个 CPU 核心，都只会有一个 CPU 核心被利用到。而创建多个线程，这些线程可以被映射到底层多个 CPU 上执行，在任务中的多个线程没有资源竞争的情况下，任务执行的效率会有显著性的提高，约等于（单核时执行时间&#x2F;CPU 核心数）。</li>
+</ul>
+<h3 id="多线程是不是越多越好，太多会有什么问题？"><a href="#多线程是不是越多越好，太多会有什么问题？" class="headerlink" title="多线程是不是越多越好，太多会有什么问题？"></a>多线程是不是越多越好，太多会有什么问题？</h3><ul>
+<li><strong>切换开销</strong>：线程的创建和切换会消耗系统资源，包括内存和CPU。如果创建太多线程，会占用大量的系统资源，导致系统负载过高，某个线程崩溃后，可能会导致进程崩溃。</li>
+<li><strong>死锁的问题</strong>：过多的线程可能会导致竞争条件和死锁。竞争条件指的是多个线程同时访问和修改共享资源，如果没有合适的同步机制，可能会导致数据不一致或错误的结果。而死锁则是指多个线程相互等待对方释放资源，导致程序无法继续执行。</li>
+</ul>
+<h3 id="线程切换为什么比进程切换快？-进程切换和线程切换的区别？"><a href="#线程切换为什么比进程切换快？-进程切换和线程切换的区别？" class="headerlink" title="线程切换为什么比进程切换快？&#x2F; 进程切换和线程切换的区别？"></a>线程切换为什么比进程切换快？&#x2F; 进程切换和线程切换的区别？</h3><p>线程切换比进程切换快是因为线程共享同一进程的地址空间和资源，线程切换时只需切换<strong>堆栈和程序计数器等</strong>少量信息，而不需要切换地址空间，避免了进程切换时需要切换整个进程的<strong>地址空间、全局变量、文件描述符等</strong>大量资源的开销，从而节省了时间和系统资源。</p>
+<h3 id="线程的生命周期和状态"><a href="#线程的生命周期和状态" class="headerlink" title="线程的生命周期和状态"></a>线程的生命周期和状态</h3><p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//picgo/1715669823633-dcd21d9d-1bc9-44b0-b708-7afda68c2257.webp" alt="img"></p>
+<h2 id="进程-vs-线程"><a href="#进程-vs-线程" class="headerlink" title="进程 vs 线程"></a>进程 vs 线程</h2><p>线程与进程的比较如下：</p>
+<ul>
+<li>进程是资源（包括内存、打开的文件等）分配的单位，线程是 CPU 调度的单位；</li>
+<li>进程拥有一个完整的资源平台，而线程只独享必不可少的资源，如寄存器和栈；</li>
+<li>线程同样具有就绪、阻塞、执行三种基本状态，同样具有状态之间的转换关系；</li>
+<li>线程能减少并发执行的时间和空间开销；</li>
+</ul>
+<br>
+
+<h1 id="进程间的通信方法"><a href="#进程间的通信方法" class="headerlink" title="进程间的通信方法"></a>进程间的通信方法</h1><p>每个进程各自有不同的用户地址空间，任何一个进程的全局变量在另一个进程中都看不到，所以 <strong>进程之间要交换数据必须通过内核</strong>。在内核中开辟一块缓冲区，进程 A 把数据从用户空间拷到内核缓冲区，进程 B 再从内核缓冲区把数据读走，内核提供的这种机制称为进程间通信。</p>
+<p>不同进程间的通信本质：进程之间可以看到一份公共资源；而提供这份资源的形式或者提供者不同，造成了通信方式不同。</p>
+<p>进程间通信主要包括管道、系统 IPC（包括消息队列、信号量、信号、共享内存等）、以及套接字 Socket。</p>
+<ol>
+<li>管道（Pipes）：管道是一种单向通信方式，用于在父进程和子进程之间或者同一主机上的不同进程之间传递数据。它可以是<strong>匿名</strong>的，也可以是<strong>命名</strong>的。</li>
+<li>命名管道（Named Pipes）：与匿名管道类似，但具有一个在文件系统中有名的路径，允许不相关的进程之间进行通信。</li>
+<li>消息队列（Message Queues）：消息队列允许一个进程向另一个进程发送消息，消息在队列中按顺序存储，并且接收方可以按需接收。</li>
+<li>共享内存（Shared Memory）：<strong>共享内存的机制，就是拿出一块虚拟地址空间来，映射到相同的物理内存中</strong>。共享内存允许多个进程访问同一块内存区域，从而实现快速的数据交换。但需要注意同步问题，以避免竞态条件和数据一致性问题。</li>
+<li>信号量（Semaphores）：信号量是一种同步原语，用于管理对共享资源的访问。它可以用于实现进程间的互斥访问和同步操作。</li>
+<li>套接字（Sockets）：套接字允许在网络上的不同主机上的进程进行通信，是实现网络通信的基础。</li>
+<li>文件（File）：进程可以通过读写文件来进行通信，这种方式通常用于进程之间的间接通信，例如使用临时文件或者共享文件。</li>
+</ol>
+<p>可以根据不同的场景选取不同的通信方式。</p>
+<h2 id="信号和信号量有什么区别？"><a href="#信号和信号量有什么区别？" class="headerlink" title="信号和信号量有什么区别？"></a>信号和信号量有什么区别？</h2><ul>
+<li><strong>信号</strong>：一种处理异步事件的方式。信号是比较复杂的通信方式，用于通知接收进程有某种事件发生，除了用于进程外，还可以发送信号给进程本身。</li>
+<li><strong>信号量</strong>：进程间通信处理同步互斥的机制。是在多线程环境下使用的一种设施，它负责协调各个线程以保证它们能够正确，合理的使用公共资源。</li>
+</ul>
+<br>
+
+<h1 id="中断"><a href="#中断" class="headerlink" title="中断"></a>中断</h1><h2 id="什么是中断？"><a href="#什么是中断？" class="headerlink" title="什么是中断？"></a>什么是中断？</h2><p><strong>CPU停下当前的工作任务，去处理其他事情，处理完后回来继续执行刚才的任务</strong>，这一过程便是中断。</p>
+<p>中断分为外部中断和内部中断：</p>
+<ul>
+<li>外部中断分为可屏蔽中断和不可屏蔽中断：<ul>
+<li><strong>可屏蔽中断</strong>：通过INTR线向CPU请求的中断，主要来自外部设备如硬盘，打印机，网卡等。此类中断并不会影响系统运行，可随时处理，甚至不处理，所以名为可屏蔽。</li>
+<li><strong>不可屏蔽中断</strong>：通过NMI线向CPU请求的中断，如电源掉电，硬件线路故障等。这里不可屏蔽的意思不是不可以屏蔽，不建议屏蔽，而是问题太大，屏蔽不了，不能屏蔽的意思。注：INTR和NMI都是CPU的引脚</li>
+</ul>
+</li>
+<li>内部中断分为陷阱、故障、终止：<ul>
+<li><strong>陷阱：是一种有意的，预先安排的异常事件</strong>，一般是在编写程序时故意设下的陷阱指令，而后执行到陷阱指令后，CPU将会调用特定程序进行相应的处理，处理结束后返回到陷阱指令的下一条指令。如系统调用，程序调试功能等。如printf函数，最底层的实现中会有一条intOx80指令，这就是一条陷阱指令，使用0x80号中断进行系统调用。</li>
+<li><strong>故障：故障是在引起故障的指令被执行，但还没有执行结束时，CPU检测到的一类的意外事件。</strong>出错时交由故障处理程序处理，如果能处理修正这个错误，就将控制返回到引起故障的指令即CPU重新执这条指令。如果不能处理就报错。常见的故障为缺页，当CPU引用的虚拟地址对应的物理页不存在时就会发生故障。缺页异常是能够修正的，有着专门的缺页处理程序，它会将缺失的物理页从磁盘中重新调进主存。而后再次执行引起故障的指令时便能够顺利执行了。</li>
+<li><strong>终止：执行指令的过程中发生了致命错误，不可修复，程序无法继续运行，只能终止，通常会是一些硬件的错误。</strong>终止处理程序不会将控制返回给原程序，而是直接终止原程序。</li>
+</ul>
+</li>
+</ul>
+<h2 id="讲讲中断的流程"><a href="#讲讲中断的流程" class="headerlink" title="讲讲中断的流程"></a>讲讲中断的流程</h2><p>中断是计算机系统中一种机制，用于在处理器执行指令时暂停当前任务，并转而执行其他任务或处理特定事件。以下是中断的基本流程：</p>
+<ul>
+<li><strong>发生中断</strong>：当外部设备或者软件程序需要处理器的注意或者响应时，会发出中断信号。处理器在接收到中断信号后，会停止当前执行的指令，保存当前执行现场，并跳转到中断处理程序执行。</li>
+<li><strong>中断响应</strong>：处理器接收到中断信号后，会根据中断向量表找到对应的中断处理程序的入口地址。处理器会保存当前执行现场（如程序计数器、寄存器状态等），以便在中断处理完成后能够恢复执行。</li>
+<li><strong>中断处理</strong>：处理器跳转到中断处理程序的入口地址开始执行中断处理程序。中断处理程序会根据中断类型进行相应的处理，可能涉及到保存现场、处理中断事件、执行特定任务等。</li>
+</ul>
+<h2 id="中断的作用是什么？"><a href="#中断的作用是什么？" class="headerlink" title="中断的作用是什么？"></a>中断的作用是什么？</h2><p>中断使得计算机系统具备应对对处理突发事件的能力，提高了CPU的工作效率，如果没有中断系统，CPU就只能按照原来的程序编写的先后顺序，对各个外设进行查询和处理，即轮询工作方式，轮询方法貌似公平，但实际工作效率却很低，却不能及时响应紧急事件。</p>
+<br>
+
+<h1 id="上下文切换"><a href="#上下文切换" class="headerlink" title="上下文切换"></a>上下文切换</h1><h2 id="进程的上下文切换"><a href="#进程的上下文切换" class="headerlink" title="进程的上下文切换"></a>进程的上下文切换</h2><p>各个进程之间是共享 CPU 资源的，在不同的时候进程之间需要切换，让不同的进程可以在 CPU 执行，那么这个<strong>一个进程切换到另一个进程运行，称为进程的上下文切换</strong>。</p>
+<p>进程是由内核管理和调度的，所以进程的切换只能发生在内核态。</p>
+<p>所以，<strong>进程的上下文切换不仅包含了虚拟内存、栈、全局变量等用户空间的资源，还包括了内核堆栈、寄存器等内核空间的资源。</strong></p>
+<p>通常，会把交换的信息保存在进程的 PCB，当要运行另外一个进程的时候，我们需要从这个进程的 PCB 取出上下文，然后恢复到 CPU 中，这使得这个进程可以继续执行，如下图所示：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/6bec25942bb73a5681c4ebc24ffaf7bc8d4a8a83f5fdce4c382e1528e626d519/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545382542462539422545372541382538422545352539322538432545372542412542462545372541382538422f31332d2545382542462539422545372541382538422545342542382538412545342542382538422545362539362538372545352538382538372545362538442541322e6a7067" alt="进程上下文切换"></p>
+<h2 id="线程的上下文切换"><a href="#线程的上下文切换" class="headerlink" title="线程的上下文切换"></a>线程的上下文切换</h2><p>在前面我们知道了，线程与进程最大的区别在于：<strong>线程是调度的基本单位，而进程则是资源拥有的基本单位</strong>。</p>
+<p>对于线程和进程，我们可以这么理解：</p>
+<ul>
+<li>当进程只有一个线程时，可以认为进程就等于线程；</li>
+<li>当进程拥有多个线程时，这些线程会共享相同的虚拟内存和全局变量等资源，这些资源在上下文切换时是不需要修改的；</li>
+</ul>
+<p>另外，线程也有自己的私有数据，比如栈和寄存器等，这些在上下文切换时也是需要保存的。</p>
+<div class="note  flat"><p>线程上下文切换的是什么？</p>
+</div>
+
+<p>这还得看线程是不是属于同一个进程：</p>
+<ul>
+<li>当两个线程不是属于同一个进程，则切换的过程就跟进程上下文切换一样；</li>
+<li><strong>当两个线程是属于同一个进程，因为虚拟内存是共享的，所以在切换时，虚拟内存这些资源就保持不动，只需要切换线程的私有数据、寄存器等不共享的数据</strong>；</li>
+</ul>
+<p>所以，线程的上下文切换相比进程，开销要小很多。</p>
+<br>
+
+<h1 id="进程调度"><a href="#进程调度" class="headerlink" title="进程调度"></a>进程调度</h1><div class="note  flat success"><p>我知道很多人会问，线程不是操作系统的调度单位吗？为什么这里参与调度的是进程？</p>
+<p>先提前说明，这里的进程指只有主线程的进程，所以调度主线程就等于调度了整个进程。</p>
+<p>那为什么干脆不直接取名线程调度？主要是操作系统相关书籍，都是用进程调度这个名字，所以我也沿用了这个名字。</p>
+</div>
+
+<h2 id="调度时机"><a href="#调度时机" class="headerlink" title="调度时机"></a>调度时机</h2><p>在进程的生命周期中，当进程从一个运行状态到另外一状态变化的时候，其实会触发一次调度。</p>
+<p>比如，以下状态的变化都会触发操作系统的调度：</p>
+<ul>
+<li><em>从就绪态 -&gt; 运行态</em>：当进程被创建时，会进入到就绪队列，操作系统会从就绪队列选择一个进程运行；</li>
+<li><em>从运行态 -&gt; 阻塞态</em>：当进程发生 I&#x2F;O 事件而阻塞时，操作系统必须选择另外一个进程运行；</li>
+<li><em>从运行态 -&gt; 结束态</em>：当进程退出结束后，操作系统得从就绪队列选择另外一个进程运行；</li>
+</ul>
+<p>因为，这些状态变化的时候，操作系统需要考虑是否要让新的进程给 CPU 运行，或者是否让当前进程从 CPU 上退出来而换另一个进程运行。</p>
+<p>另外，如果硬件时钟提供某个频率的周期性中断，那么可以根据如何处理时钟中断 ，把调度算法分为两类：</p>
+<ul>
+<li><strong>非抢占式调度算法</strong>挑选一个进程，然后让该进程运行直到被阻塞，或者直到该进程退出，才会调用另外一个进程，也就是说不会理时钟中断这个事情。</li>
+<li><strong>抢占式调度算法</strong>挑选一个进程，然后让该进程只运行某段时间，如果在该时段结束时，该进程仍然在运行时，则会把它挂起，接着调度程序从就绪队列挑选另外一个进程。这种抢占式调度处理，需要在时间间隔的末端发生<strong>时钟中断</strong>，以便把 CPU 控制返回给调度程序进行调度，也就是常说的<strong>时间片机制</strong>。</li>
+</ul>
+<h2 id="调度原则"><a href="#调度原则" class="headerlink" title="调度原则"></a>调度原则</h2><p><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/f334b95a1650b889a12c4f50939569dd4ca63fc4090f575cdfe2efc5a7f42325/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545382542462539422545372541382538422545352539322538432545372542412542462545372541382538422f32332d2545342542412539342545372541372538442545382542302538332545352542412541362545382541372538342545352538382539392e6a7067" alt="五种调度原则"></p>
+<ul>
+<li><strong>CPU 利用率</strong>：调度程序应确保 CPU 是始终匆忙的状态，这可提高 CPU 的利用率；</li>
+<li><strong>系统吞吐量</strong>：吞吐量表示的是单位时间内 CPU 完成进程的数量，长作业的进程会占用较长的 CPU 资源，因此会降低吞吐量，相反，短作业的进程会提升系统吞吐量；</li>
+<li><strong>周转时间</strong>：周转时间是进程运行 + 阻塞时间 + 等待时间的总和，一个进程的周转时间越小越好；</li>
+<li><strong>等待时间</strong>：这个等待时间不是阻塞状态的时间，而是进程处于就绪队列的时间，等待的时间越长，用户越不满意；</li>
+<li><strong>响应时间</strong>：用户提交请求到系统第一次产生响应所花费的时间，在交互式系统中，响应时间是衡量调度算法好坏的主要标准。</li>
+</ul>
+<p>说白了，这么多调度原则，目的就是要使得进程要「快」。</p>
+<h2 id="调度算法"><a href="#调度算法" class="headerlink" title="调度算法"></a>调度算法</h2><h3 id="先来先服务（FCFS）"><a href="#先来先服务（FCFS）" class="headerlink" title="先来先服务（FCFS）"></a>先来先服务（FCFS）</h3><p><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/e94cb03a507f1b22563f2046a974e851f111419f82f690c684c86a45716ea0b3/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545382542462539422545372541382538422545352539322538432545372542412542462545372541382538422f32342d2545352538352538382545362539442541352545352538352538382545362539432538442545352538412541312e6a7067" alt="FCFS 调度算法"></p>
+<p>顾名思义，先来后到，<strong>每次从就绪队列选择最先进入队列的进程，然后一直运行，直到进程退出或被阻塞，才会继续从队列中选择第一个进程接着运行。</strong></p>
+<p>这似乎很公平，但是当一个长作业先运行了，那么后面的短作业等待的时间就会很长，不利于短作业。</p>
+<p>FCFS 对长作业有利，适用于 CPU 繁忙型作业的系统，而不适用于 I&#x2F;O 繁忙型作业的系统。</p>
+<h3 id="最短作业有限（SJF）"><a href="#最短作业有限（SJF）" class="headerlink" title="最短作业有限（SJF）"></a>最短作业有限（SJF）</h3><p><strong>最短作业优先（*Shortest Job First, SJF*）调度算法</strong>同样也是顾名思义，它会<strong>优先选择运行时间最短的进程来运行</strong>，这有助于提高系统的吞吐量。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/b93644087095f975236748df7e74cd3c337634b238c98cd68e6fc43a027a61b1/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545382542462539422545372541382538422545352539322538432545372542412542462545372541382538422f32352d2545362539432538302545372539462541442545342542442539432545342542382539412545342542432539382545352538352538382545372541452539372545362542332539352e6a7067" alt="SJF 调度算法"></p>
+<p>这显然对长作业不利，很容易造成一种极端现象。</p>
+<p>比如，一个长作业在就绪队列等待运行，而这个就绪队列有非常多的短作业，那么就会使得长作业不断的往后推，周转时间变长，致使长作业长期不会被运行。</p>
+<h3 id="时间片轮转（RR）"><a href="#时间片轮转（RR）" class="headerlink" title="时间片轮转（RR）"></a>时间片轮转（RR）</h3><p>最古老、最简单、最公平且使用最广的算法就是<strong>时间片轮转（*Round Robin, RR*）调度算法</strong>。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/348ec08ffabc14061451078e378c41706c3d589fad47c855c7f2d9a6e39b4378/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545382542462539422545372541382538422545352539322538432545372542412542462545372541382538422f32372d2545362539372542362545392539372542342545372538392538372545382542442541452545382541462541322e6a7067" alt="RR 调度算法"></p>
+<p><strong>每个进程被分配一个时间段，称为时间片（*Quantum*），即允许该进程在该时间段中运行。</strong></p>
+<ul>
+<li>如果时间片用完，进程还在运行，那么将会把此进程从 CPU 释放出来，并把 CPU 分配给另外一个进程；</li>
+<li>如果该进程在时间片结束前阻塞或结束，则 CPU 立即进行切换；</li>
+</ul>
+<p>另外，时间片的长度就是一个很关键的点：</p>
+<ul>
+<li>如果时间片设得太短会导致过多的进程上下文切换，降低了 CPU 效率；</li>
+<li>如果时间片设得太长又可能引起短作业进程的响应时间变长，不利于短作业。</li>
+</ul>
+<p>一般来说，时间片设为 <code>20ms~50ms</code> 通常是一个比较合理的折中值。</p>
+<h3 id="最高优先级（HPF）"><a href="#最高优先级（HPF）" class="headerlink" title="最高优先级（HPF）"></a>最高优先级（HPF）</h3><p>前面的「时间片轮转算法」做了个假设，即让所有的进程同等重要，也不偏袒谁，大家的运行时间都一样。</p>
+<p>但是，对于多用户计算机系统就有不同的看法了，它们希望调度是有优先级的，即希望调度程序能<strong>从就绪队列中选择最高优先级的进程进行运行，这称为最高优先级（*Highest Priority First，HPF*）调度算法</strong>。</p>
+<p>进程的优先级可以分为，静态优先级和动态优先级：</p>
+<ul>
+<li>静态优先级：创建进程时候，就已经确定了优先级了，然后整个运行时间优先级都不会变化；</li>
+<li>动态优先级：根据进程的动态变化调整优先级，比如如果进程运行时间增加，则降低其优先级，如果进程等待时间（就绪队列的等待时间）增加，则升高其优先级，也就是<strong>随着时间的推移增加等待进程的优先级</strong>。</li>
+</ul>
+<p>该算法也有两种处理优先级高的方法，非抢占式和抢占式：</p>
+<ul>
+<li>非抢占式：当就绪队列中出现优先级高的进程，运行完当前进程，再选择优先级高的进程。</li>
+<li>抢占式：当就绪队列中出现优先级高的进程，当前进程挂起，调度优先级高的进程运行。</li>
+</ul>
+<p>但是依然有缺点，可能会导致低优先级的进程永远不会运行。</p>
+<h3 id="多级反馈队列（MFQ）"><a href="#多级反馈队列（MFQ）" class="headerlink" title="多级反馈队列（MFQ）"></a>多级反馈队列（MFQ）</h3><p><strong>多级反馈队列（*Multilevel Feedback Queue*）调度算法</strong>是「时间片轮转算法」和「最高优先级算法」的综合和发展。</p>
+<p>顾名思义：</p>
+<ul>
+<li>「多级」表示有多个队列，每个队列优先级从高到低，同时优先级越高时间片越短。</li>
+<li>「反馈」表示如果有新的进程加入优先级高的队列时，立刻停止当前正在运行的进程，转而去运行优先级高的队列；</li>
+</ul>
+<p><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/065ca4d7c1a1fd39320c76dbb4f262bb14dd50fc3b502753c868648302abfba8/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545382542462539422545372541382538422545352539322538432545372542412542462545372541382538422f32382d2545352541342539412545372542412541372545392539382539462545352538382539372e6a7067" alt="多级反馈队列"></p>
+<p>来看看，它是如何工作的：</p>
+<ul>
+<li>设置了多个队列，赋予每个队列不同的优先级，每个<strong>队列优先级从高到低</strong>，同时<strong>优先级越高时间片越短</strong>；</li>
+<li>新的进程会被放入到第一级队列的末尾，按先来先服务的原则排队等待被调度，如果在第一级队列规定的时间片没运行完成，则将其转入到第二级队列的末尾，以此类推，直至完成；</li>
+<li>当较高优先级的队列为空，才调度较低优先级的队列中的进程运行。如果进程运行时，有新进程进入较高优先级的队列，则停止当前运行的进程并将其移入到原队列末尾，接着让较高优先级的进程运行；</li>
+</ul>
+<p>可以发现，对于短作业可能可以在第一级队列很快被处理完。对于长作业，如果在第一级队列处理不完，可以移入下次队列等待被执行，虽然等待的时间变长了，但是运行时间也变更长了，所以该算法很好的<strong>兼顾了长短作业，同时有较好的响应时间。</strong></p>
+<br>
+
+<h1 id="什么是死锁？"><a href="#什么是死锁？" class="headerlink" title="什么是死锁？"></a>什么是死锁？</h1><p>死锁是指两个或两个以上的进程在执行过程中，因争夺资源而造成的一种互相等待的现象。若无外力作用，它们都将无法推进下去。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/2019-4sisuo1.png"></p>
+<h2 id="产生死锁的必要条件"><a href="#产生死锁的必要条件" class="headerlink" title="产生死锁的必要条件"></a>产生死锁的必要条件</h2><ul>
+<li>互斥条件：当前进程所占有的临界资源，其他进程不可访问。</li>
+<li>请求和保持条件：当前进程占有资源，但又请求其他资源。</li>
+<li>不可被剥夺条件：当前进程结束前，所占有的资源不可被剥夺。</li>
+<li>环路等待条件：进程发生死锁后，必然存在一个进程之间相互等待的环形链。</li>
+</ul>
+<h2 id="破坏死锁的必要条件"><a href="#破坏死锁的必要条件" class="headerlink" title="破坏死锁的必要条件"></a>破坏死锁的必要条件</h2><ul>
+<li>破坏请求和保持条件：一次性申请所有的资源。</li>
+<li>破坏不可被剥夺条件：如果已分配了部分资源，但其他资源未得到满足，释放已占有的资源。</li>
+<li>破坏环路等待条件：资源有序分配，系统给每类资源赋予一个序号，每个进程按编号递增的请求资源，释放则相反。</li>
+</ul>
+<h2 id="预防死锁——银行家算法"><a href="#预防死锁——银行家算法" class="headerlink" title="预防死锁——银行家算法"></a>预防死锁——银行家算法</h2><p>避免死锁就是在资源分配时，借助于算法（比如银行家算法）对资源分配进行计算评估，使其进入安全状态。</p>
+<div class="note  flat info no-icon"><p><strong>安全状态</strong> 指的是系统能够按照某种线程推进顺序（P1、P2、P3……Pn）来为每个线程分配所需资源，直到满足每个线程对资源的最大需求，使每个线程都可顺利完成。称 <code>&lt;P1、P2、P3.....Pn&gt;</code> 序列为安全序列。</p>
+</div>
+
+<p><strong>银行家算法是最有代表性的避免死锁的算法</strong>。</p>
+<p>为什么叫银行家算法呢？就是这个算法的逻辑<strong>很像银行放贷的逻辑，也就是尽可能避免坏账的出现</strong>。</p>
+<p>银行家算法的业务逻辑如下：</p>
+<ul>
+<li><strong>不负荷执行</strong>：一个进程的最大需求量不超过系统拥有的总资源数，才会被接纳执行。</li>
+<li><strong>可分期</strong>：一个进程可以分期请求资源，但总请求书不可超过最大需求量。</li>
+<li><strong>推迟分配</strong>：当系统现有资源数小于进程需求时，对进程的需求可以延迟分配，但总让进程在有限时间内获取资源。</li>
+</ul>
+<p>听起来有点绕，我们还是举个例子来说明。</p>
+<h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><p>假如系统中有三类互斥资源 R1、R2、R3，可用资源数分别是9、8、5，在指定时刻有 P1、P2、P3、P4和P5这五个进程，这些进程的对三类互斥资源的最大需求量和已分配资源数如下表所示，那么系统如何先后运行这五个进程，不会发生死锁问题？</p>
+<table>
+<thead>
+<tr>
+<th>进程</th>
+<th><strong>最大需求量（分别为R1 R2 R3）</strong></th>
+<th><strong>已分配资源数（分别为R1 R2 R3）</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>P1</td>
+<td>6 5 2</td>
+<td>1 2 1</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>2 2 1</td>
+<td>2 1 1</td>
+</tr>
+<tr>
+<td>P3</td>
+<td>8 1 1</td>
+<td>2 1 0</td>
+</tr>
+<tr>
+<td>P4</td>
+<td>1 2 1</td>
+<td>1 2 0</td>
+</tr>
+<tr>
+<td>P5</td>
+<td>3 4 4</td>
+<td>1 1 3</td>
+</tr>
+</tbody></table>
+<h4 id="第一步：分析"><a href="#第一步：分析" class="headerlink" title="第一步：分析"></a>第一步：分析</h4><p>首先分析首次需求的资源，<strong>系统剩余可用资源数分别是 2、1、0</strong>，各进程需要的资源数如下表所示。</p>
+<table>
+<thead>
+<tr>
+<th>进程</th>
+<th><strong>最大需求量</strong></th>
+<th><strong>已分配资源数</strong></th>
+<th><strong>需要的资源数</strong></th>
+<th>剩余资源数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>P1</td>
+<td>6 5 2</td>
+<td>1 2 1</td>
+<td>5 3 1</td>
+<td>2 1 0</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>2 2 1</td>
+<td>2 1 1</td>
+<td><strong>0 1 0</strong></td>
+<td><strong>2 1 0</strong></td>
+</tr>
+<tr>
+<td>P3</td>
+<td>8 1 1</td>
+<td>2 1 0</td>
+<td>6 0 1</td>
+<td>2 1 0</td>
+</tr>
+<tr>
+<td>P4</td>
+<td>1 2 1</td>
+<td>1 2 0</td>
+<td>0 0 1</td>
+<td>2 1 0</td>
+</tr>
+<tr>
+<td>P5</td>
+<td>3 4 4</td>
+<td>1 1 3</td>
+<td>2 3 1</td>
+<td>2 1 0</td>
+</tr>
+</tbody></table>
+<p>根据银行家算法不负荷原则【一个进程的最大需求量不超过系统拥有的总资源数，才会被接纳执行】，优先给进程P2执行</p>
+<h4 id="第二部：执行P2"><a href="#第二部：执行P2" class="headerlink" title="第二部：执行P2"></a>第二部：执行P2</h4><p>P2 执行之后，释放了刚刚放入的2 1 0资源，而且可以释放已分配的2 1 1资源，所以此时的资源剩余量如下表所示。</p>
+<table>
+<thead>
+<tr>
+<th>进程</th>
+<th><strong>最大需求量</strong></th>
+<th><strong>已分配资源数</strong></th>
+<th><strong>需要的资源数</strong></th>
+<th>剩余资源数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>P1</td>
+<td>6 5 2</td>
+<td>1 2 1</td>
+<td>5 3 1</td>
+<td>4 2 1</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>2 2 1</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>P3</td>
+<td>8 1 1</td>
+<td>2 1 0</td>
+<td>6 0 1</td>
+<td>4 2 1</td>
+</tr>
+<tr>
+<td>P4</td>
+<td>1 2 1</td>
+<td>1 2 0</td>
+<td><strong>0 0 1</strong></td>
+<td><strong>4 2 1</strong></td>
+</tr>
+<tr>
+<td>P5</td>
+<td>3 4 4</td>
+<td>1 1 3</td>
+<td>2 3 1</td>
+<td>4 2 1</td>
+</tr>
+</tbody></table>
+<p>以此类推，安全执行顺序为 <strong>p2 &#x3D;&gt; p4 &#x3D;&gt; p5 &#x3D;&gt; p1 &#x3D;&gt; p3</strong> 或 <strong>p2 &#x3D;&gt; p4 &#x3D;&gt;p5 &#x3D;&gt; p3 &#x3D;&gt;p1</strong>。</p>
+<br>
+
+<h1 id="乐观锁与悲观锁"><a href="#乐观锁与悲观锁" class="headerlink" title="乐观锁与悲观锁"></a>乐观锁与悲观锁</h1><h2 id="什么是悲观锁？"><a href="#什么是悲观锁？" class="headerlink" title="什么是悲观锁？"></a>什么是悲观锁？</h2><p>悲观锁总是假设最坏的情况，认为共享资源每次被访问的时候就会出现问题(比如共享数据被修改)，所以每次在获取资源操作的时候都会上锁，这样其他线程想拿到这个资源就会阻塞直到锁被上一个持有者释放。也就是说，<strong>共享资源每次只给一个线程使用，其它线程阻塞，用完后再把资源转让给其它线程</strong>。</p>
+<p>高并发的场景下，激烈的锁竞争会造成线程阻塞，大量阻塞线程会导致系统的上下文切换，增加系统的性能开销。并且，悲观锁还可能会存在死锁问题，影响代码的正常运行。</p>
+<h3 id="互斥锁"><a href="#互斥锁" class="headerlink" title="互斥锁"></a>互斥锁</h3><p>互斥锁是一种「独占锁」，比如当线程 A 加锁成功后，此时互斥锁已经被线程 A 独占了，只要线程 A 没有释放手中的锁，线程 B 加锁就会失败，于是就会释放 CPU 让给其他线程，<strong>既然线程 B 释放掉了 CPU，自然线程 B 加锁的代码就会被阻塞</strong>。</p>
+<p><strong>对于互斥锁加锁失败而阻塞的现象，是由操作系统内核实现的</strong>。当加锁失败时，内核会将线程置为「睡眠」状态，等到锁被释放后，内核会在合适的时机唤醒线程，当这个线程成功获取到锁后，于是就可以继续执行。如下图：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/62b79f1cdd6dcdb24c8d300cf3ac994520087d04ec8b25ff0dee20e4dd7a97d0/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f7374322f2545362539332538442545342542442539432545372542332542422545372542422539462f2545392539342538312f2545342542412539322545362539362541352545392539342538312545352542372541352545342542442539432545362542352538312545372541382538422e706e67" alt="img"></p>
+<p>所以，互斥锁加锁失败时，会从用户态陷入到内核态，让内核帮我们切换线程，虽然简化了使用锁的难度，但是存在一定的性能开销成本。</p>
+<p>那这个开销成本是什么呢？会有<strong>两次线程上下文切换的成本</strong>：</p>
+<ul>
+<li>当线程加锁失败时，内核会把线程的状态从「运行」状态设置为「睡眠」状态，然后把 CPU 切换给其他线程运行；</li>
+<li>接着，当锁被释放时，之前「睡眠」状态的线程会变为「就绪」状态，然后内核会在合适的时间，把 CPU 切换给该线程运行。</li>
+</ul>
+<p>所以，<strong>如果你能确定被锁住的代码执行时间很短，就不应该用互斥锁，而应该选用自旋锁，否则使用互斥锁。</strong></p>
+<h3 id="自旋锁"><a href="#自旋锁" class="headerlink" title="自旋锁"></a>自旋锁</h3><p>自旋锁是通过 CPU 提供的 <code>CAS</code> 函数（<em>Compare And Swap</em>），在「用户态」完成加锁和解锁操作，不会主动产生线程上下文切换，所以相比互斥锁来说，会快一些，开销也小一些。</p>
+<p>一般加锁的过程，包含两个步骤：</p>
+<ul>
+<li>第一步，查看锁的状态，如果锁是空闲的，则执行第二步；</li>
+<li>第二步，将锁设置为当前线程持有；</li>
+</ul>
+<p>CAS 函数就把这两个步骤合并成一条硬件级指令，形成<strong>原子指令</strong>，这样就保证了这两个步骤是不可分割的，要么一次性执行完两个步骤，要么两个步骤都不执行。</p>
+<p>自旋锁是最简单的一种锁，一直自旋，利用 CPU 周期，直到锁可用。<strong>需要注意，在单核 CPU 上，需要抢占式的调度器（即不断通过时钟中断一个线程，运行其他线程）。否则，自旋锁在单 CPU 上无法使用，因为一个自旋的线程永远不会放弃 CPU。</strong></p>
+<p>自旋锁与互斥锁使用层面比较相似，但实现层面上完全不同：<strong>当加锁失败时，互斥锁用「线程切换」来应对，自旋锁则用「忙等待」来应对</strong>。</p>
+<p>它俩是锁的最基本处理方式，更高级的锁都会选择其中一个来实现，比如读写锁既可以选择互斥锁实现，也可以基于自旋锁实现。</p>
+<h3 id="读写锁"><a href="#读写锁" class="headerlink" title="读写锁"></a>读写锁</h3><p>读写锁从字面意思我们也可以知道，它由「读锁」和「写锁」两部分构成，如果只读取共享资源用「读锁」加锁，如果要修改共享资源则用「写锁」加锁。</p>
+<p>所以，<strong>读写锁适用于能明确区分读操作和写操作的场景</strong>。</p>
+<p>读写锁的工作原理是：</p>
+<ul>
+<li>当「写锁」没有被线程持有时，多个线程能够并发地持有读锁，这大大提高了共享资源的访问效率，因为「读锁」是用于读取共享资源的场景，所以多个线程同时持有读锁也不会破坏共享资源的数据。</li>
+<li>但是，一旦「写锁」被线程持有后，读线程的获取读锁的操作会被阻塞，而且其他写线程的获取写锁的操作也会被阻塞。</li>
+</ul>
+<p>所以说，写锁是独占锁，因为任何时刻只能有一个线程持有写锁，类似互斥锁和自旋锁，而读锁是共享锁，因为读锁可以被多个线程同时持有。</p>
+<p>知道了读写锁的工作原理后，我们可以发现，<strong>读写锁在读多写少的场景，能发挥出优势</strong>。</p>
+<p>另外，根据实现的不同，读写锁可以分为「读优先锁」和「写优先锁」。</p>
+<p>读优先锁期望的是，读锁能被更多的线程持有，以便提高读线程的并发性，它的工作方式是：当读线程 A 先持有了读锁，写线程 B 在获取写锁的时候，会被阻塞，并且在阻塞过程中，后续来的读线程 C 仍然可以成功获取读锁，最后直到读线程 A 和 C 释放读锁后，写线程 B 才可以成功获取写锁。如下图：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/a648bdf68c31de207ccb4497df5f0cec083f1e5fa90cc3bafcd6b3e64432070f/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f7374322f2545362539332538442545342542442539432545372542332542422545372542422539462f2545392539342538312f2545382541462542422545342542432539382545352538352538382545392539342538312545352542372541352545342542442539432545362542352538312545372541382538422e706e67" alt="img"></p>
+<p>而「写优先锁」是优先服务写线程，其工作方式是：当读线程 A 先持有了读锁，写线程 B 在获取写锁的时候，会被阻塞，并且在阻塞过程中，后续来的读线程 C 获取读锁时会失败，于是读线程 C 将被阻塞在获取读锁的操作，这样只要读线程 A 释放读锁后，写线程 B 就可以成功获取写锁。如下图：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/5989ae11624e52cafd9590c422e8efe16ac9e4cce9e58577d7b9028ea2ea0daf/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f7374322f2545362539332538442545342542442539432545372542332542422545372542422539462f2545392539342538312f2545352538362539392545342542432539382545352538352538382545392539342538312545352542372541352545342542442539432545362542352538312545372541382538422e706e67" alt="img"></p>
+<p>读优先锁对于读线程并发性更好，但也不是没有问题。我们试想一下，如果一直有读线程获取读锁，那么写线程将永远获取不到写锁，这就造成了写线程「饥饿」的现象。</p>
+<p>写优先锁可以保证写线程不会饿死，但是如果一直有写线程获取写锁，读线程也会被「饿死」。</p>
+<p>既然不管优先读锁还是写锁，对方可能会出现饿死问题，那么我们就不偏袒任何一方，搞个「公平读写锁」。</p>
+<p><strong>公平读写锁比较简单的一种方式是：用队列把获取锁的线程排队，不管是写线程还是读线程都按照先进先出的原则加锁即可，这样读线程仍然可以并发，也不会出现「饥饿」的现象。</strong></p>
+<p>互斥锁和自旋锁都是最基本的锁，读写锁可以根据场景来选择这两种锁其中的一个进行实现。</p>
+<h2 id="什么是乐观锁？"><a href="#什么是乐观锁？" class="headerlink" title="什么是乐观锁？"></a>什么是乐观锁？</h2><p>乐观锁总是假设最好的情况，认为共享资源每次被访问的时候不会出现问题，线程可以不停地执行，无需加锁也无需等待，只是在提交修改的时候去验证对应的资源（也就是数据）是否被其它线程修改了（具体方法可以使用版本号机制或 CAS 算法）。</p>
+<p>理论上来说：</p>
+<ul>
+<li>悲观锁通常多用于<strong>写比较多</strong>的情况（多写场景，竞争激烈），这样可以避免频繁失败和重试影响性能，悲观锁的开销是固定的。不过，如果乐观锁解决了频繁失败和重试这个问题的话，也是可以考虑使用乐观锁的，要视实际情况而定。</li>
+<li>乐观锁通常多用于<strong>写比较少</strong>的情况（多读场景，竞争较少），这样可以避免频繁加锁影响性能。不过，乐观锁主要针对的对象是单个共享变量。</li>
+</ul>
+<h2 id="如何实现乐观锁？"><a href="#如何实现乐观锁？" class="headerlink" title="如何实现乐观锁？"></a>如何实现乐观锁？</h2><p>乐观锁一般会使用版本号机制或 CAS 算法实现，CAS 算法相对来说更多一些，这里需要格外注意。</p>
+</article><div class="post-copyright"><div class="post-copyright__author_group"><a class="post-copyright__author_img" href="/about/"><img class="post-copyright__author_img_front" src= "/img/spin.svg" data-lazy-src="/img/avatar.jpg"></a><div class="post-copyright__author_name">Rean's Blog</div><div class="post-copyright__author_desc">Enjoy technology and music</div></div><div class="post-tools" id="post-tools"><div class="post-tools-left"><div id="quit-box" onclick="RemoveRewardMask()"></div></div></div><div class="post-copyright__notice"><span class="post-copyright-info">本文是原创文章，采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0</a>协议，完整转载请注明来自<a href="/">Rean's Blog</a></span></div></div><div class="post-tools-right"><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E7%BA%BF%E7%A8%8B/"><span class="tags-punctuation"></span>线程<span class="tagsPageCount">2</span></a><a class="post-meta__tags" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"><span class="tags-punctuation"></span>操作系统<span class="tagsPageCount">4</span></a></div></div></div><nav class="needEndHide pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/p/9f38852a/"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">【Java】基础（一） | 数据类型 &amp; 类 &amp; 异常</div></div></a></div><div class="next-post pull-right"><a href="/p/b27c77b3/"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">【网络】Cookie/Session/Token/JWT</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="solitude st-star-smile-fill"></i><span>喜欢这篇的人也看了</span><div class="relatedPosts-link"><a onclick="event.preventDefault(); toRandomPost();" href="javascript:void(0);" rel="external nofollow" data-pjax-state="">随便逛逛</a></div></div><div class="relatedPosts-list"><div><a href="/p/7a3264f/" title="【操作系统】网络I&#x2F;O"><img class="cover" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/cover5.JPG" alt="cover"><div class="content is-center"><div class="title">【操作系统】网络I&#x2F;O</div></div></a></div><div><a href="/p/7beadfaa/" title="线程崩溃了，进程也会崩溃吗？"><img class="cover" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/cover2.jpg" alt="cover"><div class="content is-center"><div class="title">线程崩溃了，进程也会崩溃吗？</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-content"><div class="card-info-avatar is-center"><div class="author-info__top-group"><div class="author-info__sayhi" id="author-info__sayhi" onclick="sco.changeSayHelloText()">sayhello.morning</div></div></div><div class="avatar-img-group"><img class="avatar-img" alt="头像" src= "/img/spin.svg" data-lazy-src="/img/avatar.jpg"><div class="avatar-sticker"><img class="avatar-sticker-img" src= "/img/spin.svg" data-lazy-src="https://7.isyangs.cn/34/65f2e4e0423cc-34.png" alt="心情贴纸"></div></div><div class="author-info__description_group"><div class="author-info__description">分享自己对编程的<b>热爱</b>，对知识海洋<b>探索历程</b>，随机掉落<b>无参配布</b>以及<b>翻调</b>（主要是音综类，在B站因为版权基本过不了审（。</div><div class="author-info__description2">相信你可以在这里找到对你有用的知识和教程。</div></div><div class="author-info__bottom-group"><a class="author-info__bottom-group-left" href="/about/"><div class="author-info__name">Rean</div><div class="author-info__desc">Enjoy technology and music</div></a><div class="card-info-social-icons is-center"><a class="social-icon" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze" title="Github"><i class="solitude  st-github-line"></i></a><a class="social-icon" target="_blank" rel="noopener" href="https://space.bilibili.com/6531436" title="Bilibili"><i class="solitude  st-bilibili-line"></i></a></div></div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="solitude st-menu-line"></i><span>文章目录</span></div><div class="toc-content" id="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E6%80%81%E5%92%8C%E5%86%85%E6%A0%B8%E6%80%81"><span class="toc-text">用户态和内核态</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E8%BF%9B%E7%A8%8B%E5%92%8C%E7%BA%BF%E7%A8%8B%EF%BC%9F"><span class="toc-text">什么是进程和线程？</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B"><span class="toc-text">进程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E7%9A%84%E6%8E%A7%E5%88%B6%E7%BB%93%E6%9E%84"><span class="toc-text">进程的控制结构</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B"><span class="toc-text">线程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%AF%94%E5%8D%95%E7%BA%BF%E7%A8%8B%E7%9A%84%E4%BC%98%E5%8A%BF%EF%BC%8C%E5%8A%A3%E5%8A%BF%EF%BC%9F"><span class="toc-text">多线程比单线程的优势，劣势？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%94%A8%E5%A4%9A%E7%BA%BF%E7%A8%8B%EF%BC%9F"><span class="toc-text">为什么要用多线程？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%98%AF%E4%B8%8D%E6%98%AF%E8%B6%8A%E5%A4%9A%E8%B6%8A%E5%A5%BD%EF%BC%8C%E5%A4%AA%E5%A4%9A%E4%BC%9A%E6%9C%89%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98%EF%BC%9F"><span class="toc-text">多线程是不是越多越好，太多会有什么问题？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A2%E4%B8%BA%E4%BB%80%E4%B9%88%E6%AF%94%E8%BF%9B%E7%A8%8B%E5%88%87%E6%8D%A2%E5%BF%AB%EF%BC%9F-%E8%BF%9B%E7%A8%8B%E5%88%87%E6%8D%A2%E5%92%8C%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A2%E7%9A%84%E5%8C%BA%E5%88%AB%EF%BC%9F"><span class="toc-text">线程切换为什么比进程切换快？&#x2F; 进程切换和线程切换的区别？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E5%92%8C%E7%8A%B6%E6%80%81"><span class="toc-text">线程的生命周期和状态</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B-vs-%E7%BA%BF%E7%A8%8B"><span class="toc-text">进程 vs 线程</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1%E6%96%B9%E6%B3%95"><span class="toc-text">进程间的通信方法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BF%A1%E5%8F%B7%E5%92%8C%E4%BF%A1%E5%8F%B7%E9%87%8F%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%EF%BC%9F"><span class="toc-text">信号和信号量有什么区别？</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%AD%E6%96%AD"><span class="toc-text">中断</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%B8%AD%E6%96%AD%EF%BC%9F"><span class="toc-text">什么是中断？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%B2%E8%AE%B2%E4%B8%AD%E6%96%AD%E7%9A%84%E6%B5%81%E7%A8%8B"><span class="toc-text">讲讲中断的流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%AD%E6%96%AD%E7%9A%84%E4%BD%9C%E7%94%A8%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">中断的作用是什么？</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%87%E6%8D%A2"><span class="toc-text">上下文切换</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E7%9A%84%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%87%E6%8D%A2"><span class="toc-text">进程的上下文切换</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E7%9A%84%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%87%E6%8D%A2"><span class="toc-text">线程的上下文切换</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E8%B0%83%E5%BA%A6"><span class="toc-text">进程调度</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B0%83%E5%BA%A6%E6%97%B6%E6%9C%BA"><span class="toc-text">调度时机</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B0%83%E5%BA%A6%E5%8E%9F%E5%88%99"><span class="toc-text">调度原则</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95"><span class="toc-text">调度算法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%88%E6%9D%A5%E5%85%88%E6%9C%8D%E5%8A%A1%EF%BC%88FCFS%EF%BC%89"><span class="toc-text">先来先服务（FCFS）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E7%9F%AD%E4%BD%9C%E4%B8%9A%E6%9C%89%E9%99%90%EF%BC%88SJF%EF%BC%89"><span class="toc-text">最短作业有限（SJF）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%B6%E9%97%B4%E7%89%87%E8%BD%AE%E8%BD%AC%EF%BC%88RR%EF%BC%89"><span class="toc-text">时间片轮转（RR）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E9%AB%98%E4%BC%98%E5%85%88%E7%BA%A7%EF%BC%88HPF%EF%BC%89"><span class="toc-text">最高优先级（HPF）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E7%BA%A7%E5%8F%8D%E9%A6%88%E9%98%9F%E5%88%97%EF%BC%88MFQ%EF%BC%89"><span class="toc-text">多级反馈队列（MFQ）</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%AD%BB%E9%94%81%EF%BC%9F"><span class="toc-text">什么是死锁？</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%A7%E7%94%9F%E6%AD%BB%E9%94%81%E7%9A%84%E5%BF%85%E8%A6%81%E6%9D%A1%E4%BB%B6"><span class="toc-text">产生死锁的必要条件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A0%B4%E5%9D%8F%E6%AD%BB%E9%94%81%E7%9A%84%E5%BF%85%E8%A6%81%E6%9D%A1%E4%BB%B6"><span class="toc-text">破坏死锁的必要条件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%84%E9%98%B2%E6%AD%BB%E9%94%81%E2%80%94%E2%80%94%E9%93%B6%E8%A1%8C%E5%AE%B6%E7%AE%97%E6%B3%95"><span class="toc-text">预防死锁——银行家算法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%8B%E5%AD%90"><span class="toc-text">例子</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E6%AD%A5%EF%BC%9A%E5%88%86%E6%9E%90"><span class="toc-text">第一步：分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E9%83%A8%EF%BC%9A%E6%89%A7%E8%A1%8CP2"><span class="toc-text">第二部：执行P2</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B9%90%E8%A7%82%E9%94%81%E4%B8%8E%E6%82%B2%E8%A7%82%E9%94%81"><span class="toc-text">乐观锁与悲观锁</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%82%B2%E8%A7%82%E9%94%81%EF%BC%9F"><span class="toc-text">什么是悲观锁？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%92%E6%96%A5%E9%94%81"><span class="toc-text">互斥锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%87%AA%E6%97%8B%E9%94%81"><span class="toc-text">自旋锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%BB%E5%86%99%E9%94%81"><span class="toc-text">读写锁</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%B9%90%E8%A7%82%E9%94%81%EF%BC%9F"><span class="toc-text">什么是乐观锁？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E4%B9%90%E8%A7%82%E9%94%81%EF%BC%9F"><span class="toc-text">如何实现乐观锁？</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="solitude st-map-line"></i><span>最近发布</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/p/5871d67/" title="woff 字体反扒方案"><img alt="woff 字体反扒方案" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/221228-15574975489aa1.jpg"></a><div class="content"><a class="title" href="/p/5871d67/" title="woff 字体反扒方案">woff 字体反扒方案</a><a class="article-recent_post_categories" href="/p/5871d67/">研究</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/204d99f1/" title="【MyBatis】生命周期"><img alt="【MyBatis】生命周期" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/235335-1549900415dcc9.jpg"></a><div class="content"><a class="title" href="/p/204d99f1/" title="【MyBatis】生命周期">【MyBatis】生命周期</a><a class="article-recent_post_categories" href="/p/204d99f1/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/b585efd0/" title="敏感词过滤方案总结"><img alt="敏感词过滤方案总结" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture5.jpg"></a><div class="content"><a class="title" href="/p/b585efd0/" title="敏感词过滤方案总结">敏感词过滤方案总结</a><a class="article-recent_post_categories" href="/p/b585efd0/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/122902e7/" title="【并发】高并发下库存扣减如何避免超卖和少卖？"><img alt="【并发】高并发下库存扣减如何避免超卖和少卖？" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/cover8.JPG"></a><div class="content"><a class="title" href="/p/122902e7/" title="【并发】高并发下库存扣减如何避免超卖和少卖？">【并发】高并发下库存扣减如何避免超卖和少卖？</a><a class="article-recent_post_categories" href="/p/122902e7/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/683f7c8e/" title="网易云音乐歌名&amp;歌词获取方案收集"><img alt="网易云音乐歌名&amp;歌词获取方案收集" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture1.jpg"></a><div class="content"><a class="title" href="/p/683f7c8e/" title="网易云音乐歌名&amp;歌词获取方案收集">网易云音乐歌名&amp;歌词获取方案收集</a><a class="article-recent_post_categories" href="/p/683f7c8e/">教程</a></div></div></div></div></div></div></main><footer id="footer"><div id="st-footer-bar"><div class="footer-logo"><span class="solitude">Rean's Blog</span></div><div class="footer-bar-description">来自Rean's Blog - Enjoy technology and music的文章</div><a class="footer-bar-link" href="/">了解更多</a></div><div id="footer_deal"><a class="deal_link" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze" title="Github"><i class="solitude  st-github-line"></i></a><a class="deal_link" target="_blank" rel="noopener" href="https://space.bilibili.com/6531436" title="Bilibili"><i class="solitude  st-bilibili-line"></i></a></div><div id="st-footer"></div><div id="footer-bar"><div class="footer-bar-links"><div class="footer-bar-left"><div class="copyright">© 2024 By&nbsp;<a class="footer-bar-link" href="/">Rean</a></div></div><div class="footer-bar-right"><a class="footer-bar-link" target="_blank" rel="noopener" href="https://github.com/valor-x/hexo-theme-solitude" alt="主题">主题</a><a class="footer-bar-link cc" href="/null" aria-label="copyright"><i class="solitude st-copyright-line"></i><i class="solitude st-creative-commons-by-line"></i><i class="solitude st-creative-commons-nc-line"></i><i class="solitude st-creative-commons-nd-line"></i></a></div></div></div></footer></div><!-- right_menu--><div id="rightMenu"><div class="rightMenu-group rightMenu-small"><div class="rightMenu-item" id="menu-backward"><i class="solitude st-arrow-left-line"></i></div><div class="rightMenu-item" id="menu-forward"><i class="solitude st-arrow-right-line"></i></div><div class="rightMenu-item" id="menu-refresh"><i class="solitude st-restart-line"></i></div><div class="rightMenu-item" id="menu-top"><i class="solitude st-arrow-up-line"></i></div></div><div class="rightMenu-group rightMenu-line rightMenuPlugin"><div class="rightMenu-item" id="menu-copytext"><i class="solitude st-copy-fill"></i><span>复制选中文本</span></div><div class="rightMenu-item" id="menu-pastetext"><i class="solitude st-clipboard-fill"></i><span>粘贴文本</span></div><div class="rightMenu-item" id="menu-newwindow"><i class="solitude st-window-fill"></i><span>新窗口打开</span></div><div class="rightMenu-item" id="menu-copylink"><i class="solitude st-link-line"></i><span>复制链接地址</span></div><div class="rightMenu-item" id="menu-copyimg"><i class="solitude st-copy-fill"></i><span>复制此图片</span></div><div class="rightMenu-item" id="menu-downloadimg"><i class="solitude st-download-cloud-fill"></i><span>下载此图片</span></div><div class="rightMenu-item" id="menu-search"><i class="solitude st-search-line"></i><span>站内搜索</span></div><div class="rightMenu-item" id="menu-music-toggle"><i class="solitude st-play-fill"></i><span>播放音乐</span></div><div class="rightMenu-item" id="menu-music-back"><i class="solitude st-skip-back-fill"></i><span>切换到上一首</span></div><div class="rightMenu-item" id="menu-music-forward"><i class="solitude st-skip-forward-fill"></i><span>切换到下一首</span></div><div class="rightMenu-item" id="menu-music-copyMusicName"><i class="solitude st-copy-fill"></i><span>复制歌名</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><div class="rightMenu-item" id="menu-randomPost" onclick="toRandomPost()||rm.hideRightMenu()"><i class="solitude st-signal-tower-fill"></i><span>随机短文</span></div><div class="rightMenu-item" onclick="pjax.loadUrl('/categories/')||rm.hideRightMenu()"><i class="solitude st-checkbox-multiple-blank-fill"></i><span>全部分类</span></div><div class="rightMenu-item" onclick="pjax.loadUrl('/tags/')||rm.hideRightMenu()"><i class="solitude st-price-tag-fill"></i><span>全部标签</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><div class="rightMenu-item" id="menu-darkmode" onclick="sco.switchDarkMode()"><i class="solitude st-moon-clear-fill"></i><span class="menu-darkmode-text">深色模式</span></div><div class="rightMenu-item" id="menu-translate"><i class="solitude st-panben-line"></i><span>轉為繁體</span></div></div></div><div id="rightmenu-mask"></div><!-- inject body--><div><script src="/js/utils.js?v=1.8.10"></script><script src="/js/main.js?v=1.8.10"></script><script src="/js/third_party/waterfall.min.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/pjax/0.2.8/pjax.min.js"></script><script src="/js/third_party/universe.min.js?v=1.8.10"></script><script>dark()
+</script><script src="/js/tw_cn.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/vanilla-lazyload/19.1.3/lazyload.iife.min.js"></script><script src="https://cdn.staticfile.net/node-snackbar/0.1.16/snackbar.min.js"></script><script src="https://cdn.staticfile.net/fancyapps-ui/5.0.36/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.staticfile.net/Swiper/11.0.5/swiper-bundle.min.js"></script><script>var meting_api = 'https://meting.qjqq.cn/?server=:server&type=:type&id=:id&auth=:auth&r=:r';</script><script src="https://cdn.staticfile.net/aplayer/1.10.1/APlayer.min.js"></script><script src="https://cdn.staticfile.net/meting/2.0.1/Meting.min.js"></script><script>const coverColorConfig = {
+    api: 'https://api.qjqq.cn/api/Imgcolor?img=',
+    time: 43200000
+}</script><script src="/js/covercolor/api.js?v=1.8.10"></script><script src="/js/music.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/pace/1.2.4/pace.min.js"></script><script src="/js/right_menu.js?v=1.8.10"></script><div class="js-pjax"><script defer pjax src="https://cdn.staticfile.net/pearssauce-busuanzi/1.0.0/bsz.pure.min.js"></script></div></div><!-- newest comment--><!-- pjax--><script>const pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: ['title','#body-wrap','#site-config','meta[name="description"]','.js-pjax','meta[property^="og:"]','#config-diff'],
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+})
+
+document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+})
+
+document.addEventListener('pjax:complete', () => {
+    window.refreshFn()
+
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+        const newScript = document.createElement('script')
+        const content = item.text || item.textContent || item.innerHTML || ""
+        Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+        newScript.appendChild(document.createTextNode(content))
+        item.parentNode.replaceChild(newScript, item)
+    })
+
+    GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+})
+
+document.addEventListener('pjax:error', (e) => {
+    if (e.request.status === 404) {
+        pjax.loadUrl('/404.html')
+    }
+})</script><!-- theme--><script>initTheme = () => {
+    let isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const cachedMode = utils.saveToLocal.get('theme');
+    if (cachedMode === undefined) {
+        const nowMode =
+            isDarkMode ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', nowMode);
+    } else {
+        document.documentElement.setAttribute('data-theme', cachedMode);
+    }
+    is_rm && rm.mode(cachedMode === 'dark' && isDarkMode)
+}
+initTheme()</script><!-- google adsense--><!-- search--><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><button class="search-close-button"><i class="solitude st-close-fill"></i></button></nav><div class="search-wrap"><div class="search-box"><input class="search-box-input" id="search-input" type="text" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="输入关键词快速查找"></div><div id="search-results"><div id="search-hits"></div></div><div id="search-pagination"></div><div id="search-tips"></div></div></div><div id="search-mask"></div></div><script src="/js/search/local.js?v=1.8.10"></script><!-- music--><div class="needEndHide" id="nav-music" onclick="sco.musicToggle()"><div id="nav-music-hoverTips">音乐已暂停</div><meting-js id="421801417" server="netease" type="playlist" mutex="true" preload="none" data-lrctype="0" order="random" theme="var(--efu-main)"></meting-js></div></body></html><script>const posts=["p/5871d67/","p/204d99f1/","p/b585efd0/","p/122902e7/","p/683f7c8e/","p/36b252a1/","p/bbd98f0d/","p/1b320550/","p/30cd73ca/","p/332adb42/","p/4f877c1e/","p/677c7789/","p/f7f0a5f3/","p/9b5a538c/","p/37360bc0/","p/bb996d5/","p/364ea8cc/","p/a027699d/","p/21cdaec5/","p/37c37880/","p/a02febe4/","p/d1ec0e4e/","p/25d2b878/","p/8324e4bc/","p/6021f67a/","p/305331f0/","p/66be4b4/","p/de2d10bc/","p/e6628f8e/","p/4131eeff/","p/27705e17/","p/74e1a37c/","p/b5223f80/","p/9b8bc45a/","p/c9cb7159/","p/82c942ab/","p/4c19fcc6/","p/27446c6a/","p/9f38852a/","p/2516f5f2/","p/b27c77b3/","p/7a3264f/","p/7beadfaa/","p/e1d9906f/","p/a440b512/","p/a46aa116/","p/fe8dd3bd/","p/51c99199/","p/91b418a/","p/421add40/","p/9d7a18c7/","p/26345198/","p/fa30e874/","p/dea9a817/","p/59203ba6/","p/e5616c72/","p/971e9859/","p/d7f6ccff/","p/1b2ec1c2/","p/a0d1cef9/","p/a58b6af0/","p/9381aa6d/","p/38b8becb/","p/d0a26095/","p/2b3bdada/","p/ba70636/","p/374630f5/","p/a964a243/","p/a06e9899/","p/ef9a99de/","p/108f7c52/","p/a91c1846/","p/413576cf/","p/9ee60c65/","p/e74db628/","p/888c8bf3/","p/477dbe08/","p/38e8a510/","p/dfb41864/","p/b0e3506b/","p/e17fd725/","p/e1fe458c/","p/636cfdea/","p/7b854cb7/","p/b3a61240/","p/64f43fb4/","p/800f9a11/","p/4a48b34c/","p/b3641215/","p/53bc1fc9/","p/fc02f9ee/","p/25b929f6/","p/dd30b42/","p/3aa261db/","p/fc078742/","p/22c9d1d0/","p/33fc02d2/","p/70335ae0/","p/f32ef110/","p/f756486c/","p/8dd4b91f/","p/a290d941/","p/61a8a4ef/","p/c2d0bb20/","p/9770d71c/","p/41bd2aed/","p/bfebe40b/","p/6b4006e6/","p/b5696360/","p/53ab7115/","p/e6fa9b9/","p/866abf45/","p/b718b92a/","p/d26f4c21/","p/bc5d6bbe/","p/5a18917b/","p/5f2b1e2f/","p/2532a2ee/","p/4337b2c0/","p/e042d029/","p/9b4a91e5/","p/9d8ce868/","p/a69f6a48/","p/f9b9edb2/","p/cbe55d0/","p/156c59d0/","p/d4d6f818/","p/2574cf15/","p/a0efc292/","p/ec2ecf28/","p/85f11265/","p/db95e6f5/","p/a8296e6d/","p/4cc89a71/","p/d0fe2d0f/","p/ffab2f6b/","p/95d9f91e/","p/7f869365/","p/5b246b1b/","p/a9c92fa9/","p/7d49fec0/","p/a9a25fcd/","p/43bb383e/","p/b9aeb4/","p/52eaf228/","p/4be90d2f/","p/ed500d41/","p/dcfbc8e5/","p/240e5e52/","p/18cda1b3/","p/66a6c396/","p/5f33341/","p/f9bef31e/","p/acac46b/","p/a4189438/","p/ae6b0147/","p/4e982f2d/","p/403e0cac/","p/495b9f0f/","p/8e966ab9/","p/f6e1007e/","p/6f562d19/","p/10eac329/","p/cc53cf58/","p/4f2beac6/","p/73e2aa1/","p/c677e75e/","p/3f13b766/","p/cc30f00/","p/807cab5e/","p/5b5991e4/","p/e941ffc/"];function toRandomPost(){ pjax.loadUrl('/'+posts[Math.floor(Math.random()*posts.length)]); }</script>

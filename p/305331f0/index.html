@@ -1,0 +1,778 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><title>【MySQL】基础 | Rean's Blog</title><noscript>开启JavaScript才能访问本站哦~</noscript><link rel="icon" href="/img/favicon.png"><!-- index.css--><link rel="stylesheet" href="/css/index.css?v=1.8.10"><!-- inject head--><link rel="stylesheet" href="https://cdn2.codesign.qq.com/icons/7pOrz0WXB5ZWJPX/latest/iconfont.css"><!-- aplayer--><link rel="stylesheet" href="https://cdn.staticfile.net/aplayer/1.10.1/APlayer.min.css"><!-- swiper--><link rel="stylesheet" href="https://cdn.staticfile.net/Swiper/11.0.5/swiper-bundle.min.css"><!-- fancybox ui--><link rel="stylesheet" href="https://cdn.staticfile.net/fancyapps-ui/5.0.36/fancybox/fancybox.min.css"><!-- katex--><!-- Open Graph--><meta name="description" content="执行一条 select 语句，期间发生了什么？MySQL 执行流程是怎样的？ 可以看到，MySQL 的架构共分为两层：Server 层和存储引擎层 Server 层负责建立连接、分析和执行 SQL。MySQL 大多数的核心功能模块都在这实现，主要包括连接器，查询缓存、解析器、预处理器、优化器、执行"><!-- pwa--><meta name="apple-mobile-web-app-capable" content="Rean's Blog"><meta name="theme-color" content="var(--efu-main)"><meta name="apple-mobile-web-app-status-bar-style" content="var(--efu-main)"><link rel="bookmark" href="/img/favicon.png"><link rel="apple-touch-icon" href="/img/favicon.png" sizes="180x180"><script>console.log(
+    "%c Program: Hexo %c Theme: Solitude %c Version: v1.8.10",
+    "border-radius:5px 0 0 5px;padding: 5px 10px;color:white;background:#ff3842;",
+    "padding: 5px 10px;color:white;background:#3e9f50;",
+    "padding: 5px 10px;color:white;background:#0084ff;",
+)
+</script><script>(()=>{
+        const saveToLocal = {
+            set: function setWithExpiry(key, value, ttl) {
+                if (ttl === 0)
+                    return
+                const now = new Date()
+                const expiryDay = ttl * 86400000
+                const item = {
+                    value: value,
+                    expiry: now.getTime() + expiryDay
+                }
+                localStorage.setItem(key, JSON.stringify(item))
+            },
+            get: function getWithExpiry(key) {
+                const itemStr = localStorage.getItem(key)
+    
+                if (!itemStr) {
+                    return undefined
+                }
+                const item = JSON.parse(itemStr)
+                const now = new Date()
+    
+                if (now.getTime() > item.expiry) {
+                    localStorage.removeItem(key)
+                    return undefined
+                }
+                return item.value
+            }
+        };
+        window.utils = {
+            saveToLocal: saveToLocal,
+            getCSS: (url, id = false) => new Promise((resolve, reject) => {
+              const link = document.createElement('link')
+              link.rel = 'stylesheet'
+              link.href = url
+              if (id) link.id = id
+              link.onerror = reject
+              link.onload = link.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                link.onload = link.onreadystatechange = null
+                resolve()
+              }
+              document.head.appendChild(link)
+            }),
+            getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+              const script = document.createElement('script')
+              script.src = url
+              script.async = true
+              script.onerror = reject
+              script.onload = script.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                script.onload = script.onreadystatechange = null
+                resolve()
+              }
+    
+              Object.keys(attr).forEach(key => {
+                script.setAttribute(key, attr[key])
+              })
+    
+              document.head.appendChild(script)
+            }),
+            addGlobalFn: (key, fn, name = false, parent = window) => {
+                const globalFn = parent.globalFn || {}
+                const keyObj = globalFn[key] || {}
+        
+                if (name && keyObj[name]) return
+        
+                name = name || Object.keys(keyObj).length
+                keyObj[name] = fn
+                globalFn[key] = keyObj
+                parent.globalFn = globalFn
+            },
+        }
+    })()</script><!-- global head--><script>const GLOBAL_CONFIG = {
+    root: '/',
+    algolia: undefined,
+    localsearch: {"preload":false,"path":"/search.xml"},
+    runtime: '2024-01-05 00:00:00',
+    lazyload: {
+        enable: true,
+        error: '/img/error_load.png'
+    },
+    copyright: {"limit":50,"author":"作者: Rean","link":"链接: ","source":"来源: Rean's Blog","info":"著作权归作者所有。 商业转载请联系作者获得授权，非商业转载请注明出处。"},
+    highlight: {
+        enable: true,
+        limit: 200,
+        expand: true,
+        copy: true,
+        syntax: 'highlight.js'
+    },
+    randomlink: false,
+    lang: {"theme":{"dark":"已切换至深色模式","light":"已切换至浅色模式"},"copy":{"success":"复制成功","error":"复制失败"},"backtop":"返回顶部","time":{"day":"天前","hour":"小时前","just":"刚刚","min":"分钟前","month":"个月前"},"f12":"开发者模式已打开，请遵循GPL协议。","totalk":"无需删除空行，直接输入评论即可","search":{"empty":"找不到你查询的内容：${query}","hit":"找到 ${hits} 条结果，用时 ${time} 毫秒","placeholder":"输入关键词快速查找","count":"共 <b>${count}</b> 条结果。"}},
+    aside: {
+        sayhello: {
+            morning: '一日之计在于晨',
+            noon: '吃饱了才有力气干活',
+            afternoon: '集中精力，攻克难关',
+            night: '不要太劳累了，早睡更健康',
+            goodnight: '睡个好觉，保证精力充沛',
+        },
+        sayhello2: ["🤖️ 数码科技爱好者","🔍 分享与热心帮助","🔨 设计开发一条龙","🎮 游戏爱好者"],
+    },
+    covercolor: {
+        enable: true
+    },
+    comment: false,
+    lightbox: 'fancybox',
+    post_ai: false,
+    right_menu: {"mode":{"dark":"深色模式","light":"浅色模式"},"img_error":"此图片无法复制与下载","music":{"start":"播放音乐","stop":"暂停音乐"},"translate":{"translateDelay":0,"defaultEncoding":2}},
+};</script><!-- page-config head--><script id="config-diff">var PAGE_CONFIG = {
+    is_post: true,
+    is_page: false,
+    is_home: false,
+    page: '',
+    toc: true,
+    comment: false,
+    ai_text: false,
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body id="body"><!-- universe--><canvas id="universe"></canvas><!-- loading--><!-- console--><div id="console"><div class="close-btn" onclick="sco.hideConsole()"><i class="solitude st-close-fill"></i></div><div class="button-group"><div class="console-btn-item"><span class="darkmode_switchbutton" onclick="sco.switchDarkMode()" title="昼夜切换"><i class="solitude st-moon-clear-fill"></i></span></div><div class="console-btn-item" id="consoleHideAside"><span class="asideSwitch" onclick="sco.switchHideAside()" title="边栏显示控制"><i class="solitude st-side-bar-fill"></i></span></div><div class="console-btn-item" id="consoleMusic" onclick="sco.musicToggle()"><span class="music-switch" title="音乐开关"><i class="solitude st-disc-fill"></i></span></div></div><div class="console-mask" onclick="sco.hideConsole()"></div></div><!-- sidebar--><div id="sidebar" style="zoom: 1;"><div id="menu-mask" style="display: none;"></div><div id="sidebar-menus"><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">172</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">11</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">155</div></a></div></div></div><span class="sidebar-menu-item-title">功能</span><div class="sidebar-menu-item"><span class="darkmode_switchbutton menu-child" onclick="sco.switchDarkMode()"><i class="solitude st-moon-clear-fill"></i><span>显示模式</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文章</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  st-folder-fill"></i><span>文章列表</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  st-checkbox-multiple-blank-fill"></i><span>分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  st-price-tag-fill"></i><span>标签</span></a></li><li><a class="site-page child" href="/study/"><i class="solitude  st-gift-fill"></i><span>学习</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>我的</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="solitude  st-disc-fill"></i><span>音乐馆</span></a></li><li><a class="site-page child" href="/essay/"><span>即刻短文</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>关于本站</span></a></li></ul></div></div><span class="sidebar-menu-item-title">标签</span><div class="card-widget card-tags card-archives card-webinfo card-allinfo"><div class="card-tag-cloud"><a href="/tags/%E8%85%BE%E8%AE%AF/">腾讯<sup>1</sup></a><a href="/tags/%E5%90%8E%E5%8F%B0%E5%BC%80%E5%8F%91/">后台开发<sup>1</sup></a><a href="/tags/Markdown/">Markdown<sup>1</sup></a><a href="/tags/Butterfly/">Butterfly<sup>2</sup></a><a href="/tags/PyCharm/">PyCharm<sup>1</sup></a><a href="/tags/IDEA/">IDEA<sup>1</sup></a><a href="/tags/Git/">Git<sup>2</sup></a><a href="/tags/Halo/">Halo<sup>1</sup></a><a href="/tags/GitHub/">GitHub<sup>1</sup></a><a href="/tags/JavaFx/">JavaFx<sup>2</sup></a><a href="/tags/SpringBoot/">SpringBoot<sup>7</sup></a><a href="/tags/Java/">Java<sup>18</sup></a><a href="/tags/MyBatis/">MyBatis<sup>4</sup></a><a href="/tags/Hexo/">Hexo<sup>3</sup></a><a href="/tags/SyncTV/">SyncTV<sup>1</sup></a><a href="/tags/AList/">AList<sup>1</sup></a><a href="/tags/%E5%AE%9D%E5%A1%94/">宝塔<sup>3</sup></a><a href="/tags/Vue/">Vue<sup>18</sup></a><a href="/tags/Vite/">Vite<sup>6</sup></a><a href="/tags/JavaScript/">JavaScript<sup>4</sup></a><a href="/tags/TypeScript/">TypeScript<sup>3</sup></a><a href="/tags/Electron/">Electron<sup>4</sup></a><a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习<sup>1</sup></a><a href="/tags/scikit-learn/">scikit-learn<sup>1</sup></a><a href="/tags/vocalremover/">vocalremover<sup>1</sup></a><a href="/tags/BPM/">BPM<sup>1</sup></a><a href="/tags/%E9%BB%91%E7%A5%9E%E8%AF%9D%EF%BC%9A%E6%82%9F%E7%A9%BA/">黑神话：悟空<sup>1</sup></a><a href="/tags/HTTP/">HTTP<sup>5</sup></a><a href="/tags/HTTPS/">HTTPS<sup>2</sup></a><a href="/tags/%E7%9F%AD%E9%93%BE/">短链<sup>1</sup></a><a href="/tags/%E8%A7%86%E9%A2%91/">视频<sup>1</sup></a><a href="/tags/HTTP-1-1/">HTTP/1.1<sup>1</sup></a><a href="/tags/LaTex/">LaTex<sup>1</sup></a><a href="/tags/%E5%8A%A0%E5%AF%86/">加密<sup>1</sup></a><a href="/tags/IP/">IP<sup>2</sup></a><a href="/tags/ICMP/">ICMP<sup>1</sup></a><a href="/tags/I-O/">I/O<sup>2</sup></a><a href="/tags/JVM/">JVM<sup>2</sup></a><a href="/tags/Springboot/">Springboot<sup>1</sup></a><a href="/tags/ThreadLocal/">ThreadLocal<sup>1</sup></a><a href="/tags/UUID/">UUID<sup>1</sup></a><a href="/tags/%E5%B9%B6%E5%8F%91/">并发<sup>4</sup></a><a href="/tags/%E7%BA%A2%E9%BB%91%E6%A0%91/">红黑树<sup>2</sup></a><a href="/tags/%E9%93%BE%E8%A1%A8/">链表<sup>1</sup></a><a href="/tags/%E5%8A%9B%E6%89%A3/">力扣<sup>1</sup></a><a href="/tags/LeetCode/">LeetCode<sup>1</sup></a><a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库<sup>8</sup></a><a href="/tags/NLP/">NLP<sup>6</sup></a><a href="/tags/spaCy/">spaCy<sup>4</sup></a><a href="/tags/Python/">Python<sup>1</sup></a><a href="/tags/Redis/">Redis<sup>10</sup></a><a href="/tags/RDB/">RDB<sup>1</sup></a><a href="/tags/AOF/">AOF<sup>1</sup></a><a href="/tags/%E7%BA%BF%E7%A8%8B/">线程<sup>2</sup></a><a href="/tags/I-O%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">I/O多路复用<sup>2</sup></a><a href="/tags/Spring/">Spring<sup>5</sup></a><a href="/tags/TCP/">TCP<sup>7</sup></a><a href="/tags/UDP/">UDP<sup>1</sup></a><a href="/tags/Socket/">Socket<sup>1</sup></a><a href="/tags/FFMpeg/">FFMpeg<sup>1</sup></a><a href="/tags/%E6%A0%B7%E5%BC%8F/">样式<sup>1</sup></a><a href="/tags/ECMAScript/">ECMAScript<sup>2</sup></a><a href="/tags/Element/">Element<sup>3</sup></a><a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">分布式锁<sup>1</sup></a><a href="/tags/%E5%91%A8%E6%B7%B1/">周深<sup>5</sup></a><a href="/tags/%E5%BE%B5%E7%BE%BD%E6%91%A9%E6%9F%AF/">徵羽摩柯<sup>1</sup></a><a href="/tags/%E9%9F%B3%E4%B9%90%E7%BC%98%E8%AE%A1%E5%88%92/">音乐缘计划<sup>1</sup></a><a href="/tags/%E5%A5%A5%E6%96%AF%E5%8D%A1/">奥斯卡<sup>3</sup></a><a href="/tags/%E5%BC%A0%E6%9D%B0/">张杰<sup>2</sup></a><a href="/tags/%E5%A3%B0%E7%94%9F%E4%B8%8D%E6%81%AF%C2%B7%E5%AE%9D%E5%B2%9B%E5%AD%A3/">声生不息·宝岛季<sup>3</sup></a><a href="/tags/%E5%BE%90%E4%BD%B3%E8%8E%B9/">徐佳莹<sup>1</sup></a><a href="/tags/SynthV/">SynthV<sup>15</sup></a><a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统<sup>4</sup></a><a href="/tags/%E6%B0%B8%E5%A4%9CMinus/">永夜Minus<sup>4</sup></a><a href="/tags/%E9%9F%A6%E7%A4%BC%E5%AE%89/">韦礼安<sup>1</sup></a><a href="/tags/%E8%94%A1%E4%BE%9D%E6%9E%97/">蔡依林<sup>1</sup></a><a href="/tags/%E6%97%A0%E5%8F%82/">无参<sup>45</sup></a><a href="/tags/%E5%8F%A4%E9%A3%8E/">古风<sup>11</sup></a><a href="/tags/%E4%B8%89%E6%97%A0Marblue/">三无Marblue<sup>1</sup></a><a href="/tags/%E7%B4%A2%E5%BC%95/">索引<sup>1</sup></a><a href="/tags/B%E6%A0%91/">B树<sup>1</sup></a><a href="/tags/B-%E6%A0%91/">B+树<sup>1</sup></a><a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构<sup>1</sup></a><a href="/tags/%E6%A0%91/">树<sup>1</sup></a><a href="/tags/%E4%BA%8C%E5%8F%89%E6%A0%91/">二叉树<sup>1</sup></a><a href="/tags/%E8%AE%B8%E9%92%A7/">许钧<sup>1</sup></a><a href="/tags/%E6%AD%8C%E6%89%8B2024/">歌手2024<sup>37</sup></a><a href="/tags/Chante-Moore/">Chanté Moore<sup>2</sup></a><a href="/tags/%E9%BB%84%E5%AE%A3/">黄宣<sup>1</sup></a><a href="/tags/Faouzia/">Faouzia<sup>4</sup></a><a href="/tags/Lenka/">Lenka<sup>1</sup></a><a href="/tags/%E5%BC%A0%E9%92%B0%E7%90%AA/">张钰琪<sup>1</sup></a><a href="/tags/%E9%82%A3%E8%8B%B1/">那英<sup>9</sup></a><a href="/tags/%E5%B0%A4%E9%95%BF%E9%9D%96/">尤长靖<sup>2</sup></a><a href="/tags/%E5%AD%99%E6%A5%A0/">孙楠<sup>5</sup></a><a href="/tags/%E8%B0%AD%E7%BB%B4%E7%BB%B4/">谭维维<sup>3</sup></a><a href="/tags/%E5%B4%A9%E5%9D%8F%EF%BC%9A%E6%98%9F%E7%A9%B9%E9%93%81%E9%81%93/">崩坏：星穹铁道<sup>4</sup></a><a href="/tags/%E8%B5%A4%E7%BE%BD/">赤羽<sup>1</sup></a><a href="/tags/%E6%B1%AA%E8%8B%8F%E6%B3%B7/">汪苏泷<sup>4</sup></a><a href="/tags/%E5%A3%B0%E7%94%9F%E4%B8%8D%E6%81%AF%C2%B7%E5%AE%B6%E5%B9%B4%E5%8D%8E/">声生不息·家年华<sup>2</sup></a><a href="/tags/%E9%99%88%E6%A5%9A%E7%94%9F/">陈楚生<sup>2</sup></a><a href="/tags/%E9%99%88%E4%BA%A6%E6%B4%BA/">陈亦洺<sup>1</sup></a><a href="/tags/%E5%B0%9A%E8%BE%B0/">尚辰<sup>1</sup></a><a href="/tags/%E5%BF%98%E5%B7%9D%E9%A3%8E%E5%8D%8E%E5%BD%95/">忘川风华录<sup>2</sup></a><a href="/tags/%E4%B9%90%E6%AD%A3%E9%BE%99%E7%89%99/">乐正龙牙<sup>1</sup></a><a href="/tags/%E6%98%9F%E5%B0%98Infinity/">星尘Infinity<sup>1</sup></a><a href="/tags/%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F/">明日方舟<sup>2</sup></a><a href="/tags/%E7%A5%96%E5%A8%85%E7%BA%B3%E6%83%9C/">祖娅纳惜<sup>1</sup></a><a href="/tags/%E7%94%B5%E5%AD%90/">电子<sup>1</sup></a><a href="/tags/%E6%98%9F%E5%B0%98/">星尘<sup>3</sup></a><a href="/tags/%E5%BC%A0%E4%BF%A1%E5%93%B2/">张信哲<sup>2</sup></a><a href="/tags/%E9%93%B6%E4%B8%B4/">银临<sup>1</sup></a><a href="/tags/%E6%9D%8E%E5%B8%B8%E8%B6%85/">李常超<sup>1</sup></a><a href="/tags/%E5%B1%B1%E8%89%B2%E6%9C%89%E6%97%A0%E4%B8%AD/">山色有无中<sup>1</sup></a><a href="/tags/%E5%91%A8%E6%9D%B0%E4%BC%A6/">周杰伦<sup>1</sup></a><a href="/tags/%E9%BB%84%E9%9C%84%E9%9B%B2/">黄霄雲<sup>1</sup></a><a href="/tags/%E5%AE%B9%E7%A5%96%E5%84%BF/">容祖儿<sup>1</sup></a><a href="/tags/%E6%88%91%E6%98%AF%E6%AD%8C%E6%89%8B%C2%B7%E7%AC%AC%E5%9B%9B%E5%AD%A3/">我是歌手·第四季<sup>1</sup></a><a href="/tags/%E6%9D%8E%E5%85%8B%E5%8B%A4/">李克勤<sup>1</sup></a><a href="/tags/%E7%B2%A4%E8%AF%AD/">粤语<sup>2</sup></a><a href="/tags/%E9%BB%84%E4%B8%BD%E7%8E%B2/">黄丽玲<sup>1</sup></a><a href="/tags/G-E-M-%E9%82%93%E7%B4%AB%E6%A3%8B/">G.E.M.邓紫棋<sup>6</sup></a><a href="/tags/T-I-M-E/">T.I.M.E.<sup>4</sup></a><a href="/tags/%E6%97%B6%E5%85%89%E9%9F%B3%E4%B9%90%E4%BC%9A%C2%B7%E8%80%81%E5%8F%8B%E8%AE%B0/">时光音乐会·老友记<sup>4</sup></a><a href="/tags/%E5%BC%A0%E5%AD%A6%E5%8F%8B/">张学友<sup>1</sup></a><a href="/tags/%E6%9D%A8%E4%B8%9E%E7%90%B3/">杨丞琳<sup>1</sup></a><a href="/tags/%E6%B1%AA%E5%B3%B0/">汪峰<sup>1</sup></a><a href="/tags/%E6%9C%AA%E5%AE%9A%E4%BA%8B%E4%BB%B6%E7%B0%BF/">未定事件簿<sup>1</sup></a><a href="/tags/%E5%BC%A0%E8%BF%9C/">张远<sup>1</sup></a><a href="/tags/%E5%AD%99%E7%87%95%E5%A7%BF/">孙燕姿<sup>1</sup></a><a href="/tags/%E6%B5%B7%E6%9D%A5%E9%98%BF%E6%9C%A8/">海来阿木<sup>1</sup></a><a href="/tags/%E6%9B%B9%E6%9D%A8/">曹杨<sup>2</sup></a><a href="/tags/%E4%B8%8B%E4%B8%80%E6%88%98%E6%AD%8C%E6%89%8B/">下一战歌手<sup>2</sup></a><a href="/tags/Fine%E4%B9%90%E5%9B%A2/">Fine乐团<sup>1</sup></a><a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络<sup>4</sup></a><a href="/tags/DNS/">DNS<sup>1</sup></a><a href="/tags/MAC/">MAC<sup>1</sup></a><a href="/tags/Adam-Lambert/">Adam Lambert<sup>1</sup></a><a href="/tags/%E4%BA%9A%E5%BD%93%C2%B7%E5%85%B0%E4%BC%AF%E7%89%B9/">亚当·兰伯特<sup>1</sup></a><a href="/tags/Hayden/">Hayden<sup>1</sup></a><a href="/tags/%E6%9A%AE%E5%A4%9C/">暮夜<sup>1</sup></a><a href="/tags/ACE-Studio/">ACE Studio<sup>2</sup></a><a href="/tags/%E5%B0%9A%E9%9B%AF%E5%A9%95/">尚雯婕<sup>1</sup></a><a href="/tags/%E4%B8%9C%E6%96%B9%E6%A0%80%E5%AD%90/">东方栀子<sup>2</sup></a><a href="/tags/%E9%BB%84%E7%BB%AE%E7%8F%8A/">黄绮珊<sup>1</sup></a><a href="/tags/%E5%8D%8E%E6%99%A8%E5%AE%87/">华晨宇<sup>1</sup></a><a href="/tags/JUN/">JUN<sup>1</sup></a><a href="/tags/%E6%9E%97%E5%BF%86%E8%8E%B2/">林忆莲<sup>1</sup></a><a href="/tags/UTAU/">UTAU<sup>1</sup></a><a href="/tags/Sheena/">Sheena<sup>1</sup></a><a href="/tags/%E5%89%A7%E5%A5%BD%E5%90%AC%E7%9A%84%E6%AD%8C/">剧好听的歌<sup>1</sup></a><a href="/tags/Syncthing/">Syncthing<sup>1</sup></a><a href="/tags/%E5%90%8C%E6%AD%A5/">同步<sup>1</sup></a><a href="/tags/%E6%94%AF%E4%BB%98%E5%AE%9D/">支付宝<sup>1</sup></a><a href="/tags/Apifox/">Apifox<sup>2</sup></a></div></div></div></div><!-- keyboard--><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav class="show" id="nav"><div id="nav-group"><div id="blog_name"><a id="site-name" href="/" title="返回博客主页"><span class="title">Rean's Blog</span></a></div><div id="page-name-mask"><div id="page-name"><a id="page-name-text" onclick="sco.toTop()">【MySQL】基础</a></div></div><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文章</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  st-folder-fill"></i><span>文章列表</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  st-checkbox-multiple-blank-fill"></i><span>分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  st-price-tag-fill"></i><span>标签</span></a></li><li><a class="site-page child" href="/study/"><i class="solitude  st-gift-fill"></i><span>学习</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>我的</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="solitude  st-disc-fill"></i><span>音乐馆</span></a></li><li><a class="site-page child" href="/essay/"><span>即刻短文</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>关于本站</span></a></li></ul></div></div></div><div id="nav-left"></div><div id="nav-right"><div class="nav-button" id="randomPost_button"><a class="site-page" onclick="toRandomPost()" title="随机一篇文章" href="javascript:void(0);"><i class="solitude st-signal-tower-fill"></i></a></div><div class="nav-button" id="search-button"><a class="site-page social-icon search" href="javascript:void(0);" title="搜索"><i class="solitude st-search-line"></i></a></div><div class="nav-button" id="nav-console"><a class="console_switchbutton" onclick="sco.showConsole()" title="中控台" href="javascript:void(0);"><i class="solitude st-dashboard-fill"></i></a></div><div class="nav-button" id="nav-totop" onclick="sco.toTop()"><a class="totopbtn"><i class="solitude st-arrow-up-line"></i><span id="percent">0</span></a></div><div id="toggle-menu"><a class="site-page"><i class="solitude st-menu-line"></i></a></div></div></div></nav><div class="coverdiv" id="coverdiv"><img class="nolazyload" id="post-cover" src="https://npm.elemecdn.com/justlovesmile-photo/cover4.jpg" alt="【MySQL】基础"></div><div id="post-info"><div id="post-firstinfo"><div class="meta-firstline"><a class="post-meta-original" title="该文章为原创文章，注意版权协议">原创</a><span class="post-meta-categories"><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a></span><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/"><span class="tags-name tags-punctuation">数据库</span></a></div></div></div></div><h1 class="post-title">【MySQL】基础</h1><div id="post-meta"><div class="meta-secondline"><span class="post-meta-date" title="发布于 2024-08-21 15:23:54"><i class="post-meta-icon solitude st-calendar-todo-fill"></i><time datetime="2024-08-21T07:23:54.000Z">2024-08-21T07:23:54.000Z</time></span><span class="post-meta-date" title="最后更新于 2024-11-12 21:01:59"><i class="post-meta-icon solitude st-refresh-line"></i><time datetime="2024-11-12T13:01:59.077Z">2024-11-12T13:01:59.077Z</time></span><span class="post-meta-wordcount"><i class="post-meta-icon solitude st-word-fill" title="文章字数"></i><span class="word-count">13k</span><span class="post-meta-separator"></span><i class="post-meta-icon solitude st-clock-fill" title="阅读耗时"></i><span>46 min</span></span><a class="post-meta-pv" href="/p/305331f0/" title="文章热度"><i class="post-meta-icon solitude st-fire-fill"></i><span id="busuanzi_page_pv"><i class="solitude st-loading-line"></i></span></a></div></div></div><section class="main-hero-waves-area waves-area"><svg class="waves-svg" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto"><defs><path id="gentle-wave" d="M -160 44 c 30 0 58 -18 88 -18 s 58 18 88 18 s 58 -18 88 -18 s 58 18 88 18 v 44 h -352 Z"></path></defs><g class="parallax"><use href="#gentle-wave" x="48" y="0"></use><use href="#gentle-wave" x="48" y="3"></use><use href="#gentle-wave" x="48" y="5"></use><use href="#gentle-wave" x="48" y="7"></use></g></svg></section></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="执行一条-select-语句，期间发生了什么？"><a href="#执行一条-select-语句，期间发生了什么？" class="headerlink" title="执行一条 select 语句，期间发生了什么？"></a>执行一条 select 语句，期间发生了什么？</h1><h2 id="MySQL-执行流程是怎样的？"><a href="#MySQL-执行流程是怎样的？" class="headerlink" title="MySQL 执行流程是怎样的？"></a>MySQL 执行流程是怎样的？</h2><p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/mysql%25E6%259F%25A5%25E8%25AF%25A2%25E6%25B5%2581%25E7%25A8%258B.png" alt="查询语句执行流程"></p>
+<p>可以看到，MySQL 的架构共分为两层：<strong>Server 层和存储引擎层</strong></p>
+<ul>
+<li><strong>Server 层负责建立连接、分析和执行 SQL</strong>。MySQL 大多数的核心功能模块都在这实现，主要包括连接器，查询缓存、解析器、预处理器、优化器、执行器等。另外，所有的内置函数（如日期、时间、数学和加密函数等）和所有跨存储引擎的功能（如存储过程、触发器、视图等。）都在 Server 层实现。</li>
+<li><strong>存储引擎层负责数据的存储和提取</strong>。支持 InnoDB、MyISAM、Memory 等多个存储引擎，不同的存储引擎共用一个 Server 层。现在最常用的存储引擎是 InnoDB，从 MySQL 5.5 版本开始，InnoDB 成为了 MySQL 的默认存储引擎。我们常说的索引数据结构，就是由存储引擎层实现的，不同的存储引擎支持的索引类型也不相同，比如 InnoDB 支持索引类型是 B+树，且是默认使用，也就是说在数据表中创建的主键索引和二级索引默认使用的是 B+ 树索引。</li>
+</ul>
+<h2 id="第一步：连接器"><a href="#第一步：连接器" class="headerlink" title="第一步：连接器"></a>第一步：连接器</h2><p>如果你在 Linux 操作系统里要使用 MySQL，那你第一步肯定是要先连接 MySQL 服务，然后才能执行 SQL 语句。连接的过程需要先经过 TCP 三次握手，因为 MySQL 是基于 TCP 协议进行传输的。</p>
+<p>当你的账号或密码不正确时，会报 <code>Access denied for user</code> 错误，连接成功如果后续没有任何操作，那么这个连接就处于空闲状态，到达一定时间后它便会断开连接，这个时间一般是 8 小时，是由 <strong>wait_timeout</strong> 参数控制的。</p>
+<h2 id="第二步：查询缓存"><a href="#第二步：查询缓存" class="headerlink" title="第二步：查询缓存"></a>第二步：查询缓存</h2><p>连接器的工作完成后，客户端就可以向 MySQL 服务发送 SQL 语句了，MySQL 服务收到 SQL 语句后，就会解析出 SQL 语句的第一个字段，看看是什么类型的语句。</p>
+<p>如果 SQL 是查询语句（select 语句），MySQL 就会先去查询缓存（Query Cache）里查找缓存数据，看看之前有没有执行过这一条命令，这个查询缓存是以 key-value 形式保存在内存中的，key 为 SQL 查询语句，value 为 SQL 语句查询的结果。</p>
+<p>如果查询的语句命中查询缓存，那么就会直接返回 value 给客户端。如果查询的语句没有命中查询缓存中，那么就要往下继续执行，等执行完后，查询的结果就会被存入查询缓存中。</p>
+<p>这么看，查询缓存还挺有用，但是其实<strong>查询缓存挺鸡肋</strong>的。</p>
+<p>对于更新比较频繁的表，查询缓存的命中率很低的，因为只要一个表有更新操作，那么这个表的查询缓存就会被清空。如果刚缓存了一个查询结果很大的数据，还没被使用的时候，刚好这个表有更新操作，查询缓冲就被清空了，相当于缓存了个寂寞。</p>
+<p>所以，MySQL 8.0 版本直接将查询缓存删掉了，也就是说 MySQL 8.0 开始，执行一条 SQL 查询语句，不会再走到查询缓存这个阶段了。</p>
+<div class="note  flat info"><p>这里说的查询缓存是 server 层的，也就是 MySQL 8.0 版本移除的是 server 层的查询缓存，并不是 Innodb 存储引擎中的 buffer pool。</p>
+</div>
+
+<h2 id="第三步：解析-SQL"><a href="#第三步：解析-SQL" class="headerlink" title="第三步：解析 SQL"></a>第三步：解析 SQL</h2><p>在正式执行 SQL 查询语句之前，MySQL 会先对 SQL 语句做解析，这个工作交由「解析器」来完成。</p>
+<h3 id="解析器"><a href="#解析器" class="headerlink" title="解析器"></a>解析器</h3><p>解析器会做如下两件事情。</p>
+<p>第一件事情，<strong>词法分析</strong>。MySQL 会根据你输入的字符串识别出关键字出来，构建出 SQL 语法树，这样方便后面模块获取 SQL 类型、表名、字段名、where 条件等等。</p>
+<p>第二件事情，<strong>语法分析</strong>。根据词法分析的结果，语法解析器会根据语法规则，判断你输入的这个 SQL 语句是否满足 MySQL 语法。</p>
+<p>如果我们输入的 SQL 语句语法不对，就会在解析器这个阶段报错。</p>
+<p>但是注意，表不存在或者字段不存在，并不是在解析器里做的，《MySQL 45 讲》说是在解析器做的，但是经过我和朋友看 MySQL 源码（5.7 和 8.0）得出结论是解析器只负责构建语法树和检查语法，但是不会去查表或者字段存不存在。</p>
+<p>那到底谁来做检测表和字段是否存在的工作呢？别急，接下来就是了。</p>
+<h2 id="第四步：执行-SQL"><a href="#第四步：执行-SQL" class="headerlink" title="第四步：执行 SQL"></a>第四步：执行 SQL</h2><p>经过解析器后，接着就要进入执行 SQL 查询语句的流程了，每条<code>SELECT</code> 查询语句流程主要可以分为下面这三个阶段：</p>
+<ul>
+<li>prepare 阶段，也就是预处理阶段；</li>
+<li>optimize 阶段，也就是优化阶段；</li>
+<li>execute 阶段，也就是执行阶段；</li>
+</ul>
+<h3 id="预处理器"><a href="#预处理器" class="headerlink" title="预处理器"></a>预处理器</h3><p>我们先来说说预处理阶段做了什么事情。</p>
+<ul>
+<li>检查 SQL 查询语句中的表或者字段是否存在；</li>
+<li>将 <code>select *</code> 中的 <code>*</code> 符号，扩展为表上的所有列；</li>
+</ul>
+<h3 id="优化器"><a href="#优化器" class="headerlink" title="优化器"></a>优化器</h3><p>经过预处理阶段后，还需要为 SQL 查询语句先制定一个执行计划，这个工作交由「优化器」来完成的。</p>
+<p><strong>优化器主要负责将 SQL 查询语句的执行方案确定下来</strong>，比如在表里面有多个索引的时候，优化器会基于查询成本的考虑，来决定选择使用哪个索引。</p>
+<p>当然，我们本次的查询语句（select * from product where id &#x3D; 1）很简单，就是选择使用主键索引。</p>
+<p>要想知道优化器选择了哪个索引，我们可以在查询语句最前面加个 <code>explain</code> 命令，这样就会输出这条 SQL 语句的执行计划，然后执行计划中的 key 就表示执行过程中使用了哪个索引，比如下图的 key 为 <code>PRIMARY</code> 就是使用了主键索引。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20241112205611.png"></p>
+<p>如果查询语句的执行计划里的 key 为 null 说明没有使用索引，那就会全表扫描（type &#x3D; ALL），这种查询扫描的方式是效率最低档次的。</p>
+<p>这张 product 表只有一个索引就是主键，现在我在表中将 name 设置为普通索引（二级索引）。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20241112205643.png"></p>
+<p>这时 product 表就有主键索引（id）和普通索引（name）。假设执行了这条查询语句：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">select id from product where id &gt; 1  and name like &#x27;i%&#x27;;</span><br></pre></td></tr></table></figure>
+
+<p>这条查询语句的结果既可以使用主键索引，也可以使用普通索引，但是执行的效率会不同。这时，就需要优化器来决定使用哪个索引了。</p>
+<p>很显然这条查询语句是<strong>覆盖索引</strong>，直接在二级索引就能查找到结果（因为二级索引的 B+ 树的叶子节点的数据存储的是主键值），就没必要在主键索引查找了，因为查询主键索引的 B+ 树的成本会比查询二级索引的 B+ 的成本大，优化器基于查询成本的考虑，会选择查询代价小的普通索引。</p>
+<p>在下图中执行计划，我们可以看到，执行过程中使用了普通索引（name），Exta 为 Using index，这就是表明使用了覆盖索引优化。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/1e12ed50cb7447fce7914d30701cfcd44373d091298ec1c3d69ccb85d7131d24/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f6d7973716c2f73716c2545362538392541372545382541312538432545382542462538372545372541382538422f2545392538302538392545362538422541392545372542342541322545352542432539352e706e67" alt="img"></p>
+<h3 id="执行器"><a href="#执行器" class="headerlink" title="执行器"></a>执行器</h3><p>经历完优化器后，就确定了执行方案，接下来 MySQL 就真正开始执行语句了，这个工作是由「执行器」完成的。在执行的过程中，执行器就会和存储引擎交互了，交互是以数据行为单位的。</p>
+<p>接下来，用三种方式执行过程，跟大家说一下执行器和存储引擎的交互过程。</p>
+<ul>
+<li>主键索引查询</li>
+<li>全表扫描</li>
+<li>索引下推</li>
+</ul>
+<h4 id="主键索引查询"><a href="#主键索引查询" class="headerlink" title="主键索引查询"></a>主键索引查询</h4><p>以本文开头查询语句为例，看看执行器是怎么工作的。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">select * from product where id = 1;</span><br></pre></td></tr></table></figure>
+
+<p>这条查询语句的查询条件用到了主键索引，而且是等值查询，同时主键 id 是唯一，不会有 id 相同的记录，所以优化器决定选用访问类型为 const 进行查询，也就是使用主键索引查询一条记录，那么执行器与存储引擎的执行流程是这样的：</p>
+<ul>
+<li>执行器第一次查询，会调用 read_first_record 函数指针指向的函数，因为优化器选择的访问类型为 const，这个函数指针被指向为 InnoDB 引擎索引查询的接口，把条件 <code>id = 1</code> 交给存储引擎，<strong>让存储引擎定位符合条件的第一条记录</strong>。</li>
+<li>存储引擎通过主键索引的 B+ 树结构定位到 id &#x3D; 1 的第一条记录，如果记录是不存在的，就会向执行器上报记录找不到的错误，然后查询结束。如果记录是存在的，就会将记录返回给执行器；</li>
+<li>执行器从存储引擎读到记录后，接着判断记录是否符合查询条件，如果符合则发送给客户端，如果不符合则跳过该记录。</li>
+<li>执行器查询的过程是一个 while 循环，所以还会再查一次，但是这次因为不是第一次查询了，所以会调用 read_record 函数指针指向的函数，因为优化器选择的访问类型为 const，这个函数指针被指向为一个永远返回 - 1 的函数，所以当调用该函数的时候，执行器就退出循环，也就是结束查询了。</li>
+</ul>
+<p>至此，这个语句就执行完成了。</p>
+<h4 id="全表扫描"><a href="#全表扫描" class="headerlink" title="全表扫描"></a>全表扫描</h4><p>举个全表扫描的例子：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">select * from product where name = &#x27;iphone&#x27;;</span><br></pre></td></tr></table></figure>
+
+<p>这条查询语句的查询条件没有用到索引，所以优化器决定选用访问类型为 ALL 进行查询，也就是全表扫描的方式查询，那么这时执行器与存储引擎的执行流程是这样的：</p>
+<ul>
+<li>执行器第一次查询，会调用 read_first_record 函数指针指向的函数，因为优化器选择的访问类型为 all，这个函数指针被指向为 InnoDB 引擎全扫描的接口，<strong>让存储引擎读取表中的第一条记录</strong>；</li>
+<li>执行器会判断读到的这条记录的 name 是不是 iphone，如果不是则跳过；如果是则将记录发给客户端（是的没错，Server 层每从存储引擎读到一条记录就会发送给客户端，之所以客户端显示的时候是直接显示所有记录的，是因为客户端是等查询语句查询完成后，才会显示出所有的记录）。</li>
+<li>执行器查询的过程是一个 while 循环，所以还会再查一次，会调用 read_record 函数指针指向的函数，因为优化器选择的访问类型为 all，read_record 函数指针指向的还是 InnoDB 引擎全扫描的接口，所以接着向存储引擎层要求继续读刚才那条记录的下一条记录，存储引擎把下一条记录取出后就将其返回给执行器（Server 层），执行器继续判断条件，不符合查询条件即跳过该记录，否则发送到客户端；</li>
+<li>一直重复上述过程，直到存储引擎把表中的所有记录读完，然后向执行器（Server 层）返回了读取完毕的信息；</li>
+<li>执行器收到存储引擎报告的查询完毕的信息，退出循环，停止查询。</li>
+</ul>
+<p>至此，这个语句就执行完成了。</p>
+<h4 id="索引下推"><a href="#索引下推" class="headerlink" title="索引下推"></a>索引下推</h4><p>在这部分非常适合讲索引下推（MySQL 5.6 推出的查询优化策略），这样大家能清楚的知道，「下推」这个动作，下推到了哪里。</p>
+<p>索引下推能够减少<strong>二级索引</strong>在查询时的回表操作，提高查询的效率，因为它将 Server 层部分负责的事情，交给存储引擎层去处理了。</p>
+<p>举一个具体的例子，方便大家理解，这里一张用户表如下，我对 age 和 reward 字段建立了联合索引（age，reward）：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20241112205709.png"></p>
+<p>现在有下面这条查询语句：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">select * from t_user  where age &gt; 20 and reward = 100000;</span><br></pre></td></tr></table></figure>
+
+<p>联合索引当遇到范围查询 (&gt;、&lt;) 就会停止匹配，也就是 <strong>age 字段能用到联合索引，但是 reward 字段则无法利用到索引</strong>。具体原因这里可以看这篇：<a target="_blank" rel="noopener" href="https://xiaolincoding.com/mysql/index/index_interview.html#%E6%8C%89%E5%AD%97%E6%AE%B5%E4%B8%AA%E6%95%B0%E5%88%86%E7%B1%BB">索引常见面试题</a></p>
+<p>那么，不使用索引下推（MySQL 5.6 之前的版本）时，执行器与存储引擎的执行流程是这样的：</p>
+<ul>
+<li>Server 层首先调用存储引擎的接口定位到满足查询条件的第一条二级索引记录，也就是定位到 age &gt; 20 的第一条记录；</li>
+<li>存储引擎根据二级索引的 B+ 树快速定位到这条记录后，获取主键值，然后<strong>进行回表操作</strong>，将完整的记录返回给 Server 层；</li>
+<li>Server 层在判断该记录的 reward 是否等于 100000，如果成立则将其发送给客户端；否则跳过该记录；</li>
+<li>接着，继续向存储引擎索要下一条记录，存储引擎在二级索引定位到记录后，获取主键值，然后回表操作，将完整的记录返回给 Server 层；</li>
+<li>如此往复，直到存储引擎把表中的所有记录读完。</li>
+</ul>
+<p>可以看到，没有索引下推的时候，每查询到一条二级索引记录，都要进行回表操作，然后将记录返回给 Server，接着 Server 再判断该记录的 reward 是否等于 100000。</p>
+<p>而使用索引下推后，判断记录的 reward 是否等于 100000 的工作交给了存储引擎层，过程如下：</p>
+<ul>
+<li>Server 层首先调用存储引擎的接口定位到满足查询条件的第一条二级索引记录，也就是定位到 age &gt; 20 的第一条记录；</li>
+<li>存储引擎定位到二级索引后，<strong>先不执行回表</strong>操作，而是先判断一下该索引中包含的列（reward 列）的条件（reward 是否等于 100000）是否成立。如果<strong>条件不成立</strong>，则直接<strong>跳过该二级索引</strong>。如果<strong>成立</strong>，则<strong>执行回表</strong>操作，将完成记录返回给 Server 层。</li>
+<li>Server 层在判断其他的查询条件（本次查询没有其他条件）是否成立，如果成立则将其发送给客户端；否则跳过该记录，然后向存储引擎索要下一条记录。</li>
+<li>如此往复，直到存储引擎把表中的所有记录读完。</li>
+</ul>
+<p>可以看到，使用了索引下推后，虽然 reward 列无法使用到联合索引，但是因为它包含在联合索引（age，reward）里，所以直接在存储引擎过滤出满足 reward &#x3D; 100000 的记录后，才去执行回表操作获取整个记录。相比于没有使用索引下推，<strong>节省了很多回表操作</strong>。</p>
+<p>当你发现执行计划里的 Extra 部分显示了“Using index condition”，说明使用了索引下推。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20241112205729.png"></p>
+<br>
+
+<h1 id="HAVING-子句是什么？"><a href="#HAVING-子句是什么？" class="headerlink" title="HAVING 子句是什么？"></a>HAVING 子句是什么？</h1><p>HAVING 子句可以让我们筛选分组后的各组数据。</p>
+<p>在 SQL 中增加 HAVING 子句原因是，WHERE 关键字无法与聚合函数一起使用。</p>
+<ul>
+<li><p>Having子句的作用和WHERE子句差不多，都是用来做条件筛选的；</p>
+</li>
+<li><p>只是Having子句需要写在GROPY BY子句的后面；</p>
+</li>
+<li><p>GROPY BY 子句执行完毕之后，才会轮到Having子句去执行；自然Having子句的执行顺序是在WHERRE子句之后的，所以在Having子句中可以使用聚合函数做条件判断。</p>
+</li>
+</ul>
+<h2 id="having-和-where-区别"><a href="#having-和-where-区别" class="headerlink" title="having 和 where 区别"></a>having 和 where 区别</h2><ul>
+<li>having是对一个表的数据进行分组之后，对组信息进行相应条件筛选</li>
+<li>having筛选时，只能根据select子句中可出现的字段（数据）来进行条件设定</li>
+<li>having子句与where子句一样，都是用于条件判断</li>
+<li>where是判断数据从磁盘读入内存的时候</li>
+<li>having是判断分组统计之前的所有条件</li>
+<li>having子句中可以使用字段别名，而where不能使用</li>
+<li>having能够使用统计函数，而where不能使用</li>
+</ul>
+<h2 id="having-和-where-应用"><a href="#having-和-where-应用" class="headerlink" title="having 和 where 应用"></a>having 和 where 应用</h2><p>在 MySQL 中，HAVING 和 WHERE 是用于筛选数据的两个关键字，它们有以下用法：</p>
+<p>用途：</p>
+<ul>
+<li><p>WHERE：WHERE 子句用于在执行查询之前筛选行。它可用于过滤 SELECT、UPDATE、DELETE 语句中的行，根据指定的条件选择要操作的数据行。</p>
+</li>
+<li><p>HAVING：HAVING 子句用于在执行聚合查询后筛选结果集。它仅能在包含聚合函数（如 SUM、COUNT、AVG 等）的 SELECT 语句中使用，并在查询结果进行聚合操作后，对聚合结果进行筛选。</p>
+</li>
+</ul>
+<p>位置：</p>
+<ul>
+<li><p>WHERE：WHERE 子句通常出现在 SELECT、UPDATE、DELETE 语句的 FROM 子句之后、GROUP BY 子句之前。</p>
+</li>
+<li><p>HAVING：HAVING 子句通常出现在 GROUP BY 子句之后、ORDER BY 子句之前。</p>
+</li>
+</ul>
+<p>过滤条件：</p>
+<ul>
+<li><p>WHERE：WHERE 子句用于指定过滤条件，其中可以使用比较操作符（如 &#x3D;, &lt;&gt;, &lt;, &gt;, BETWEEN, IN 等）和逻辑操作符（如 AND, OR, NOT）。</p>
+</li>
+<li><p>HAVING：HAVING 子句用于指定对聚合结果的过滤条件，其中可以使用比较操作符和逻辑操作符，也可以使用聚合函数。</p>
+</li>
+</ul>
+<p>示例： 假设有一个名为 orders 的表，其中包含 customer_id（客户ID）和 total_price（总价格）字段。我们希望查找每个客户的总价格大于 100 的订单。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> customer_id, <span class="built_in">SUM</span>(total_price) <span class="keyword">AS</span> total</span><br><span class="line"><span class="keyword">FROM</span> orders</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> customer_id</span><br><span class="line"><span class="keyword">HAVING</span> <span class="built_in">SUM</span>(total_price) <span class="operator">&gt;</span> <span class="number">100</span>;</span><br></pre></td></tr></table></figure>
+
+<br>
+
+<h1 id="MySQL-一行记录是怎么存储的？"><a href="#MySQL-一行记录是怎么存储的？" class="headerlink" title="MySQL 一行记录是怎么存储的？"></a>MySQL 一行记录是怎么存储的？</h1><h2 id="MySQL-的数据存放在哪个文件？"><a href="#MySQL-的数据存放在哪个文件？" class="headerlink" title="MySQL 的数据存放在哪个文件？"></a>MySQL 的数据存放在哪个文件？</h2><p>大家都知道 MySQL 的数据都是保存在磁盘的，那具体是保存在哪个文件呢？</p>
+<p>MySQL 存储的行为是由存储引擎实现的，MySQL 支持多种存储引擎，不同的存储引擎保存的文件自然也不同。</p>
+<p>InnoDB 是我们常用的存储引擎，也是 MySQL 默认的存储引擎。所以，本文主要以 InnoDB 存储引擎展开讨论。</p>
+<p>先来看看 MySQL 数据库的文件存放在哪个目录？</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mysql&gt; SHOW VARIABLES LIKE &#x27;datadir&#x27;;</span><br><span class="line">+---------------+-----------------+</span><br><span class="line">| Variable_name | Value           |</span><br><span class="line">+---------------+-----------------+</span><br><span class="line">| datadir       | /var/lib/mysql/ |</span><br><span class="line">+---------------+-----------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+
+<p>我们每创建一个 database（数据库）都会在 <code>/var/lib/mysql/</code> 目录里面创建一个以 database 为名的目录，然后保存表结构和表数据的文件都会存放在这个目录里。</p>
+<p>比如，我这里有一个名为 my_test 的 database，该 database 里有一张名为 t_order 数据库表。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20241112205812.png"></p>
+<p>然后，我们进入 &#x2F;var&#x2F;lib&#x2F;mysql&#x2F;my_test 目录，看看里面有什么文件？</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[root@xiaolin ~]#ls /var/lib/mysql/my_test</span><br><span class="line">db.opt  </span><br><span class="line">t_order.frm  </span><br><span class="line">t_order.ibd</span><br></pre></td></tr></table></figure>
+
+
+
+<p>可以看到，共有三个文件，这三个文件分别代表着：</p>
+<ul>
+<li>db.opt，用来存储当前数据库的默认字符集和字符校验规则。</li>
+<li>t_order.frm，t_order 的<strong>表结构</strong>会保存在这个文件。在 MySQL 中建立一张表都会生成一个.frm 文件，该文件是用来保存每个表的元数据信息的，主要包含表结构定义。</li>
+<li>t_order.ibd，t_order 的<strong>表数据</strong>会保存在这个文件。表数据既可以存在共享表空间文件（文件名：ibdata1）里，也可以存放在独占表空间文件（文件名：表名字.ibd）。这个行为是由参数 innodb_file_per_table 控制的，若设置了参数 innodb_file_per_table 为 1，则会将存储的数据、索引等信息单独存储在一个独占表空间，从 MySQL 5.6.6 版本开始，它的默认值就是 1 了，因此从这个版本之后，MySQL 中每一张表的数据都存放在一个独立的 .ibd 文件。</li>
+</ul>
+<p>好了，现在我们知道了一张数据库表的数据是保存在「表名字.ibd」的文件里的，这个文件也称为独占表空间文件。</p>
+<h3 id="表空间文件的结构是怎么样的？"><a href="#表空间文件的结构是怎么样的？" class="headerlink" title="表空间文件的结构是怎么样的？"></a>表空间文件的结构是怎么样的？</h3><p><strong>表空间由段（segment）、区（extent）、页（page）、行（row）组成</strong>，InnoDB 存储引擎的逻辑存储结构大致如下图：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20241112205834.png"></p>
+<p>下面我们从下往上一个个看看。</p>
+<h4 id="行（row）"><a href="#行（row）" class="headerlink" title="行（row）"></a>行（row）</h4><p>数据库表中的记录都是按行（row）进行存放的，每行记录根据不同的行格式，有不同的存储结构。</p>
+<p>后面我们详细介绍 InnoDB 存储引擎的行格式，也是本文重点介绍的内容。</p>
+<h4 id="页（page）"><a href="#页（page）" class="headerlink" title="页（page）"></a>页（page）</h4><p>记录是按照行来存储的，但是数据库的读取并不以「行」为单位，否则一次读取（也就是一次 I&#x2F;O 操作）只能处理一行数据，效率会非常低。</p>
+<p>因此，<strong>InnoDB 的数据是按「页」为单位来读写的</strong>，也就是说，当需要读一条记录的时候，并不是将这个行记录从磁盘读出来，而是以页为单位，将其整体读入内存。</p>
+<p><strong>默认每个页的大小为 16KB</strong>，也就是最多能保证 16KB 的连续存储空间。</p>
+<p>页是 InnoDB 存储引擎磁盘管理的最小单元，意味着数据库每次读写都是以 16KB 为单位的，一次最少从磁盘中读取 16K 的内容到内存中，一次最少把内存中的 16K 内容刷新到磁盘中。</p>
+<p>页的类型有很多，常见的有数据页、undo 日志页、溢出页等等。数据表中的行记录是用「数据页」来管理的，数据页的结构这里我就不讲细说了，之前文章有说过，感兴趣的可以去看这篇文章：<a target="_blank" rel="noopener" href="https://xiaolincoding.com/mysql/index/page.html">换一个角度看 B+ 树</a></p>
+<p>总之知道表中的记录存储在「数据页」里面就行。</p>
+<h4 id="区（extent）"><a href="#区（extent）" class="headerlink" title="区（extent）"></a>区（extent）</h4><p>我们知道 InnoDB 存储引擎是用 B+ 树来组织数据的。</p>
+<p>B+ 树中每一层都是通过双向链表连接起来的，如果是以页为单位来分配存储空间，那么链表中相邻的两个页之间的物理位置并不是连续的，可能离得非常远，那么磁盘查询时就会有大量的随机 I&#x2F;O，随机 I&#x2F;O 是非常慢的。</p>
+<p>解决这个问题也很简单，就是让链表中相邻的页的物理位置也相邻，这样就可以使用顺序 I&#x2F;O 了，那么在范围查询（扫描叶子节点）的时候性能就会很高。</p>
+<p>那具体怎么解决呢？</p>
+<p><strong>在表中数据量大的时候，为某个索引分配空间的时候就不再按照页为单位分配了，而是按照区（extent）为单位分配。每个区的大小为 1MB，对于 16KB 的页来说，连续的 64 个页会被划为一个区，这样就使得链表中相邻的页的物理位置也相邻，就能使用顺序 I&#x2F;O 了</strong>。</p>
+<h4 id="段（segment）"><a href="#段（segment）" class="headerlink" title="段（segment）"></a>段（segment）</h4><p>表空间是由各个段（segment）组成的，段是由多个区（extent）组成的。段一般分为数据段、索引段和回滚段等。</p>
+<ul>
+<li>索引段：存放 B + 树的非叶子节点的区的集合；</li>
+<li>数据段：存放 B + 树的叶子节点的区的集合；</li>
+<li>回滚段：存放的是回滚数据的区的集合，之前讲<a target="_blank" rel="noopener" href="https://xiaolincoding.com/mysql/transaction/mvcc.html">事务隔离</a>的时候就介绍到了 MVCC 利用了回滚段实现了多版本查询数据。</li>
+</ul>
+<p>好了，终于说完表空间的结构了。接下来，就具体讲一下 InnoDB 的行格式了。</p>
+<p>之所以要绕一大圈才讲行记录的格式，主要是想让大家知道行记录是存储在哪个文件，以及行记录在这个表空间文件中的哪个区域，有一个从上往下切入的视角，这样理解起来不会觉得很抽象。</p>
+<h2 id="InnoDB-行格式有哪些？"><a href="#InnoDB-行格式有哪些？" class="headerlink" title="InnoDB 行格式有哪些？"></a>InnoDB 行格式有哪些？</h2><p>行格式（row_format），就是一条记录的存储结构。</p>
+<p>InnoDB 提供了 4 种行格式，分别是 Redundant、Compact、Dynamic 和 Compressed 行格式。</p>
+<ul>
+<li>Redundant 是很古老的行格式了，MySQL 5.0 版本之前用的行格式，现在基本没人用了。</li>
+<li>由于 Redundant 不是一种紧凑的行格式，所以 MySQL 5.0 之后引入了 Compact 行记录存储方式，Compact 是一种紧凑的行格式，设计的初衷就是为了让一个数据页中可以存放更多的行记录，从 MySQL 5.1 版本之后，行格式默认设置成 Compact。</li>
+<li>Dynamic 和 Compressed 两个都是紧凑的行格式，它们的行格式都和 Compact 差不多，因为都是基于 Compact 改进一点东西。从 MySQL5.7 版本之后，默认使用 Dynamic 行格式。</li>
+</ul>
+<p>Redundant 行格式我这里就不讲了，因为现在基本没人用了，这次重点介绍 Compact 行格式，因为 Dynamic 和 Compressed 这两个行格式跟 Compact 非常像。</p>
+<p>所以，弄懂了 Compact 行格式，之后去了解其他行格式，很快也能看懂。</p>
+<h2 id="COMPACT-行格式长什么样？"><a href="#COMPACT-行格式长什么样？" class="headerlink" title="COMPACT 行格式长什么样？"></a>COMPACT 行格式长什么样？</h2><p>先跟 Compact 行格式混个脸熟，它长这样：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20241112205852.png"></p>
+<p>可以看到，一条完整的记录分为「记录的额外信息」和「记录的真实数据」两个部分。</p>
+<h3 id="记录的额外信息"><a href="#记录的额外信息" class="headerlink" title="记录的额外信息"></a>记录的额外信息</h3><p>记录的额外信息包含 3 个部分：变长字段长度列表、NULL 值列表、记录头信息。</p>
+<h4 id="1-变长字段长度列表"><a href="#1-变长字段长度列表" class="headerlink" title="1. 变长字段长度列表"></a>1. 变长字段长度列表</h4><p>varchar(n) 和 char(n) 的区别是什么，相信大家都非常清楚，char 是定长的，varchar 是变长的，变长字段实际存储的数据的长度（大小）不固定的。</p>
+<p>所以，在存储数据的时候，也要把数据占用的大小存起来，存到「变长字段长度列表」里面，读取数据的时候才能根据这个「变长字段长度列表」去读取对应长度的数据。其他 TEXT、BLOB 等变长字段也是这么实现的。</p>
+<p>为了展示「变长字段长度列表」具体是怎么保存「变长字段的真实数据占用的字节数」，我们先创建这样一张表，字符集是 ascii（所以每一个字符占用的 1 字节），行格式是 Compact，t_user 表中 name 和 phone 字段都是变长字段：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">CREATE TABLE `t_user` (</span><br><span class="line">  `id` int(11) NOT NULL,</span><br><span class="line">  `name` VARCHAR(20) DEFAULT NULL,</span><br><span class="line">  `phone` VARCHAR(20) DEFAULT NULL,</span><br><span class="line">  `age` int(11) DEFAULT NULL,</span><br><span class="line">  PRIMARY KEY (`id`) USING BTREE</span><br><span class="line">) ENGINE = InnoDB DEFAULT CHARACTER SET = ascii ROW_FORMAT = COMPACT;</span><br></pre></td></tr></table></figure>
+
+<p>现在 t_user 表里有这三条记录：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20241112205914.png"></p>
+<p>接下来，我们看看看看这三条记录的行格式中的「变长字段长度列表」是怎样存储的。</p>
+<p>先来看第一条记录：</p>
+<ul>
+<li>name 列的值为 a，真实数据占用的字节数是 1 字节，十六进制 0x01；</li>
+<li>phone 列的值为 123，真实数据占用的字节数是 3 字节，十六进制 0x03；</li>
+<li>age 列和 id 列不是变长字段，所以这里不用管。</li>
+</ul>
+<p>这些变长字段的真实数据占用的字节数会按照列的顺序<strong>逆序存放</strong>（等下会说为什么要这么设计），所以「变长字段长度列表」里的内容是「03 01」，而不是「01 03」。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20241112205930.png"></p>
+<p>同样的道理，我们也可以得出<strong>第二条记录</strong>的行格式中，「变长字段长度列表」里的内容是「04 02」，如下图：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20241112205941.png"></p>
+<p><strong>第三条记录</strong>中 phone 列的值是 NULL，<strong>NULL 是不会存放在行格式中记录的真实数据部分里的</strong>，所以「变长字段长度列表」里不需要保存值为 NULL 的变长字段的长度。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20241112210014.png"></p>
+<div class="note  flat info"><p>为什么「变长字段长度列表」的信息要按照逆序存放？</p>
+</div>
+
+<p>这个设计是有想法的，主要是因为「记录头信息」中指向下一个记录的指针，指向的是下一条记录的「记录头信息」和「真实数据」之间的位置，这样的好处是向左读就是记录头信息，向右读就是真实数据，比较方便。</p>
+<p>「变长字段长度列表」中的信息之所以要逆序存放，是因为这样可以<strong>使得位置靠前的记录的真实数据和数据对应的字段长度信息可以同时在一个 CPU Cache Line 中，这样就可以提高 CPU Cache 的命中率</strong>。</p>
+<p>同样的道理，NULL 值列表的信息也需要逆序存放。</p>
+<h4 id="NULL-值列表"><a href="#NULL-值列表" class="headerlink" title="NULL 值列表"></a>NULL 值列表</h4><p>表中的某些列可能会存储 NULL 值，如果把这些 NULL 值都放到记录的真实数据中会比较浪费空间，所以 Compact 行格式把这些值为 NULL 的列存储到 NULL 值列表中。</p>
+<p>如果存在允许 NULL 值的列，则每个列对应一个二进制位（bit），二进制位按照列的顺序逆序排列。</p>
+<ul>
+<li>二进制位的值为<code>1</code>时，代表该列的值为 NULL。</li>
+<li>二进制位的值为<code>0</code>时，代表该列的值不为 NULL。</li>
+</ul>
+<p>另外，NULL 值列表必须用整数个字节的位表示（1 字节 8 位），如果使用的二进制位个数不足整数个字节，则在字节的高位补 <code>0</code>。</p>
+<p>看看<strong>第三条记录</strong>，第三条记录 phone 列 和 age 列是 NULL 值，所以，对于第三条数据，NULL 值列表用十六进制表示是 0x06。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20241112210053.png"></p>
+<p>我们把三条记录的 NULL 值列表都填充完毕后，它们的行格式是这样的：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20241112210112.png"></p>
+<div class="note  flat info"><p>每个数据库表的行格式都有「NULL 值列表」吗？</p>
+</div>
+
+<p>NULL 值列表也不是必须的。</p>
+<p><strong>当数据表的字段都定义成 NOT NULL 的时候，这时候表里的行格式就不会有 NULL 值列表了</strong>。</p>
+<p>所以在设计数据库表的时候，通常都是建议将字段设置为 NOT NULL，这样可以至少节省 1 字节的空间（NULL 值列表至少占用 1 字节空间）。</p>
+<div class="note  flat info"><p>「NULL 值列表」是固定 1 字节空间吗？如果这样的话，一条记录有 9 个字段值都是 NULL，这时候怎么表示？</p>
+</div>
+
+<p>「NULL 值列表」的空间不是固定 1 字节的。</p>
+<p>当一条记录有 9 个字段值都是 NULL，那么就会创建 2 字节空间的「NULL 值列表」，以此类推。</p>
+<h4 id="记录头信息"><a href="#记录头信息" class="headerlink" title="记录头信息"></a>记录头信息</h4><p>记录头信息中包含的内容很多，我就不一一列举了，这里说几个比较重要的：</p>
+<ul>
+<li>delete_mask：标识此条数据是否被删除。从这里可以知道，我们执行 detele 删除记录的时候，并不会真正的删除记录，只是将这个记录的 delete_mask 标记为 1。</li>
+<li>next_record：下一条记录的位置。从这里可以知道，记录与记录之间是通过链表组织的。在前面我也提到了，指向的是下一条记录的「记录头信息」和「真实数据」之间的位置，这样的好处是向左读就是记录头信息，向右读就是真实数据，比较方便。</li>
+<li>record_type：表示当前记录的类型，0 表示普通记录，1 表示 B+树非叶子节点记录，2 表示最小记录，3 表示最大记录</li>
+</ul>
+<h3 id="记录的真实数据"><a href="#记录的真实数据" class="headerlink" title="记录的真实数据"></a>记录的真实数据</h3><p>记录真实数据部分除了我们定义的字段，还有三个隐藏字段，分别为：row_id、trx_id、roll_pointer，我们来看下这三个字段是什么。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20241112210129.png"></p>
+<ul>
+<li>row_id</li>
+</ul>
+<p>如果我们建表的时候指定了主键或者唯一约束列，那么就没有 row_id 隐藏字段了。如果既没有指定主键，又没有唯一约束，那么 InnoDB 就会为记录添加 row_id 隐藏字段。row_id 不是必需的，占用 6 个字节。</p>
+<ul>
+<li>trx_id</li>
+</ul>
+<p>事务 id，表示这个数据是由哪个事务生成的。trx_id 是必需的，占用 6 个字节。</p>
+<ul>
+<li>roll_pointer</li>
+</ul>
+<p>这条记录上一个版本的指针。roll_pointer 是必需的，占用 7 个字节。</p>
+<p>如果你熟悉 MVCC 机制，你应该就清楚 trx_id 和 roll_pointer 的作用了，如果你还不知道 MVCC 机制，可以看完<a target="_blank" rel="noopener" href="https://xiaolincoding.com/mysql/transaction/mvcc.html">这篇文章</a>，一定要掌握，面试也很经常问 MVCC 是怎么实现的。</p>
+<h2 id="varchar-n-中-n-最大取值为多少？"><a href="#varchar-n-中-n-最大取值为多少？" class="headerlink" title="varchar(n) 中 n 最大取值为多少？"></a>varchar(n) 中 n 最大取值为多少？</h2><p>我们要清楚一点，<strong>MySQL 规定除了 TEXT、BLOBs 这种大对象类型之外，其他所有的列（不包括隐藏列和记录头信息）占用的字节长度加起来不能超过 65535 个字节</strong>。</p>
+<p>也就是说，一行记录除了 TEXT、BLOBs 类型的列，限制最大为 65535 字节，注意是一行的总长度，不是一列。</p>
+<p>知道了这个前提之后，我们再来看看这个问题：「varchar(n) 中 n 最大取值为多少？」</p>
+<p>varchar(n) 字段类型的 n 代表的是最多存储的字符数量，并不是字节大小哦。</p>
+<p>要算 varchar(n) 最大能允许存储的字节数，还要看数据库表的字符集，因为字符集代表着，1 个字符要占用多少字节，比如 ascii 字符集，1 个字符占用 1 字节，那么 varchar(100) 意味着最大能允许存储 100 字节的数据。</p>
+<h3 id="单字段的情况"><a href="#单字段的情况" class="headerlink" title="单字段的情况"></a>单字段的情况</h3><p>前面我们知道了，一行记录最大只能存储 65535 字节的数据。</p>
+<p>那假设数据库表只有一个 varchar(n) 类型的列且字符集是 ascii，在这种情况下，varchar(n) 中 n 最大取值是 65535 吗？</p>
+<p><strong>一行数据的最大字节数 65535，其实是包含「变长字段长度列表」和「NULL 值列表」所占用的字节数的</strong>。所以，我们在算 varchar(n) 中 n 最大值时，需要减去 storage overhead 占用的字节数。</p>
+<p>这是因为我们存储字段类型为 varchar(n) 的数据时，其实分成了三个部分来存储：</p>
+<ul>
+<li>真实数据</li>
+<li>真实数据占用的字节数</li>
+<li>NULL 标识，如果不允许为 NULL，这部分不需要</li>
+</ul>
+<p>当然，我上面这个例子是针对字符集为 ascii 情况，如果采用的是 UTF-8，varchar(n) 最多能存储的数据计算方式就不一样了：</p>
+<ul>
+<li>在 UTF-8 字符集下，一个字符串最多需要三个字节，varchar(n) 的 n 最大取值就是 65532&#x2F;3 &#x3D; 21844。</li>
+</ul>
+<p>上面所说的只是针对于一个字段的计算方式。</p>
+<h2 id="行溢出后，MySQL-是怎么处理的？"><a href="#行溢出后，MySQL-是怎么处理的？" class="headerlink" title="行溢出后，MySQL 是怎么处理的？"></a>行溢出后，MySQL 是怎么处理的？</h2><p>MySQL 中磁盘和内存交互的基本单位是页，一个页的大小一般是 <code>16KB</code>，也就是 <code>16384字节</code>，而一个 varchar(n) 类型的列最多可以存储 <code>65532字节</code>，一些大对象如 TEXT、BLOB 可能存储更多的数据，这时一个页可能就存不了一条记录。这个时候就会<strong>发生行溢出，多的数据就会存到另外的「溢出页」中</strong>。</p>
+<p>如果一个数据页存不了一条记录，InnoDB 存储引擎会自动将溢出的数据存放到「溢出页」中。在一般情况下，InnoDB 的数据都是存放在「数据页」中。但是当发生行溢出时，溢出的数据会存放到「溢出页」中。</p>
+<p>当发生行溢出时，在记录的真实数据处只会<strong>保存该列的一部分数据</strong>，而把剩余的数据放在「溢出页」中，然后真实数据处用 20 字节存储指向溢出页的地址，从而可以找到剩余数据所在的页。大致如下图所示。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/20241112210150.png"></p>
+<p>上面这个是 Compact 行格式在发生行溢出后的处理。</p>
+<p>Compressed 和 Dynamic 这两个行格式和 Compact 非常类似，主要的区别在于处理行溢出数据时有些区别。</p>
+<p>这两种格式采用完全的行溢出方式，记录的真实数据处<strong>不会存储该列的一部分数据</strong>，只存储 20 个字节的指针来指向溢出页。而实际的数据都存储在溢出页中。</p>
+<br>
+
+<h1 id="MySQL-的存储引擎有哪些？它们之间有什么区别？"><a href="#MySQL-的存储引擎有哪些？它们之间有什么区别？" class="headerlink" title="MySQL 的存储引擎有哪些？它们之间有什么区别？"></a>MySQL 的存储引擎有哪些？它们之间有什么区别？</h1><p>在 MySQL 8.4 版本一共提供了 10 个引擎，每种引擎都有其特定的特性和用途，但相对而言比较常见的是以下几个：</p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>MyISAM</th>
+<th>Memory</th>
+<th>InnoDB</th>
+<th>Archive</th>
+<th>NDB</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>B+树索引</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>备份&#x2F;按时间点恢复</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>集群数据库支持</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>聚簇索引</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>压缩数据</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>数据缓存</td>
+<td>No</td>
+<td>N&#x2F;A</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>加密数据</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>外键支持</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>全文检索</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>地理空间数据类型支持</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>地理空间索引支持</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>哈希索引</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>索引缓存</td>
+<td>Yes</td>
+<td>N&#x2F;A</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>锁的粒度</td>
+<td>Table</td>
+<td>Table</td>
+<td>Row</td>
+<td>Row</td>
+<td>Row</td>
+</tr>
+<tr>
+<td>MVCC</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>复制支持</td>
+<td>Yes</td>
+<td>Limited</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>存储限制</td>
+<td>256TB</td>
+<td>RAM</td>
+<td>64TB</td>
+<td>None</td>
+<td>384EB</td>
+</tr>
+<tr>
+<td>T-tree 索引</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>事务</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+</tbody></table>
+<p>实际上我们仅需重点了解 InnoDB 和 MyISAM 即可，其它仅需有点印象即可。</p>
+<h2 id="MyISAM"><a href="#MyISAM" class="headerlink" title="MyISAM"></a>MyISAM</h2><p>1）MyISAM 是基于 ISAM 引擎而来的，支持全文检索、数据压缩、空间函数，<strong>不支持事务和行级锁，只有表级别锁</strong>，它适用于 OLAP 场景，也就是分析类的，基本上都是读取，不会有什么写入动作的场景。</p>
+<p>2）MyISAM 的索引也是 B+ 树，只是不像 InnoDB 那种叶子节点会存储完整的数据，MyISAM 的数据是独立于索引单独存储的，所以主键和非主键索引差别不大。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/L8OYQmWD_image.png"></p>
+<p>3）MyISAM 不支持崩溃后的安全恢复，而 InnoDB 有个 redolog 可以支持安全恢复。</p>
+<p>4）MyISAM 写入性能差。因为锁的粒度太粗了，不支持行锁，只有表锁，所以写入的时候会对整张表加锁。不过有个并发插入的开关，开启之后当数据中间没有空洞的时候，也就是插入的新数据是从末尾插入时，读取数据是不会阻塞的。</p>
+<h2 id="InnoDB（MySQL-默认引擎）"><a href="#InnoDB（MySQL-默认引擎）" class="headerlink" title="InnoDB（MySQL 默认引擎）"></a>InnoDB（MySQL 默认引擎）</h2><p>1）InnoDB <strong>支持事务</strong>，实现了<strong>四种标准的隔离级别</strong>，利用 MVCC 来支持高并发，默认事务隔离级别为可重复读，支持行锁，利用行锁+间隙锁提供可重复读级别下防止幻读的能力，支持崩溃后的数据安全恢复。</p>
+<p>2）支持外键，不过一般互联网项目都不会用外键的，性能太差，利用业务代码来实现约束即可。</p>
+<p>3）由于 InnoDB 使用行级锁定和支持事务，因此在并发性能方面表现较好，特别是在多个用户同时对数据库进行读写操作时。</p>
+<p>4）InnoDB 的主键索引称为聚簇索引，也就是<strong>数据和索引是放在一起的</strong>，这与 MyISAM 有所不同，并且它的辅助索引(非主键索引)只存储索引值与主键，因此当辅助索引不能覆盖查询的列时，需要通过找到的主键再去聚簇索引查询数据，这个过程称之为回表。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/yMAM6R4d_image.png"></p>
+<h2 id="MyISAM-和-InnoDB-适用场景"><a href="#MyISAM-和-InnoDB-适用场景" class="headerlink" title="MyISAM 和 InnoDB 适用场景"></a>MyISAM 和 InnoDB 适用场景</h2><p>InnoDB 更适合需要高并发、事务处理和数据完整性保证的场景，例如电商平台、金融系统和社交网络等。</p>
+<p>而 MyISAM 更适合读操作远多于写操作且对数据完整性要求不高的场景，例如内容管理系统、博客平台和报表系统等。</p>
+<br>
+
+<h1 id="为什么在-MySQL-中不推荐使用多表-JOIN？"><a href="#为什么在-MySQL-中不推荐使用多表-JOIN？" class="headerlink" title="为什么在 MySQL 中不推荐使用多表 JOIN？"></a>为什么在 MySQL 中不推荐使用多表 JOIN？</h1><p>这里的多表往往指的是超过三个表才是多表，正常两个表 join 是没问题的！（但是也需要评估下量级和是否命中索引）</p>
+<p>阿里的 Java 规范手册里也有一句话：“超过三个表禁止使用 Join”。</p>
+<p>这是为什么呢？</p>
+<p>其实数据量小都无所谓。但当数据量大的时候，影响就被放大了。如果让数据库来承担这个复杂的关联操作，需要对联接的每个表进行扫描、匹配和组合，消耗大量的 CPU 和内存资源。让复杂的关联操作占用了大量的数据库资源，会影响其他查询修改操作。</p>
+<p><strong>数据库往往是我们系统的弱点</strong>，很多情况下性能瓶颈都在数据库，<strong>因此我们需要尽量避免把压力放在数据库上</strong>。</p>
+<br>
+
+<h1 id="MySQL-中-DELETE、DROP-和-TRUNCATE-的区别是什么？"><a href="#MySQL-中-DELETE、DROP-和-TRUNCATE-的区别是什么？" class="headerlink" title="MySQL 中 DELETE、DROP 和 TRUNCATE 的区别是什么？"></a>MySQL 中 DELETE、DROP 和 TRUNCATE 的区别是什么？</h1><h2 id="DELETE"><a href="#DELETE" class="headerlink" title="DELETE"></a>DELETE</h2><p><code>Delete</code> 用于删除行数据，但保留表结构和相关的对象。</p>
+<p>本质上这个删除其实就是给数据行打个标记，并不实时删除，因此 delete 之后，空间的大小不会变化。</p>
+<p>而且 delete 操作会生成 binlog、redolog 和 undolog，所以如果删除全表使用 delete 的话，性能会比较差！ 但是它可以回滚。</p>
+<h2 id="DROP"><a href="#DROP" class="headerlink" title="DROP"></a>DROP</h2><p><code>Drop</code> 用于<strong>完全删除数据库表，包括数据和结构</strong>。</p>
+<p>在 InnoDB 中，每张表数据内容和索引都存储在一个以 .ibd 后缀的文件中，drop 就是直接把这个文件给删除了！还有一个 .frm 后缀的文件也会被删除，这个文件包含表的元数据和结构定义。</p>
+<p>文件都删了，所以这个操作无法回滚，表空间会被回收，但是如果表存在系统共享表空间，则不会回收空间。</p>
+<p>默认创建的表会有独立表空间，把 <code>innodb_file_per_table</code> 的值改为 OFF 后，就会被放到共享表空间中，即统一的 ibdata1 文件中。</p>
+<h2 id="TRUNCATE"><a href="#TRUNCATE" class="headerlink" title="TRUNCATE"></a>TRUNCATE</h2><p><code>Truncate</code> 只删除数据，不会删除表结构和索引等其他结构。</p>
+<p><code>Truncate</code> 会对整张表的数据进行删除，且不会记录回滚等日志，所以它无法被回滚。</p>
+<p>并且主键字段是自增的，使用 <code>Truncate</code> 删除后自增重新从 1 开始。</p>
+<br>
+
+<h1 id="MySQL-中-DATETIME-和-TIMESTAMP-类型的区别是什么？"><a href="#MySQL-中-DATETIME-和-TIMESTAMP-类型的区别是什么？" class="headerlink" title="MySQL 中 DATETIME 和 TIMESTAMP 类型的区别是什么？"></a>MySQL 中 DATETIME 和 TIMESTAMP 类型的区别是什么？</h1><h2 id="存储格式"><a href="#存储格式" class="headerlink" title="存储格式"></a>存储格式</h2><ul>
+<li>DATETIME：存储的是具体的日期和时间，格式为 YYYY-MM-DD HH:MM:SS。它不依赖于时区信息，存储的是原始数据。</li>
+<li>TIMESTAMP：存储的是自 1970-01-01 00:00:01 UTC 以来的秒数，格式为 YYYY-MM-DD HH:MM:SS。它依赖于时区信息，存储的是 UTC 时间。</li>
+</ul>
+<h2 id="时间范围"><a href="#时间范围" class="headerlink" title="时间范围"></a>时间范围</h2><ul>
+<li>DATETIME：可以表示从 1000-01-01 00:00:00 到 9999-12-31 23:59:59 的时间范围。</li>
+<li>TIMESTAMP：可以表示从 1970-01-01 00:00:01 UTC 到 2038-01-19 03:14:07 UTC 的时间范围（32 位整数表示的限制）。</li>
+</ul>
+<h2 id="时区处理"><a href="#时区处理" class="headerlink" title="时区处理"></a>时区处理</h2><ul>
+<li>DATETIME：不考虑时区，它存储的是输入的日期和时间值，不进行任何时区转换。</li>
+<li>TIMESTAMP：考虑时区，它存储的是 UTC 时间，插入和检索时会根据当前时区进行转换。这意味着在不同的时区中，TIMESTAMP 类型的数据会自动调整以显示本地时间。</li>
+</ul>
+<h2 id="默认值和自动更新"><a href="#默认值和自动更新" class="headerlink" title="默认值和自动更新"></a>默认值和自动更新</h2><ul>
+<li>DATETIME：在 MySQL 5.6 及更早版本中，DATETIME 列不能有自动更新的默认值。在 MySQL 5.6 及以后版本中，可以使用 DEFAULT 和 ON UPDATE 子句来指定自动初始化和更新行为，但不像 TIMESTAMP 那么直观。</li>
+<li>TIMESTAMP：在 MySQL 5.6 及更高版本中，TIMESTAMP 列可以有默认的当前时间戳 CURRENT_TIMESTAMP，并且可以使用 ON UPDATE CURRENT_TIMESTAMP 使其在行更新时自动更新为当前时间戳。这使得 TIMESTAMP 非常适合记录行的创建和修改时间。</li>
+</ul>
+<br>
+
+<h1 id="数据库的三大范式是什么？"><a href="#数据库的三大范式是什么？" class="headerlink" title="数据库的三大范式是什么？"></a>数据库的三大范式是什么？</h1><p>数据库的三大范式是数据库设计中常用的规范，它们的目的是<strong>减少数据冗余，提高数据的完整性和一致性</strong>，使得表的设计更清晰。</p>
+<h2 id="第一范式（1NF）：规范化"><a href="#第一范式（1NF）：规范化" class="headerlink" title="第一范式（1NF）：规范化"></a>第一范式（1NF）：规范化</h2><p>定义：第一范式要求数据库表中的所有字段值必须是原子值，即每个字段值是不可再分的基本数据项。换句话说，表中的每一列都只包含单一值，不允许出现重复的列或多值列。</p>
+<p>目的：确保数据表的每一列都是单一值，消除重复的列，从而保证数据的原子性。</p>
+<p>例如地址作为一个字段，实际上可以拆分成省、市、区等，所以这就不符合第一范式。</p>
+<h2 id="第二范式（2NF）：消除部分依赖"><a href="#第二范式（2NF）：消除部分依赖" class="headerlink" title="第二范式（2NF）：消除部分依赖"></a>第二范式（2NF）：消除部分依赖</h2><p>定义：在满足第一范式的基础上，第二范式要求所有非主键字段必须完全依赖于整个主键。</p>
+<p>目的：消除非主键字段对主键部分依赖，从而避免数据冗余和更新异常。</p>
+<p>例如 【员工ID、员工姓名、部门ID、部门名】 为一张表，员工 ID 为主键。此时，员工姓名依赖员工ID，部门名依赖部门ID，这就违反了第二范式。</p>
+<p>符合范式的设计是：员工表【员工ID、员工姓名、部门ID】，部门表【部门ID、部门名】。</p>
+<h2 id="第三范式（3NF）：消除传递依赖"><a href="#第三范式（3NF）：消除传递依赖" class="headerlink" title="第三范式（3NF）：消除传递依赖"></a>第三范式（3NF）：消除传递依赖</h2><p>定义：在满足第二范式的基础上，第三范式要求非主键字段必须直接依赖于主键，而不能通过其他非主键字段间接依赖于主键。</p>
+<p>目的：消除非主键字段对主键的传递依赖，从而进一步减少数据冗余和更新异常。</p>
+<p>例如 【员工ID、员工姓名、部门ID、部门名、经理ID】 为一张表，员工 ID 为主键。此时，经理 ID 依赖部门 ID，部门 ID 依赖员工ID，这说明有依赖传递，违反了第三范式。</p>
+<p>符合范式的设计是：员工表【员工ID、员工姓名、部门ID】，部门表【部门ID、部门名、经理ID】。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><ul>
+<li>第一范式（1NF）：确保每一列都是原子值，即是不可分割的基础数据项。</li>
+<li>第二范式（2NF）：在满足1NF的基础上，消除非主键字段对主键部分依赖。</li>
+<li>第三范式（3NF）：在满足2NF的基础上，消除非主键字段对主键的传递依赖。</li>
+</ul>
+<p><strong>不过现在业务上的表设计基本都是反范式的</strong>。当然不是说完全不遵守范式，而是适当的进行调整。</p>
+<p>比如业务上经常需要冗余字段，减少联表查询，提升性能，特别是业务量比较大的公司，这种冗余是很有必要的！</p>
+<br>
+
+<h1 id="MySQL-中-AUTO-INCREMENT-列达到最大值时会发生什么？"><a href="#MySQL-中-AUTO-INCREMENT-列达到最大值时会发生什么？" class="headerlink" title="MySQL 中 AUTO_INCREMENT 列达到最大值时会发生什么？"></a>MySQL 中 AUTO_INCREMENT 列达到最大值时会发生什么？</h1><p>先说结论：在 MySQL 中，<strong>如果表定义的自增 ID 到达上限后，再申请下一个 ID，得到的值不变！</strong></p>
+<p>例如 int 是 4 个字节，上限是 2 的 32 次方 -1，即 2147483647，当到达这个值的之后，下次插入得到的还是这个值。</p>
+<p>再列举下 AUTO_INCREMENT 列不同数据类型的最大值：</p>
+<ul>
+<li>对于 TINYINT（8位），最大值是 127（有符号）或 255（无符号）。</li>
+<li>对于 SMALLINT（16位），最大值是 32,767（有符号）或 65,535（无符号）。</li>
+<li>对于 MEDIUMINT（24位），最大值是 8,388,607（有符号）或 16,777,215（无符号）。</li>
+<li>对于 INT（32位），最大值是 2,147,483,647（有符号）或 4,294,967,295（无符号）。</li>
+<li>对于 BIGINT（64位），最大值是 9,223,372,036,854,775,807（有符号）或 18,446,744,073,709,551,615（无符号）。</li>
+</ul>
+<br>
+
+<h1 id="在-MySQL-中存储金额数据，应该使用什么数据类型？"><a href="#在-MySQL-中存储金额数据，应该使用什么数据类型？" class="headerlink" title="在 MySQL 中存储金额数据，应该使用什么数据类型？"></a>在 MySQL 中存储金额数据，应该使用什么数据类型？</h1><p>在数据库中业界常用两种类型来存储金额：bigint 和 decimal。</p>
+<p>1）bigint 代码中用 long。</p>
+<ul>
+<li>范围：可以存储的整数范围为 -2^63 到 2^63 - 1（在 MySQL 中为 64 位有符号整数）</li>
+<li>存储空间：占用 8 字节（64 位）</li>
+<li>精度：精确存储整数，但<strong>不支持小数部分</strong>，存储的金额单位是分</li>
+</ul>
+<p>2）decimal 代码中使用 BigDecimal。</p>
+<ul>
+<li>范围：可以存储的数字范围和小数位数由定义的精度和标度决定</li>
+<li>存储空间：存储空间取决于定义的精度和标度，存储较大数值时会占用更多空间</li>
+<li>精度：支持高精度的小数运算，精确存储定点数，一般用 decimal(18,6)，18 是总位数，6 是小数</li>
+</ul>
+<p>long 类型保存到分，使得小数位（厘）的数据不好处理（需要手动处理，比较麻烦），因此精度不够高。</p>
+<p>在高精度金额计算场景下不合适，例如有些三方支付系统是需要抽成的，例如千分之三、万分之一等等，这类的抽成要求精度比较高，例如 会得到 1234.5678 这样的金额，乘以 100 后仍然无法存储为精确整数，还是小数，存储则会丢失精度。</p>
+<p>0.0078 看似很少，但抽成的笔数一多，比如一天 30 万笔，每笔少个 0.0078，每天的差额也得 2340 元！一年不得 85 万！</p>
+<p>所以<strong>高精度的计算不推荐使用 bigint</strong>。</p>
+<p>BigDecimal 则很适用于高精度金额场景，且非常灵活，只不过相对于 long 性能会差一些，但是在大部分业务上我个人认为可以忽略这个性能问题，除非是特殊场景要求极端性能，所以一般情况下我推荐使用 decimal。</p>
+<br>
+
+<h1 id="什么是数据库的视图？"><a href="#什么是数据库的视图？" class="headerlink" title="什么是数据库的视图？"></a>什么是数据库的视图？</h1><p>视图是一种虚拟表，它是基于 SQL 查询结果的，它本身并不存储数据，而是<strong>存储 SQL 查询</strong>。</p>
+<p>视图可以包含一个或多个表的数据，并且可以对这些数据进行筛选、计算、排序等操作。</p>
+<p>它的作用如下：</p>
+<ul>
+<li>简化复杂查询：视图可以将复杂的查询封装成一个简单的视图，使得用户在查询数据时更加方便。</li>
+<li>安全性：通过视图可以限制用户访问特定的表和列，保护敏感数据。例如，只允许用户查看某些列而不是整个表。</li>
+<li>数据抽象：视图提供了一种数据抽象层，用户可以通过视图获取需要的数据，而不必关心底层表的结构和关系。</li>
+<li>可重用性：定义一次视图，可以在多个查询中重复使用，减少代码冗余。</li>
+</ul>
+<br>
+
+<h1 id="MySQL-中-EXISTS-和-IN-的区别是什么？"><a href="#MySQL-中-EXISTS-和-IN-的区别是什么？" class="headerlink" title="MySQL 中 EXISTS 和 IN 的区别是什么？"></a>MySQL 中 EXISTS 和 IN 的区别是什么？</h1><p>exists 和 in 都用于子查询，exists 检查子查询是否返回结果集，返回布尔值。in 检查某个值是否在子查询返回的结果集中，返回具体的值。</p>
+<p>在性能上，由于两者机制的问题，在不同场景性能有所差异。</p>
+<p>exists 的查询机制是<strong>循环外表</strong>，通过外表的每行数据去内表查询是否有匹配的值，<strong>一旦找到符合条件的记录，此次内表子查询就会停止执行</strong>。然后再通过下一个外表的值来查询，如此循环。所以它适合子查询中表比外表大且有索引的场景。</p>
+<p>而 in 子查询在执行时会先执行子查询并生成结果集，然后将结果集与外部查询的列进行比较，所以它适合子查询记录少，且主查询表大有索引的场景。</p>
+<p>简单总结：外层查询表量级小于子查询表，则用 exists，外层查询表量级大于子查询表，则用 in ，如果外层和子查询表差不多，则都行。建议具体情况还是以 explain 分析为主。</p>
+<br>
+
+<h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><p><a target="_blank" rel="noopener" href="https://xiaolincoding.com/mysql/base/how_select.html#%E7%AC%AC%E4%B8%80%E6%AD%A5-%E8%BF%9E%E6%8E%A5%E5%99%A8">执行一条 select 语句，期间发生了什么？ | 小林coding (xiaolincoding.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://xiaolincoding.com/mysql/base/row_format.html#mysql-%E7%9A%84%E6%95%B0%E6%8D%AE%E5%AD%98%E6%94%BE%E5%9C%A8%E5%93%AA%E4%B8%AA%E6%96%87%E4%BB%B6">MySQL 一行记录是怎么存储的？ | 小林coding (xiaolincoding.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/csucsgoat/article/details/115380747">数据库的高级查询四：Having子句（Having子句需要和GROUP BY子句结合，才能使用）_sql having必须和group by-CSDN博客</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author_group"><a class="post-copyright__author_img" href="/about/"><img class="post-copyright__author_img_front" src= "/img/spin.svg" data-lazy-src="/img/avatar.jpg"></a><div class="post-copyright__author_name">Rean's Blog</div><div class="post-copyright__author_desc">Enjoy technology and music</div></div><div class="post-tools" id="post-tools"><div class="post-tools-left"><div id="quit-box" onclick="RemoveRewardMask()"></div></div></div><div class="post-copyright__notice"><span class="post-copyright-info">本文是原创文章，采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0</a>协议，完整转载请注明来自<a href="/">Rean's Blog</a></span></div></div><div class="post-tools-right"><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/"><span class="tags-punctuation"></span>数据库<span class="tagsPageCount">8</span></a></div></div></div><nav class="needEndHide pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/p/6021f67a/"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">《黑神话：悟空》100%全流程全成就全要素收集指南</div></div></a></div><div class="next-post pull-right"><a href="/p/66be4b4/"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">【Java】JVM（二） | GC</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="solitude st-star-smile-fill"></i><span>喜欢这篇的人也看了</span><div class="relatedPosts-link"><a onclick="event.preventDefault(); toRandomPost();" href="javascript:void(0);" rel="external nofollow" data-pjax-state="">随便逛逛</a></div></div><div class="relatedPosts-list"><div><a href="/p/1b320550/" title="什么是负载均衡？负载均衡算法有哪些？"><img class="cover" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/cover2.jpg" alt="cover"><div class="content is-center"><div class="title">什么是负载均衡？负载均衡算法有哪些？</div></div></a></div><div><a href="/p/a02febe4/" title="【MySQL】优化"><img class="cover" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/cover8.JPG" alt="cover"><div class="content is-center"><div class="title">【MySQL】优化</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-content"><div class="card-info-avatar is-center"><div class="author-info__top-group"><div class="author-info__sayhi" id="author-info__sayhi" onclick="sco.changeSayHelloText()">sayhello.morning</div></div></div><div class="avatar-img-group"><img class="avatar-img" alt="头像" src= "/img/spin.svg" data-lazy-src="/img/avatar.jpg"><div class="avatar-sticker"><img class="avatar-sticker-img" src= "/img/spin.svg" data-lazy-src="https://7.isyangs.cn/34/65f2e4e0423cc-34.png" alt="心情贴纸"></div></div><div class="author-info__description_group"><div class="author-info__description">分享自己对编程的<b>热爱</b>，对知识海洋<b>探索历程</b>，随机掉落<b>无参配布</b>以及<b>翻调</b>（主要是音综类，在B站因为版权基本过不了审（。</div><div class="author-info__description2">相信你可以在这里找到对你有用的知识和教程。</div></div><div class="author-info__bottom-group"><a class="author-info__bottom-group-left" href="/about/"><div class="author-info__name">Rean</div><div class="author-info__desc">Enjoy technology and music</div></a><div class="card-info-social-icons is-center"><a class="social-icon" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze" title="Github"><i class="solitude  st-github-line"></i></a><a class="social-icon" target="_blank" rel="noopener" href="https://space.bilibili.com/6531436" title="Bilibili"><i class="solitude  st-bilibili-line"></i></a></div></div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="solitude st-menu-line"></i><span>文章目录</span></div><div class="toc-content" id="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E4%B8%80%E6%9D%A1-select-%E8%AF%AD%E5%8F%A5%EF%BC%8C%E6%9C%9F%E9%97%B4%E5%8F%91%E7%94%9F%E4%BA%86%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">执行一条 select 语句，期间发生了什么？</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#MySQL-%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E6%98%AF%E6%80%8E%E6%A0%B7%E7%9A%84%EF%BC%9F"><span class="toc-text">MySQL 执行流程是怎样的？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E6%AD%A5%EF%BC%9A%E8%BF%9E%E6%8E%A5%E5%99%A8"><span class="toc-text">第一步：连接器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E6%AD%A5%EF%BC%9A%E6%9F%A5%E8%AF%A2%E7%BC%93%E5%AD%98"><span class="toc-text">第二步：查询缓存</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E6%AD%A5%EF%BC%9A%E8%A7%A3%E6%9E%90-SQL"><span class="toc-text">第三步：解析 SQL</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E6%9E%90%E5%99%A8"><span class="toc-text">解析器</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E5%9B%9B%E6%AD%A5%EF%BC%9A%E6%89%A7%E8%A1%8C-SQL"><span class="toc-text">第四步：执行 SQL</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%84%E5%A4%84%E7%90%86%E5%99%A8"><span class="toc-text">预处理器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E5%99%A8"><span class="toc-text">优化器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E5%99%A8"><span class="toc-text">执行器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BB%E9%94%AE%E7%B4%A2%E5%BC%95%E6%9F%A5%E8%AF%A2"><span class="toc-text">主键索引查询</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%A8%E8%A1%A8%E6%89%AB%E6%8F%8F"><span class="toc-text">全表扫描</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E4%B8%8B%E6%8E%A8"><span class="toc-text">索引下推</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#HAVING-%E5%AD%90%E5%8F%A5%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">HAVING 子句是什么？</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#having-%E5%92%8C-where-%E5%8C%BA%E5%88%AB"><span class="toc-text">having 和 where 区别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#having-%E5%92%8C-where-%E5%BA%94%E7%94%A8"><span class="toc-text">having 和 where 应用</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#MySQL-%E4%B8%80%E8%A1%8C%E8%AE%B0%E5%BD%95%E6%98%AF%E6%80%8E%E4%B9%88%E5%AD%98%E5%82%A8%E7%9A%84%EF%BC%9F"><span class="toc-text">MySQL 一行记录是怎么存储的？</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#MySQL-%E7%9A%84%E6%95%B0%E6%8D%AE%E5%AD%98%E6%94%BE%E5%9C%A8%E5%93%AA%E4%B8%AA%E6%96%87%E4%BB%B6%EF%BC%9F"><span class="toc-text">MySQL 的数据存放在哪个文件？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A1%A8%E7%A9%BA%E9%97%B4%E6%96%87%E4%BB%B6%E7%9A%84%E7%BB%93%E6%9E%84%E6%98%AF%E6%80%8E%E4%B9%88%E6%A0%B7%E7%9A%84%EF%BC%9F"><span class="toc-text">表空间文件的结构是怎么样的？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A1%8C%EF%BC%88row%EF%BC%89"><span class="toc-text">行（row）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%A1%B5%EF%BC%88page%EF%BC%89"><span class="toc-text">页（page）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8C%BA%EF%BC%88extent%EF%BC%89"><span class="toc-text">区（extent）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AE%B5%EF%BC%88segment%EF%BC%89"><span class="toc-text">段（segment）</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#InnoDB-%E8%A1%8C%E6%A0%BC%E5%BC%8F%E6%9C%89%E5%93%AA%E4%BA%9B%EF%BC%9F"><span class="toc-text">InnoDB 行格式有哪些？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#COMPACT-%E8%A1%8C%E6%A0%BC%E5%BC%8F%E9%95%BF%E4%BB%80%E4%B9%88%E6%A0%B7%EF%BC%9F"><span class="toc-text">COMPACT 行格式长什么样？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%B0%E5%BD%95%E7%9A%84%E9%A2%9D%E5%A4%96%E4%BF%A1%E6%81%AF"><span class="toc-text">记录的额外信息</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%8F%98%E9%95%BF%E5%AD%97%E6%AE%B5%E9%95%BF%E5%BA%A6%E5%88%97%E8%A1%A8"><span class="toc-text">1. 变长字段长度列表</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#NULL-%E5%80%BC%E5%88%97%E8%A1%A8"><span class="toc-text">NULL 值列表</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%B0%E5%BD%95%E5%A4%B4%E4%BF%A1%E6%81%AF"><span class="toc-text">记录头信息</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%B0%E5%BD%95%E7%9A%84%E7%9C%9F%E5%AE%9E%E6%95%B0%E6%8D%AE"><span class="toc-text">记录的真实数据</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#varchar-n-%E4%B8%AD-n-%E6%9C%80%E5%A4%A7%E5%8F%96%E5%80%BC%E4%B8%BA%E5%A4%9A%E5%B0%91%EF%BC%9F"><span class="toc-text">varchar(n) 中 n 最大取值为多少？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%95%E5%AD%97%E6%AE%B5%E7%9A%84%E6%83%85%E5%86%B5"><span class="toc-text">单字段的情况</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A1%8C%E6%BA%A2%E5%87%BA%E5%90%8E%EF%BC%8CMySQL-%E6%98%AF%E6%80%8E%E4%B9%88%E5%A4%84%E7%90%86%E7%9A%84%EF%BC%9F"><span class="toc-text">行溢出后，MySQL 是怎么处理的？</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#MySQL-%E7%9A%84%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E6%9C%89%E5%93%AA%E4%BA%9B%EF%BC%9F%E5%AE%83%E4%BB%AC%E4%B9%8B%E9%97%B4%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%EF%BC%9F"><span class="toc-text">MySQL 的存储引擎有哪些？它们之间有什么区别？</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#MyISAM"><span class="toc-text">MyISAM</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#InnoDB%EF%BC%88MySQL-%E9%BB%98%E8%AE%A4%E5%BC%95%E6%93%8E%EF%BC%89"><span class="toc-text">InnoDB（MySQL 默认引擎）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MyISAM-%E5%92%8C-InnoDB-%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-text">MyISAM 和 InnoDB 适用场景</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%9C%A8-MySQL-%E4%B8%AD%E4%B8%8D%E6%8E%A8%E8%8D%90%E4%BD%BF%E7%94%A8%E5%A4%9A%E8%A1%A8-JOIN%EF%BC%9F"><span class="toc-text">为什么在 MySQL 中不推荐使用多表 JOIN？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#MySQL-%E4%B8%AD-DELETE%E3%80%81DROP-%E5%92%8C-TRUNCATE-%E7%9A%84%E5%8C%BA%E5%88%AB%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">MySQL 中 DELETE、DROP 和 TRUNCATE 的区别是什么？</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#DELETE"><span class="toc-text">DELETE</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DROP"><span class="toc-text">DROP</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TRUNCATE"><span class="toc-text">TRUNCATE</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#MySQL-%E4%B8%AD-DATETIME-%E5%92%8C-TIMESTAMP-%E7%B1%BB%E5%9E%8B%E7%9A%84%E5%8C%BA%E5%88%AB%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">MySQL 中 DATETIME 和 TIMESTAMP 类型的区别是什么？</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AD%98%E5%82%A8%E6%A0%BC%E5%BC%8F"><span class="toc-text">存储格式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%97%B6%E9%97%B4%E8%8C%83%E5%9B%B4"><span class="toc-text">时间范围</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%97%B6%E5%8C%BA%E5%A4%84%E7%90%86"><span class="toc-text">时区处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%BB%98%E8%AE%A4%E5%80%BC%E5%92%8C%E8%87%AA%E5%8A%A8%E6%9B%B4%E6%96%B0"><span class="toc-text">默认值和自动更新</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E4%B8%89%E5%A4%A7%E8%8C%83%E5%BC%8F%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">数据库的三大范式是什么？</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E8%8C%83%E5%BC%8F%EF%BC%881NF%EF%BC%89%EF%BC%9A%E8%A7%84%E8%8C%83%E5%8C%96"><span class="toc-text">第一范式（1NF）：规范化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E8%8C%83%E5%BC%8F%EF%BC%882NF%EF%BC%89%EF%BC%9A%E6%B6%88%E9%99%A4%E9%83%A8%E5%88%86%E4%BE%9D%E8%B5%96"><span class="toc-text">第二范式（2NF）：消除部分依赖</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E8%8C%83%E5%BC%8F%EF%BC%883NF%EF%BC%89%EF%BC%9A%E6%B6%88%E9%99%A4%E4%BC%A0%E9%80%92%E4%BE%9D%E8%B5%96"><span class="toc-text">第三范式（3NF）：消除传递依赖</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-text">小结</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#MySQL-%E4%B8%AD-AUTO-INCREMENT-%E5%88%97%E8%BE%BE%E5%88%B0%E6%9C%80%E5%A4%A7%E5%80%BC%E6%97%B6%E4%BC%9A%E5%8F%91%E7%94%9F%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">MySQL 中 AUTO_INCREMENT 列达到最大值时会发生什么？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9C%A8-MySQL-%E4%B8%AD%E5%AD%98%E5%82%A8%E9%87%91%E9%A2%9D%E6%95%B0%E6%8D%AE%EF%BC%8C%E5%BA%94%E8%AF%A5%E4%BD%BF%E7%94%A8%E4%BB%80%E4%B9%88%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%EF%BC%9F"><span class="toc-text">在 MySQL 中存储金额数据，应该使用什么数据类型？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E8%A7%86%E5%9B%BE%EF%BC%9F"><span class="toc-text">什么是数据库的视图？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#MySQL-%E4%B8%AD-EXISTS-%E5%92%8C-IN-%E7%9A%84%E5%8C%BA%E5%88%AB%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">MySQL 中 EXISTS 和 IN 的区别是什么？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="toc-text">参考链接</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="solitude st-map-line"></i><span>最近发布</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/p/5871d67/" title="woff 字体反扒方案"><img alt="woff 字体反扒方案" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/221228-15574975489aa1.jpg"></a><div class="content"><a class="title" href="/p/5871d67/" title="woff 字体反扒方案">woff 字体反扒方案</a><a class="article-recent_post_categories" href="/p/5871d67/">研究</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/204d99f1/" title="【MyBatis】生命周期"><img alt="【MyBatis】生命周期" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/235335-1549900415dcc9.jpg"></a><div class="content"><a class="title" href="/p/204d99f1/" title="【MyBatis】生命周期">【MyBatis】生命周期</a><a class="article-recent_post_categories" href="/p/204d99f1/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/b585efd0/" title="敏感词过滤方案总结"><img alt="敏感词过滤方案总结" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture5.jpg"></a><div class="content"><a class="title" href="/p/b585efd0/" title="敏感词过滤方案总结">敏感词过滤方案总结</a><a class="article-recent_post_categories" href="/p/b585efd0/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/122902e7/" title="【并发】高并发下库存扣减如何避免超卖和少卖？"><img alt="【并发】高并发下库存扣减如何避免超卖和少卖？" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/cover8.JPG"></a><div class="content"><a class="title" href="/p/122902e7/" title="【并发】高并发下库存扣减如何避免超卖和少卖？">【并发】高并发下库存扣减如何避免超卖和少卖？</a><a class="article-recent_post_categories" href="/p/122902e7/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/683f7c8e/" title="网易云音乐歌名&amp;歌词获取方案收集"><img alt="网易云音乐歌名&amp;歌词获取方案收集" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture1.jpg"></a><div class="content"><a class="title" href="/p/683f7c8e/" title="网易云音乐歌名&amp;歌词获取方案收集">网易云音乐歌名&amp;歌词获取方案收集</a><a class="article-recent_post_categories" href="/p/683f7c8e/">教程</a></div></div></div></div></div></div></main><footer id="footer"><div id="st-footer-bar"><div class="footer-logo"><span class="solitude">Rean's Blog</span></div><div class="footer-bar-description">来自Rean's Blog - Enjoy technology and music的文章</div><a class="footer-bar-link" href="/">了解更多</a></div><div id="footer_deal"><a class="deal_link" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze" title="Github"><i class="solitude  st-github-line"></i></a><a class="deal_link" target="_blank" rel="noopener" href="https://space.bilibili.com/6531436" title="Bilibili"><i class="solitude  st-bilibili-line"></i></a></div><div id="st-footer"></div><div id="footer-bar"><div class="footer-bar-links"><div class="footer-bar-left"><div class="copyright">© 2024 By&nbsp;<a class="footer-bar-link" href="/">Rean</a></div></div><div class="footer-bar-right"><a class="footer-bar-link" target="_blank" rel="noopener" href="https://github.com/valor-x/hexo-theme-solitude" alt="主题">主题</a><a class="footer-bar-link cc" href="/null" aria-label="copyright"><i class="solitude st-copyright-line"></i><i class="solitude st-creative-commons-by-line"></i><i class="solitude st-creative-commons-nc-line"></i><i class="solitude st-creative-commons-nd-line"></i></a></div></div></div></footer></div><!-- right_menu--><div id="rightMenu"><div class="rightMenu-group rightMenu-small"><div class="rightMenu-item" id="menu-backward"><i class="solitude st-arrow-left-line"></i></div><div class="rightMenu-item" id="menu-forward"><i class="solitude st-arrow-right-line"></i></div><div class="rightMenu-item" id="menu-refresh"><i class="solitude st-restart-line"></i></div><div class="rightMenu-item" id="menu-top"><i class="solitude st-arrow-up-line"></i></div></div><div class="rightMenu-group rightMenu-line rightMenuPlugin"><div class="rightMenu-item" id="menu-copytext"><i class="solitude st-copy-fill"></i><span>复制选中文本</span></div><div class="rightMenu-item" id="menu-pastetext"><i class="solitude st-clipboard-fill"></i><span>粘贴文本</span></div><div class="rightMenu-item" id="menu-newwindow"><i class="solitude st-window-fill"></i><span>新窗口打开</span></div><div class="rightMenu-item" id="menu-copylink"><i class="solitude st-link-line"></i><span>复制链接地址</span></div><div class="rightMenu-item" id="menu-copyimg"><i class="solitude st-copy-fill"></i><span>复制此图片</span></div><div class="rightMenu-item" id="menu-downloadimg"><i class="solitude st-download-cloud-fill"></i><span>下载此图片</span></div><div class="rightMenu-item" id="menu-search"><i class="solitude st-search-line"></i><span>站内搜索</span></div><div class="rightMenu-item" id="menu-music-toggle"><i class="solitude st-play-fill"></i><span>播放音乐</span></div><div class="rightMenu-item" id="menu-music-back"><i class="solitude st-skip-back-fill"></i><span>切换到上一首</span></div><div class="rightMenu-item" id="menu-music-forward"><i class="solitude st-skip-forward-fill"></i><span>切换到下一首</span></div><div class="rightMenu-item" id="menu-music-copyMusicName"><i class="solitude st-copy-fill"></i><span>复制歌名</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><div class="rightMenu-item" id="menu-randomPost" onclick="toRandomPost()||rm.hideRightMenu()"><i class="solitude st-signal-tower-fill"></i><span>随机短文</span></div><div class="rightMenu-item" onclick="pjax.loadUrl('/categories/')||rm.hideRightMenu()"><i class="solitude st-checkbox-multiple-blank-fill"></i><span>全部分类</span></div><div class="rightMenu-item" onclick="pjax.loadUrl('/tags/')||rm.hideRightMenu()"><i class="solitude st-price-tag-fill"></i><span>全部标签</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><div class="rightMenu-item" id="menu-darkmode" onclick="sco.switchDarkMode()"><i class="solitude st-moon-clear-fill"></i><span class="menu-darkmode-text">深色模式</span></div><div class="rightMenu-item" id="menu-translate"><i class="solitude st-panben-line"></i><span>轉為繁體</span></div></div></div><div id="rightmenu-mask"></div><!-- inject body--><div><script src="/js/utils.js?v=1.8.10"></script><script src="/js/main.js?v=1.8.10"></script><script src="/js/third_party/waterfall.min.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/pjax/0.2.8/pjax.min.js"></script><script src="/js/third_party/universe.min.js?v=1.8.10"></script><script>dark()
+</script><script src="/js/tw_cn.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/vanilla-lazyload/19.1.3/lazyload.iife.min.js"></script><script src="https://cdn.staticfile.net/node-snackbar/0.1.16/snackbar.min.js"></script><script src="https://cdn.staticfile.net/fancyapps-ui/5.0.36/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.staticfile.net/Swiper/11.0.5/swiper-bundle.min.js"></script><script>var meting_api = 'https://meting.qjqq.cn/?server=:server&type=:type&id=:id&auth=:auth&r=:r';</script><script src="https://cdn.staticfile.net/aplayer/1.10.1/APlayer.min.js"></script><script src="https://cdn.staticfile.net/meting/2.0.1/Meting.min.js"></script><script>const coverColorConfig = {
+    api: 'https://api.qjqq.cn/api/Imgcolor?img=',
+    time: 43200000
+}</script><script src="/js/covercolor/api.js?v=1.8.10"></script><script src="/js/music.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/pace/1.2.4/pace.min.js"></script><script src="/js/right_menu.js?v=1.8.10"></script><div class="js-pjax"><script defer pjax src="https://cdn.staticfile.net/pearssauce-busuanzi/1.0.0/bsz.pure.min.js"></script></div></div><!-- newest comment--><!-- pjax--><script>const pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: ['title','#body-wrap','#site-config','meta[name="description"]','.js-pjax','meta[property^="og:"]','#config-diff'],
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+})
+
+document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+})
+
+document.addEventListener('pjax:complete', () => {
+    window.refreshFn()
+
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+        const newScript = document.createElement('script')
+        const content = item.text || item.textContent || item.innerHTML || ""
+        Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+        newScript.appendChild(document.createTextNode(content))
+        item.parentNode.replaceChild(newScript, item)
+    })
+
+    GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+})
+
+document.addEventListener('pjax:error', (e) => {
+    if (e.request.status === 404) {
+        pjax.loadUrl('/404.html')
+    }
+})</script><!-- theme--><script>initTheme = () => {
+    let isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const cachedMode = utils.saveToLocal.get('theme');
+    if (cachedMode === undefined) {
+        const nowMode =
+            isDarkMode ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', nowMode);
+    } else {
+        document.documentElement.setAttribute('data-theme', cachedMode);
+    }
+    is_rm && rm.mode(cachedMode === 'dark' && isDarkMode)
+}
+initTheme()</script><!-- google adsense--><!-- search--><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><button class="search-close-button"><i class="solitude st-close-fill"></i></button></nav><div class="search-wrap"><div class="search-box"><input class="search-box-input" id="search-input" type="text" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="输入关键词快速查找"></div><div id="search-results"><div id="search-hits"></div></div><div id="search-pagination"></div><div id="search-tips"></div></div></div><div id="search-mask"></div></div><script src="/js/search/local.js?v=1.8.10"></script><!-- music--><div class="needEndHide" id="nav-music" onclick="sco.musicToggle()"><div id="nav-music-hoverTips">音乐已暂停</div><meting-js id="421801417" server="netease" type="playlist" mutex="true" preload="none" data-lrctype="0" order="random" theme="var(--efu-main)"></meting-js></div></body></html><script>const posts=["p/5871d67/","p/204d99f1/","p/b585efd0/","p/122902e7/","p/683f7c8e/","p/36b252a1/","p/bbd98f0d/","p/1b320550/","p/30cd73ca/","p/332adb42/","p/4f877c1e/","p/677c7789/","p/f7f0a5f3/","p/9b5a538c/","p/37360bc0/","p/bb996d5/","p/364ea8cc/","p/a027699d/","p/21cdaec5/","p/37c37880/","p/a02febe4/","p/d1ec0e4e/","p/25d2b878/","p/8324e4bc/","p/6021f67a/","p/305331f0/","p/66be4b4/","p/de2d10bc/","p/e6628f8e/","p/4131eeff/","p/27705e17/","p/74e1a37c/","p/b5223f80/","p/9b8bc45a/","p/c9cb7159/","p/82c942ab/","p/4c19fcc6/","p/27446c6a/","p/9f38852a/","p/2516f5f2/","p/b27c77b3/","p/7a3264f/","p/7beadfaa/","p/e1d9906f/","p/a440b512/","p/a46aa116/","p/fe8dd3bd/","p/51c99199/","p/91b418a/","p/421add40/","p/9d7a18c7/","p/26345198/","p/fa30e874/","p/dea9a817/","p/59203ba6/","p/e5616c72/","p/971e9859/","p/d7f6ccff/","p/1b2ec1c2/","p/a0d1cef9/","p/a58b6af0/","p/9381aa6d/","p/38b8becb/","p/d0a26095/","p/2b3bdada/","p/ba70636/","p/374630f5/","p/a964a243/","p/a06e9899/","p/ef9a99de/","p/108f7c52/","p/a91c1846/","p/413576cf/","p/9ee60c65/","p/e74db628/","p/888c8bf3/","p/477dbe08/","p/38e8a510/","p/dfb41864/","p/b0e3506b/","p/e17fd725/","p/e1fe458c/","p/636cfdea/","p/7b854cb7/","p/b3a61240/","p/64f43fb4/","p/800f9a11/","p/4a48b34c/","p/b3641215/","p/53bc1fc9/","p/fc02f9ee/","p/25b929f6/","p/dd30b42/","p/3aa261db/","p/fc078742/","p/22c9d1d0/","p/33fc02d2/","p/70335ae0/","p/f32ef110/","p/f756486c/","p/8dd4b91f/","p/a290d941/","p/61a8a4ef/","p/c2d0bb20/","p/9770d71c/","p/41bd2aed/","p/bfebe40b/","p/6b4006e6/","p/b5696360/","p/53ab7115/","p/e6fa9b9/","p/866abf45/","p/b718b92a/","p/d26f4c21/","p/bc5d6bbe/","p/5a18917b/","p/5f2b1e2f/","p/2532a2ee/","p/4337b2c0/","p/e042d029/","p/9b4a91e5/","p/9d8ce868/","p/a69f6a48/","p/f9b9edb2/","p/cbe55d0/","p/156c59d0/","p/d4d6f818/","p/2574cf15/","p/a0efc292/","p/ec2ecf28/","p/85f11265/","p/db95e6f5/","p/a8296e6d/","p/4cc89a71/","p/d0fe2d0f/","p/ffab2f6b/","p/95d9f91e/","p/7f869365/","p/5b246b1b/","p/a9c92fa9/","p/7d49fec0/","p/a9a25fcd/","p/43bb383e/","p/b9aeb4/","p/52eaf228/","p/4be90d2f/","p/ed500d41/","p/dcfbc8e5/","p/240e5e52/","p/18cda1b3/","p/66a6c396/","p/5f33341/","p/f9bef31e/","p/acac46b/","p/a4189438/","p/ae6b0147/","p/4e982f2d/","p/403e0cac/","p/495b9f0f/","p/8e966ab9/","p/f6e1007e/","p/6f562d19/","p/10eac329/","p/cc53cf58/","p/4f2beac6/","p/73e2aa1/","p/c677e75e/","p/3f13b766/","p/cc30f00/","p/807cab5e/","p/5b5991e4/","p/e941ffc/"];function toRandomPost(){ pjax.loadUrl('/'+posts[Math.floor(Math.random()*posts.length)]); }</script>

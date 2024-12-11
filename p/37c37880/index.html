@@ -1,0 +1,420 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><title>【Spring】Bean/IoC/AOP/启动流程 | Rean's Blog</title><noscript>开启JavaScript才能访问本站哦~</noscript><link rel="icon" href="/img/favicon.png"><!-- index.css--><link rel="stylesheet" href="/css/index.css?v=1.8.10"><!-- inject head--><link rel="stylesheet" href="https://cdn2.codesign.qq.com/icons/7pOrz0WXB5ZWJPX/latest/iconfont.css"><!-- aplayer--><link rel="stylesheet" href="https://cdn.staticfile.net/aplayer/1.10.1/APlayer.min.css"><!-- swiper--><link rel="stylesheet" href="https://cdn.staticfile.net/Swiper/11.0.5/swiper-bundle.min.css"><!-- fancybox ui--><link rel="stylesheet" href="https://cdn.staticfile.net/fancyapps-ui/5.0.36/fancybox/fancybox.min.css"><!-- katex--><!-- Open Graph--><meta name="description" content="什么是 Spring Bean？在 Spring 中，构成应用程序主干并由 Spring IoC 容器管理的对象称为 bean。bean 是由Spring IoC 容器实例化、组装和管理的对象。 什么是 Spring IoC？IoC，即 Inversion of Control，控制反转。控制反转通"><!-- pwa--><meta name="apple-mobile-web-app-capable" content="Rean's Blog"><meta name="theme-color" content="var(--efu-main)"><meta name="apple-mobile-web-app-status-bar-style" content="var(--efu-main)"><link rel="bookmark" href="/img/favicon.png"><link rel="apple-touch-icon" href="/img/favicon.png" sizes="180x180"><script>console.log(
+    "%c Program: Hexo %c Theme: Solitude %c Version: v1.8.10",
+    "border-radius:5px 0 0 5px;padding: 5px 10px;color:white;background:#ff3842;",
+    "padding: 5px 10px;color:white;background:#3e9f50;",
+    "padding: 5px 10px;color:white;background:#0084ff;",
+)
+</script><script>(()=>{
+        const saveToLocal = {
+            set: function setWithExpiry(key, value, ttl) {
+                if (ttl === 0)
+                    return
+                const now = new Date()
+                const expiryDay = ttl * 86400000
+                const item = {
+                    value: value,
+                    expiry: now.getTime() + expiryDay
+                }
+                localStorage.setItem(key, JSON.stringify(item))
+            },
+            get: function getWithExpiry(key) {
+                const itemStr = localStorage.getItem(key)
+    
+                if (!itemStr) {
+                    return undefined
+                }
+                const item = JSON.parse(itemStr)
+                const now = new Date()
+    
+                if (now.getTime() > item.expiry) {
+                    localStorage.removeItem(key)
+                    return undefined
+                }
+                return item.value
+            }
+        };
+        window.utils = {
+            saveToLocal: saveToLocal,
+            getCSS: (url, id = false) => new Promise((resolve, reject) => {
+              const link = document.createElement('link')
+              link.rel = 'stylesheet'
+              link.href = url
+              if (id) link.id = id
+              link.onerror = reject
+              link.onload = link.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                link.onload = link.onreadystatechange = null
+                resolve()
+              }
+              document.head.appendChild(link)
+            }),
+            getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+              const script = document.createElement('script')
+              script.src = url
+              script.async = true
+              script.onerror = reject
+              script.onload = script.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                script.onload = script.onreadystatechange = null
+                resolve()
+              }
+    
+              Object.keys(attr).forEach(key => {
+                script.setAttribute(key, attr[key])
+              })
+    
+              document.head.appendChild(script)
+            }),
+            addGlobalFn: (key, fn, name = false, parent = window) => {
+                const globalFn = parent.globalFn || {}
+                const keyObj = globalFn[key] || {}
+        
+                if (name && keyObj[name]) return
+        
+                name = name || Object.keys(keyObj).length
+                keyObj[name] = fn
+                globalFn[key] = keyObj
+                parent.globalFn = globalFn
+            },
+        }
+    })()</script><!-- global head--><script>const GLOBAL_CONFIG = {
+    root: '/',
+    algolia: undefined,
+    localsearch: {"preload":false,"path":"/search.xml"},
+    runtime: '2024-01-05 00:00:00',
+    lazyload: {
+        enable: true,
+        error: '/img/error_load.png'
+    },
+    copyright: {"limit":50,"author":"作者: Rean","link":"链接: ","source":"来源: Rean's Blog","info":"著作权归作者所有。 商业转载请联系作者获得授权，非商业转载请注明出处。"},
+    highlight: {
+        enable: true,
+        limit: 200,
+        expand: true,
+        copy: true,
+        syntax: 'highlight.js'
+    },
+    randomlink: false,
+    lang: {"theme":{"dark":"已切换至深色模式","light":"已切换至浅色模式"},"copy":{"success":"复制成功","error":"复制失败"},"backtop":"返回顶部","time":{"day":"天前","hour":"小时前","just":"刚刚","min":"分钟前","month":"个月前"},"f12":"开发者模式已打开，请遵循GPL协议。","totalk":"无需删除空行，直接输入评论即可","search":{"empty":"找不到你查询的内容：${query}","hit":"找到 ${hits} 条结果，用时 ${time} 毫秒","placeholder":"输入关键词快速查找","count":"共 <b>${count}</b> 条结果。"}},
+    aside: {
+        sayhello: {
+            morning: '一日之计在于晨',
+            noon: '吃饱了才有力气干活',
+            afternoon: '集中精力，攻克难关',
+            night: '不要太劳累了，早睡更健康',
+            goodnight: '睡个好觉，保证精力充沛',
+        },
+        sayhello2: ["🤖️ 数码科技爱好者","🔍 分享与热心帮助","🔨 设计开发一条龙","🎮 游戏爱好者"],
+    },
+    covercolor: {
+        enable: true
+    },
+    comment: false,
+    lightbox: 'fancybox',
+    post_ai: false,
+    right_menu: {"mode":{"dark":"深色模式","light":"浅色模式"},"img_error":"此图片无法复制与下载","music":{"start":"播放音乐","stop":"暂停音乐"},"translate":{"translateDelay":0,"defaultEncoding":2}},
+};</script><!-- page-config head--><script id="config-diff">var PAGE_CONFIG = {
+    is_post: true,
+    is_page: false,
+    is_home: false,
+    page: '',
+    toc: true,
+    comment: false,
+    ai_text: false,
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body id="body"><!-- universe--><canvas id="universe"></canvas><!-- loading--><!-- console--><div id="console"><div class="close-btn" onclick="sco.hideConsole()"><i class="solitude st-close-fill"></i></div><div class="button-group"><div class="console-btn-item"><span class="darkmode_switchbutton" onclick="sco.switchDarkMode()" title="昼夜切换"><i class="solitude st-moon-clear-fill"></i></span></div><div class="console-btn-item" id="consoleHideAside"><span class="asideSwitch" onclick="sco.switchHideAside()" title="边栏显示控制"><i class="solitude st-side-bar-fill"></i></span></div><div class="console-btn-item" id="consoleMusic" onclick="sco.musicToggle()"><span class="music-switch" title="音乐开关"><i class="solitude st-disc-fill"></i></span></div></div><div class="console-mask" onclick="sco.hideConsole()"></div></div><!-- sidebar--><div id="sidebar" style="zoom: 1;"><div id="menu-mask" style="display: none;"></div><div id="sidebar-menus"><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">172</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">11</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">155</div></a></div></div></div><span class="sidebar-menu-item-title">功能</span><div class="sidebar-menu-item"><span class="darkmode_switchbutton menu-child" onclick="sco.switchDarkMode()"><i class="solitude st-moon-clear-fill"></i><span>显示模式</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文章</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  st-folder-fill"></i><span>文章列表</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  st-checkbox-multiple-blank-fill"></i><span>分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  st-price-tag-fill"></i><span>标签</span></a></li><li><a class="site-page child" href="/study/"><i class="solitude  st-gift-fill"></i><span>学习</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>我的</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="solitude  st-disc-fill"></i><span>音乐馆</span></a></li><li><a class="site-page child" href="/essay/"><span>即刻短文</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>关于本站</span></a></li></ul></div></div><span class="sidebar-menu-item-title">标签</span><div class="card-widget card-tags card-archives card-webinfo card-allinfo"><div class="card-tag-cloud"><a href="/tags/%E8%85%BE%E8%AE%AF/">腾讯<sup>1</sup></a><a href="/tags/%E5%90%8E%E5%8F%B0%E5%BC%80%E5%8F%91/">后台开发<sup>1</sup></a><a href="/tags/Markdown/">Markdown<sup>1</sup></a><a href="/tags/Butterfly/">Butterfly<sup>2</sup></a><a href="/tags/PyCharm/">PyCharm<sup>1</sup></a><a href="/tags/IDEA/">IDEA<sup>1</sup></a><a href="/tags/Git/">Git<sup>2</sup></a><a href="/tags/Halo/">Halo<sup>1</sup></a><a href="/tags/GitHub/">GitHub<sup>1</sup></a><a href="/tags/JavaFx/">JavaFx<sup>2</sup></a><a href="/tags/SpringBoot/">SpringBoot<sup>7</sup></a><a href="/tags/Java/">Java<sup>18</sup></a><a href="/tags/MyBatis/">MyBatis<sup>4</sup></a><a href="/tags/Hexo/">Hexo<sup>3</sup></a><a href="/tags/SyncTV/">SyncTV<sup>1</sup></a><a href="/tags/AList/">AList<sup>1</sup></a><a href="/tags/%E5%AE%9D%E5%A1%94/">宝塔<sup>3</sup></a><a href="/tags/Vue/">Vue<sup>18</sup></a><a href="/tags/Vite/">Vite<sup>6</sup></a><a href="/tags/JavaScript/">JavaScript<sup>4</sup></a><a href="/tags/TypeScript/">TypeScript<sup>3</sup></a><a href="/tags/Electron/">Electron<sup>4</sup></a><a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习<sup>1</sup></a><a href="/tags/scikit-learn/">scikit-learn<sup>1</sup></a><a href="/tags/vocalremover/">vocalremover<sup>1</sup></a><a href="/tags/BPM/">BPM<sup>1</sup></a><a href="/tags/%E9%BB%91%E7%A5%9E%E8%AF%9D%EF%BC%9A%E6%82%9F%E7%A9%BA/">黑神话：悟空<sup>1</sup></a><a href="/tags/HTTP/">HTTP<sup>5</sup></a><a href="/tags/HTTPS/">HTTPS<sup>2</sup></a><a href="/tags/%E7%9F%AD%E9%93%BE/">短链<sup>1</sup></a><a href="/tags/%E8%A7%86%E9%A2%91/">视频<sup>1</sup></a><a href="/tags/HTTP-1-1/">HTTP/1.1<sup>1</sup></a><a href="/tags/LaTex/">LaTex<sup>1</sup></a><a href="/tags/%E5%8A%A0%E5%AF%86/">加密<sup>1</sup></a><a href="/tags/IP/">IP<sup>2</sup></a><a href="/tags/ICMP/">ICMP<sup>1</sup></a><a href="/tags/I-O/">I/O<sup>2</sup></a><a href="/tags/JVM/">JVM<sup>2</sup></a><a href="/tags/Springboot/">Springboot<sup>1</sup></a><a href="/tags/ThreadLocal/">ThreadLocal<sup>1</sup></a><a href="/tags/UUID/">UUID<sup>1</sup></a><a href="/tags/%E5%B9%B6%E5%8F%91/">并发<sup>4</sup></a><a href="/tags/%E7%BA%A2%E9%BB%91%E6%A0%91/">红黑树<sup>2</sup></a><a href="/tags/%E9%93%BE%E8%A1%A8/">链表<sup>1</sup></a><a href="/tags/%E5%8A%9B%E6%89%A3/">力扣<sup>1</sup></a><a href="/tags/LeetCode/">LeetCode<sup>1</sup></a><a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库<sup>8</sup></a><a href="/tags/NLP/">NLP<sup>6</sup></a><a href="/tags/spaCy/">spaCy<sup>4</sup></a><a href="/tags/Python/">Python<sup>1</sup></a><a href="/tags/Redis/">Redis<sup>10</sup></a><a href="/tags/RDB/">RDB<sup>1</sup></a><a href="/tags/AOF/">AOF<sup>1</sup></a><a href="/tags/%E7%BA%BF%E7%A8%8B/">线程<sup>2</sup></a><a href="/tags/I-O%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">I/O多路复用<sup>2</sup></a><a href="/tags/Spring/">Spring<sup>5</sup></a><a href="/tags/TCP/">TCP<sup>7</sup></a><a href="/tags/UDP/">UDP<sup>1</sup></a><a href="/tags/Socket/">Socket<sup>1</sup></a><a href="/tags/FFMpeg/">FFMpeg<sup>1</sup></a><a href="/tags/%E6%A0%B7%E5%BC%8F/">样式<sup>1</sup></a><a href="/tags/ECMAScript/">ECMAScript<sup>2</sup></a><a href="/tags/Element/">Element<sup>3</sup></a><a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">分布式锁<sup>1</sup></a><a href="/tags/%E5%91%A8%E6%B7%B1/">周深<sup>5</sup></a><a href="/tags/%E5%BE%B5%E7%BE%BD%E6%91%A9%E6%9F%AF/">徵羽摩柯<sup>1</sup></a><a href="/tags/%E9%9F%B3%E4%B9%90%E7%BC%98%E8%AE%A1%E5%88%92/">音乐缘计划<sup>1</sup></a><a href="/tags/%E5%A5%A5%E6%96%AF%E5%8D%A1/">奥斯卡<sup>3</sup></a><a href="/tags/%E5%BC%A0%E6%9D%B0/">张杰<sup>2</sup></a><a href="/tags/%E5%A3%B0%E7%94%9F%E4%B8%8D%E6%81%AF%C2%B7%E5%AE%9D%E5%B2%9B%E5%AD%A3/">声生不息·宝岛季<sup>3</sup></a><a href="/tags/%E5%BE%90%E4%BD%B3%E8%8E%B9/">徐佳莹<sup>1</sup></a><a href="/tags/SynthV/">SynthV<sup>15</sup></a><a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统<sup>4</sup></a><a href="/tags/%E6%B0%B8%E5%A4%9CMinus/">永夜Minus<sup>4</sup></a><a href="/tags/%E9%9F%A6%E7%A4%BC%E5%AE%89/">韦礼安<sup>1</sup></a><a href="/tags/%E8%94%A1%E4%BE%9D%E6%9E%97/">蔡依林<sup>1</sup></a><a href="/tags/%E6%97%A0%E5%8F%82/">无参<sup>45</sup></a><a href="/tags/%E5%8F%A4%E9%A3%8E/">古风<sup>11</sup></a><a href="/tags/%E4%B8%89%E6%97%A0Marblue/">三无Marblue<sup>1</sup></a><a href="/tags/%E7%B4%A2%E5%BC%95/">索引<sup>1</sup></a><a href="/tags/B%E6%A0%91/">B树<sup>1</sup></a><a href="/tags/B-%E6%A0%91/">B+树<sup>1</sup></a><a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构<sup>1</sup></a><a href="/tags/%E6%A0%91/">树<sup>1</sup></a><a href="/tags/%E4%BA%8C%E5%8F%89%E6%A0%91/">二叉树<sup>1</sup></a><a href="/tags/%E8%AE%B8%E9%92%A7/">许钧<sup>1</sup></a><a href="/tags/%E6%AD%8C%E6%89%8B2024/">歌手2024<sup>37</sup></a><a href="/tags/Chante-Moore/">Chanté Moore<sup>2</sup></a><a href="/tags/%E9%BB%84%E5%AE%A3/">黄宣<sup>1</sup></a><a href="/tags/Faouzia/">Faouzia<sup>4</sup></a><a href="/tags/Lenka/">Lenka<sup>1</sup></a><a href="/tags/%E5%BC%A0%E9%92%B0%E7%90%AA/">张钰琪<sup>1</sup></a><a href="/tags/%E9%82%A3%E8%8B%B1/">那英<sup>9</sup></a><a href="/tags/%E5%B0%A4%E9%95%BF%E9%9D%96/">尤长靖<sup>2</sup></a><a href="/tags/%E5%AD%99%E6%A5%A0/">孙楠<sup>5</sup></a><a href="/tags/%E8%B0%AD%E7%BB%B4%E7%BB%B4/">谭维维<sup>3</sup></a><a href="/tags/%E5%B4%A9%E5%9D%8F%EF%BC%9A%E6%98%9F%E7%A9%B9%E9%93%81%E9%81%93/">崩坏：星穹铁道<sup>4</sup></a><a href="/tags/%E8%B5%A4%E7%BE%BD/">赤羽<sup>1</sup></a><a href="/tags/%E6%B1%AA%E8%8B%8F%E6%B3%B7/">汪苏泷<sup>4</sup></a><a href="/tags/%E5%A3%B0%E7%94%9F%E4%B8%8D%E6%81%AF%C2%B7%E5%AE%B6%E5%B9%B4%E5%8D%8E/">声生不息·家年华<sup>2</sup></a><a href="/tags/%E9%99%88%E6%A5%9A%E7%94%9F/">陈楚生<sup>2</sup></a><a href="/tags/%E9%99%88%E4%BA%A6%E6%B4%BA/">陈亦洺<sup>1</sup></a><a href="/tags/%E5%B0%9A%E8%BE%B0/">尚辰<sup>1</sup></a><a href="/tags/%E5%BF%98%E5%B7%9D%E9%A3%8E%E5%8D%8E%E5%BD%95/">忘川风华录<sup>2</sup></a><a href="/tags/%E4%B9%90%E6%AD%A3%E9%BE%99%E7%89%99/">乐正龙牙<sup>1</sup></a><a href="/tags/%E6%98%9F%E5%B0%98Infinity/">星尘Infinity<sup>1</sup></a><a href="/tags/%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F/">明日方舟<sup>2</sup></a><a href="/tags/%E7%A5%96%E5%A8%85%E7%BA%B3%E6%83%9C/">祖娅纳惜<sup>1</sup></a><a href="/tags/%E7%94%B5%E5%AD%90/">电子<sup>1</sup></a><a href="/tags/%E6%98%9F%E5%B0%98/">星尘<sup>3</sup></a><a href="/tags/%E5%BC%A0%E4%BF%A1%E5%93%B2/">张信哲<sup>2</sup></a><a href="/tags/%E9%93%B6%E4%B8%B4/">银临<sup>1</sup></a><a href="/tags/%E6%9D%8E%E5%B8%B8%E8%B6%85/">李常超<sup>1</sup></a><a href="/tags/%E5%B1%B1%E8%89%B2%E6%9C%89%E6%97%A0%E4%B8%AD/">山色有无中<sup>1</sup></a><a href="/tags/%E5%91%A8%E6%9D%B0%E4%BC%A6/">周杰伦<sup>1</sup></a><a href="/tags/%E9%BB%84%E9%9C%84%E9%9B%B2/">黄霄雲<sup>1</sup></a><a href="/tags/%E5%AE%B9%E7%A5%96%E5%84%BF/">容祖儿<sup>1</sup></a><a href="/tags/%E6%88%91%E6%98%AF%E6%AD%8C%E6%89%8B%C2%B7%E7%AC%AC%E5%9B%9B%E5%AD%A3/">我是歌手·第四季<sup>1</sup></a><a href="/tags/%E6%9D%8E%E5%85%8B%E5%8B%A4/">李克勤<sup>1</sup></a><a href="/tags/%E7%B2%A4%E8%AF%AD/">粤语<sup>2</sup></a><a href="/tags/%E9%BB%84%E4%B8%BD%E7%8E%B2/">黄丽玲<sup>1</sup></a><a href="/tags/G-E-M-%E9%82%93%E7%B4%AB%E6%A3%8B/">G.E.M.邓紫棋<sup>6</sup></a><a href="/tags/T-I-M-E/">T.I.M.E.<sup>4</sup></a><a href="/tags/%E6%97%B6%E5%85%89%E9%9F%B3%E4%B9%90%E4%BC%9A%C2%B7%E8%80%81%E5%8F%8B%E8%AE%B0/">时光音乐会·老友记<sup>4</sup></a><a href="/tags/%E5%BC%A0%E5%AD%A6%E5%8F%8B/">张学友<sup>1</sup></a><a href="/tags/%E6%9D%A8%E4%B8%9E%E7%90%B3/">杨丞琳<sup>1</sup></a><a href="/tags/%E6%B1%AA%E5%B3%B0/">汪峰<sup>1</sup></a><a href="/tags/%E6%9C%AA%E5%AE%9A%E4%BA%8B%E4%BB%B6%E7%B0%BF/">未定事件簿<sup>1</sup></a><a href="/tags/%E5%BC%A0%E8%BF%9C/">张远<sup>1</sup></a><a href="/tags/%E5%AD%99%E7%87%95%E5%A7%BF/">孙燕姿<sup>1</sup></a><a href="/tags/%E6%B5%B7%E6%9D%A5%E9%98%BF%E6%9C%A8/">海来阿木<sup>1</sup></a><a href="/tags/%E6%9B%B9%E6%9D%A8/">曹杨<sup>2</sup></a><a href="/tags/%E4%B8%8B%E4%B8%80%E6%88%98%E6%AD%8C%E6%89%8B/">下一战歌手<sup>2</sup></a><a href="/tags/Fine%E4%B9%90%E5%9B%A2/">Fine乐团<sup>1</sup></a><a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络<sup>4</sup></a><a href="/tags/DNS/">DNS<sup>1</sup></a><a href="/tags/MAC/">MAC<sup>1</sup></a><a href="/tags/Adam-Lambert/">Adam Lambert<sup>1</sup></a><a href="/tags/%E4%BA%9A%E5%BD%93%C2%B7%E5%85%B0%E4%BC%AF%E7%89%B9/">亚当·兰伯特<sup>1</sup></a><a href="/tags/Hayden/">Hayden<sup>1</sup></a><a href="/tags/%E6%9A%AE%E5%A4%9C/">暮夜<sup>1</sup></a><a href="/tags/ACE-Studio/">ACE Studio<sup>2</sup></a><a href="/tags/%E5%B0%9A%E9%9B%AF%E5%A9%95/">尚雯婕<sup>1</sup></a><a href="/tags/%E4%B8%9C%E6%96%B9%E6%A0%80%E5%AD%90/">东方栀子<sup>2</sup></a><a href="/tags/%E9%BB%84%E7%BB%AE%E7%8F%8A/">黄绮珊<sup>1</sup></a><a href="/tags/%E5%8D%8E%E6%99%A8%E5%AE%87/">华晨宇<sup>1</sup></a><a href="/tags/JUN/">JUN<sup>1</sup></a><a href="/tags/%E6%9E%97%E5%BF%86%E8%8E%B2/">林忆莲<sup>1</sup></a><a href="/tags/UTAU/">UTAU<sup>1</sup></a><a href="/tags/Sheena/">Sheena<sup>1</sup></a><a href="/tags/%E5%89%A7%E5%A5%BD%E5%90%AC%E7%9A%84%E6%AD%8C/">剧好听的歌<sup>1</sup></a><a href="/tags/Syncthing/">Syncthing<sup>1</sup></a><a href="/tags/%E5%90%8C%E6%AD%A5/">同步<sup>1</sup></a><a href="/tags/%E6%94%AF%E4%BB%98%E5%AE%9D/">支付宝<sup>1</sup></a><a href="/tags/Apifox/">Apifox<sup>2</sup></a></div></div></div></div><!-- keyboard--><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav class="show" id="nav"><div id="nav-group"><div id="blog_name"><a id="site-name" href="/" title="返回博客主页"><span class="title">Rean's Blog</span></a></div><div id="page-name-mask"><div id="page-name"><a id="page-name-text" onclick="sco.toTop()">【Spring】Bean/IoC/AOP/启动流程</a></div></div><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文章</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  st-folder-fill"></i><span>文章列表</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  st-checkbox-multiple-blank-fill"></i><span>分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  st-price-tag-fill"></i><span>标签</span></a></li><li><a class="site-page child" href="/study/"><i class="solitude  st-gift-fill"></i><span>学习</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>我的</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="solitude  st-disc-fill"></i><span>音乐馆</span></a></li><li><a class="site-page child" href="/essay/"><span>即刻短文</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>关于本站</span></a></li></ul></div></div></div><div id="nav-left"></div><div id="nav-right"><div class="nav-button" id="randomPost_button"><a class="site-page" onclick="toRandomPost()" title="随机一篇文章" href="javascript:void(0);"><i class="solitude st-signal-tower-fill"></i></a></div><div class="nav-button" id="search-button"><a class="site-page social-icon search" href="javascript:void(0);" title="搜索"><i class="solitude st-search-line"></i></a></div><div class="nav-button" id="nav-console"><a class="console_switchbutton" onclick="sco.showConsole()" title="中控台" href="javascript:void(0);"><i class="solitude st-dashboard-fill"></i></a></div><div class="nav-button" id="nav-totop" onclick="sco.toTop()"><a class="totopbtn"><i class="solitude st-arrow-up-line"></i><span id="percent">0</span></a></div><div id="toggle-menu"><a class="site-page"><i class="solitude st-menu-line"></i></a></div></div></div></nav><div class="coverdiv" id="coverdiv"><img class="nolazyload" id="post-cover" src="/img/SynthV_banner_Image_BG1.jpg" alt="【Spring】Bean/IoC/AOP/启动流程"></div><div id="post-info"><div id="post-firstinfo"><div class="meta-firstline"><a class="post-meta-original" title="该文章为原创文章，注意版权协议">原创</a><span class="post-meta-categories"><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a></span><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Spring/"><span class="tags-name tags-punctuation">Spring</span></a></div></div></div></div><h1 class="post-title">【Spring】Bean/IoC/AOP/启动流程</h1><div id="post-meta"><div class="meta-secondline"><span class="post-meta-date" title="发布于 2024-09-05 17:16:42"><i class="post-meta-icon solitude st-calendar-todo-fill"></i><time datetime="2024-09-05T09:16:42.000Z">2024-09-05T09:16:42.000Z</time></span><span class="post-meta-date" title="最后更新于 2024-11-09 20:35:40"><i class="post-meta-icon solitude st-refresh-line"></i><time datetime="2024-11-09T12:35:40.862Z">2024-11-09T12:35:40.862Z</time></span><span class="post-meta-wordcount"><i class="post-meta-icon solitude st-word-fill" title="文章字数"></i><span class="word-count">5.5k</span><span class="post-meta-separator"></span><i class="post-meta-icon solitude st-clock-fill" title="阅读耗时"></i><span>19 min</span></span><a class="post-meta-pv" href="/p/37c37880/" title="文章热度"><i class="post-meta-icon solitude st-fire-fill"></i><span id="busuanzi_page_pv"><i class="solitude st-loading-line"></i></span></a></div></div></div><section class="main-hero-waves-area waves-area"><svg class="waves-svg" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto"><defs><path id="gentle-wave" d="M -160 44 c 30 0 58 -18 88 -18 s 58 18 88 18 s 58 -18 88 -18 s 58 18 88 18 v 44 h -352 Z"></path></defs><g class="parallax"><use href="#gentle-wave" x="48" y="0"></use><use href="#gentle-wave" x="48" y="3"></use><use href="#gentle-wave" x="48" y="5"></use><use href="#gentle-wave" x="48" y="7"></use></g></svg></section></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="什么是-Spring-Bean？"><a href="#什么是-Spring-Bean？" class="headerlink" title="什么是 Spring Bean？"></a>什么是 Spring Bean？</h2><p>在 Spring 中，构成应用程序主干并由 Spring IoC 容器管理的对象称为 bean。bean 是由Spring IoC 容器实例化、组装和管理的对象。</p>
+<h2 id="什么是-Spring-IoC？"><a href="#什么是-Spring-IoC？" class="headerlink" title="什么是 Spring IoC？"></a>什么是 Spring IoC？</h2><p>IoC，即 Inversion of Control，控制反转。<strong>控制反转通过依赖注入（DI）方式实现对象之间的松耦合关系</strong>。</p>
+<p>首先要明确 IOC 是一种思想，而<strong>不是一个具体的技术</strong>，其次 IOC 这个思想也不是 Spring 创造的。</p>
+<p>然后我们要理解到底<strong>控制</strong>的是什么，其实就是<strong>控制对象的创建</strong>，IOC 容器根据配置文件来创建对象，在对象的生命周期内，在<strong>不同时期</strong>根据不同配置进行对象的创建和改造。</p>
+<p>那什么被<strong>反转</strong>了？其实就是关于创建对象且注入依赖对象的这个动作，本来这个动作是由我们程序员在代码里面指定的，例如对象 A 依赖对象 B，在创建对象 A 代码里，我们需要写好如何创建对象 B，这样才能构造出一个完整的 A。</p>
+<p>而反转之后，这个动作就由 IOC 容器触发，IOC 容器在创建对象 A 的时候，发现依赖对象 B ，根据配置文件，它会创建 B，并将对象 B 注入 A 中。</p>
+<p>这里要注意，注入的不一定非得是一个对象，也可以注入配置文件里面的一个值给对象 A 等等。</p>
+<p>在 Spring 中，类的实例化、依赖的实例化、依赖的传入都交由 Spring Bean 容器控制，而不是用 new 方式实例化对象、通过非构造函数方法传入依赖等常规方式。实质的控制权已经交由程序管理，而不是程序员管理，所以叫控制反转。</p>
+<h2 id="Spring-中的-DI-是什么？"><a href="#Spring-中的-DI-是什么？" class="headerlink" title="Spring 中的 DI 是什么？"></a>Spring 中的 DI 是什么？</h2><p>DI，Dependency Injection，依赖注入。</p>
+<p>普遍的答案是 DI 是 IOC 的一种实现。</p>
+<p>其实它跟 IOC 的概念一致，只是从不同角度来描述罢了。</p>
+<p>大致理解为容器在运行的时候，可以找到被依赖的对象，然后将其注入，通过这样的方式，使得各对象之间的关系可由运行期决定，而不用在编码时候明确。</p>
+<h2 id="Spring-IOC-有什么好处？"><a href="#Spring-IOC-有什么好处？" class="headerlink" title="Spring IOC 有什么好处？"></a>Spring IOC 有什么好处？</h2><p>对象的创建都由 IOC 容器来控制之后，对象之间就不会有很明确的依赖关系，使得非常容易设计出松耦合的程序。</p>
+<p>例如，对象 A 需要依赖一个实现 B，但是对象都由 IOC 控制之后，我们不需要明确地在对象 A 的代码里写死依赖的实现 B，只需要写明依赖一个接口，这样我们的代码就能顺序的编写下去。</p>
+<p>然后，我们可以在配置文件里定义 A 依赖的具体的实现 B，根据配置文件，在创建 A 的时候，IOC 容器就知晓 A 依赖的 B，这时候注入这个依赖即可。</p>
+<p>如果之后你有新的实现需要替换，那 A 的代码不需要任何改动，你只需要将配置文件 A 依赖 B 改成 B1，这样重启之后，IOC 容器会为 A 注入 B1。</p>
+<p>并且也因为创建对象由 IOC 全权把控，那么我们就能很方便的让 IOC 基于扩展点来“加工”对象，例如我们要代理一个对象，IOC 在对象创建完毕，直接判断下这个对象是否需要代理，如果要代理，则直接包装返回代理对象。</p>
+<p>这等于我们只要告诉 IOC 我们要什么，IOC 就能基于我们提供的配置文件，创建符合我们需求的对象。</p>
+<h2 id="Spring-中的-FactoryBean-是什么？"><a href="#Spring-中的-FactoryBean-是什么？" class="headerlink" title="Spring 中的 FactoryBean 是什么？"></a>Spring 中的 FactoryBean 是什么？</h2><p>从命名角度来看，我们可以得知它就是一个 Bean，而不是一个工厂。</p>
+<p>那为什么名字如此奇怪，它其实是一个接口，并且有以下几个方法：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/CISrnraB_4b5433fd-c3d9-4606-af51-c988ab8f9285.png" alt="img"></p>
+<p>如果一个对象实现了这接口，那它就成为一种特殊的 Bean，注册到 IOC 容器之后，如果调用 getBean 获取得到的其实是 FactoryBean.getObject() 方法返回的结果。</p>
+<p>为什么要这样做？</p>
+<p>假设你依赖一个第三方的类 A，而我们又不能修改第三方的类，并且这个对象创建比较复杂，那么你就可以创建一个 bean 来封装它：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">AFactoryBean</span> <span class="keyword">implements</span> <span class="title class_">FactoryBean</span>&lt;A&gt; &#123;</span><br><span class="line">    <span class="keyword">public</span> A <span class="title function_">getObject</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">A</span> <span class="variable">a</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">A</span>();</span><br><span class="line">        a.setXXX</span><br><span class="line">        ....</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">return</span> A</span><br><span class="line">    &#125;</span><br><span class="line">    ....省略一些实现</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样，我们 getBean(“A”) 会得到 AFactoryBean.getObject 的结果，如果单纯只想要 AFactoryBean， 那么加个 “&amp;” 即可，即 getBean(“&amp;A”)</p>
+<h2 id="Spring-Bean-一共有几种作用域？"><a href="#Spring-Bean-一共有几种作用域？" class="headerlink" title="Spring Bean 一共有几种作用域？"></a>Spring Bean 一共有几种作用域？</h2><p>从官网，我们很容易可以得知，最新版本一共有六种作用域：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/qwlMoKUc_673e289c-a559-4966-9d3c-845ab8043e24.png"></p>
+<ul>
+<li>singleton：默认是单例，含义不用解释了吧，一个 IOC 容器内部仅此一个</li>
+<li>prototype：原型，多实例</li>
+<li>request：每个请求都会新建一个属于自己的 Bean 实例，这种作用域仅存在 Spring Web 应用中</li>
+<li>session：一个 http session 中有一个 bean 的实例，这种作用域仅存在 Spring Web 应用中</li>
+<li>application：整个 ServletContext 生命周期里，只有一个 bean，这种作用域仅存在 Spring Web 应用中</li>
+<li>websocket：一个 WebSocket 生命周期内一个 bean 实例，这种作用域仅存在 Spring Web 应用中</li>
+</ul>
+<h2 id="说下-Spring-Bean-的生命周期？"><a href="#说下-Spring-Bean-的生命周期？" class="headerlink" title="说下 Spring Bean 的生命周期？"></a>说下 Spring Bean 的生命周期？</h2><p>在说具体的生命周期前，我们需要先知晓之所以 Bean 容易被添加一些属性，或者能在运行时被改造就是因为在生成 Bean 的时候，Spring对外暴露出很多扩展点。</p>
+<p>基于这些点我们可以设置一些逻辑，Spring 会在 Bean 创建的某些阶段根据这些扩展点，基于此进行 Bean 的改造。</p>
+<p>有了上面的认识，我们再来看 Spring Bean 的生命周期，我用一幅图先总结一下：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/zNxXrxM1_60913d46-9305-41c6-adc6-7787e078b188.png"></p>
+<p>大致了解生命周期之后，我们再来看详细的操作，可以看到有好多扩展点：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/coeRfvs5_4ebac0e4-813d-4fc5-93c7-141e309d57e9.png"></p>
+<h2 id="PostConstruct-和-PreDestroy-注解的作用是什么？"><a href="#PostConstruct-和-PreDestroy-注解的作用是什么？" class="headerlink" title="@PostConstruct 和 @PreDestroy 注解的作用是什么？"></a>@PostConstruct 和 @PreDestroy 注解的作用是什么？</h2><p>Spring 通过它们来管理 Bean 的生命周期。</p>
+<ul>
+<li><p>**<code>@PostConstruct</code>**：用于标记方法，当依赖注入完成后，在 Bean 初始化完成后调用，这个方法会自动被调用。常用于进行初始化逻辑，例如设置默认值、检查依赖等。</p>
+<ul>
+<li><p><strong>使用场景</strong>：</p>
+<ul>
+<li><strong>依赖注入后做额外的初始化工作</strong>：例如，某个服务需要在依赖注入后连接外部系统。</li>
+<li><strong>进行状态检查</strong>：在 Bean 初始化后验证某些关键属性是否正确配置。</li>
+</ul>
+</li>
+<li><p><strong>执行时机</strong>：</p>
+<ul>
+<li><code>@PostConstruct</code> 方法在依赖注入完成后立即执行，但在 Bean 可以被其他对象使用之前调用（即在 Bean 完成初始化前调用，Bean 处于准备状态）。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>**<code>@PreDestroy</code>**：用于标记方法，在 Bean 即将被销毁时调用。常用于进行资源的释放、清理工作。</p>
+<ul>
+<li><p><strong>使用场景</strong>：</p>
+<ul>
+<li><p><strong>资源清理</strong>：例如关闭数据库连接、文件句柄、线程池等。</p>
+</li>
+<li><p><strong>会话管理</strong>：例如在 Web 应用中，清理用户会话或缓存。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>执行时机</strong>：</p>
+<ul>
+<li><code>@PreDestroy</code> 方法在 Bean 即将被销毁时调用，一般是在 Spring 容器关闭时执行。对于单例（<code>singleton</code>）作用域的 Bean，会在容器关闭时调用；对于原型（<code>prototype</code>）作用域的 Bean，不会调用销毁方法，因为容器不管理其生命周期。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="Spring-的启动过程？"><a href="#Spring-的启动过程？" class="headerlink" title="Spring 的启动过程？"></a>Spring 的启动过程？</h2><p>Bean的一生从总体上来说可以分为两个阶段：</p>
+<ul>
+<li>容器启动阶段</li>
+<li>Bean实例化阶段</li>
+</ul>
+<ol>
+<li><p>加载配置文件，初始化容器：Spring 启动时首先会读取配置文件（如 XML 配置文件、Java Config 类等），包括配置数据库连接、事务管理、AOP 配置等。</p>
+</li>
+<li><p>实例化容器：Spring 根据配置文件中的信息创建容器 ApplicationContext，在容器启动阶段实例化 BeanFactory，会扫描所有的 Bean 定义。对于基于注解的配置，Spring 会扫描指定包下的所有带有 <code>@Component</code>、<code>@Service</code>、<code>@Controller</code> 等注解的类，并加载它们的定义到容器中。对于 XML 配置，Spring 会解析 <code>&lt;bean&gt;</code> 元素并加载定义，得到 BeanDefinitions。</p>
+</li>
+<li><p>解析 BeanDefinitions：Spring 容器会解析配置文件中的 BeanDefinitions，即声明的 Bean 元数据，包括 Bean 的作用域、依赖关系等信息。</p>
+</li>
+<li><p>实例化 Bean：Spring 根据 BeanDefinitions 实例化 Bean 对象，将其放入容器管理，但不会立即注入依赖。这个过程类似于类的构造函数调用。</p>
+</li>
+<li><p>注入依赖：Spring 进行依赖注入，将 Bean 之间的依赖关系进行注入，包括构造函数注入、属性注入等。</p>
+<ul>
+<li><p><strong>构造函数注入</strong>：通过构造函数来注入依赖。</p>
+</li>
+<li><p><strong>Setter 注入</strong>：通过 Setter 方法注入依赖。</p>
+</li>
+<li><p><strong>字段注入</strong>：通过 <code>@Autowired</code> 注解直接注入字段。</p>
+</li>
+</ul>
+</li>
+<li><p>处理 Bean 生命周期初始化方法：</p>
+<ul>
+<li><p>Spring 调用 Bean 初始化方法（如果有定义的话），对 Bean 进行初始化。</p>
+</li>
+<li><p>如果 Bean 实现了 <code>InitializingBean</code> 接口，Spring 会调用其 <code>afterPropertiesSet</code> 方法。</p>
+</li>
+</ul>
+</li>
+<li><p>处理 BeanPostProcessors：容器定义了很多 BeanPostProcessor，处理其中的自定义逻辑，例如 postProcessBeforeInitialization 会在 Bean 初始化前调用， postProcessAfterInitialization 则在之后调用。</p>
+<p>Spring AOP 代理也在这个阶段生成。</p>
+</li>
+<li><p>发布事件：Spring 可能会在启动过程中发布一些事件，比如容器启动事件。</p>
+</li>
+<li><p>完成启动：当所有 Bean 初始化完毕、依赖注入完成、AOP 配置生效等都准备就绪时，Spring 容器启动完成。</p>
+</li>
+</ol>
+<p>需要指出，容器启动阶段与Bean实例化阶段存在多少时间差。</p>
+<p>如果我们选择懒加载的方式，那么直到我们伸手向Spring要依赖对象实例之前，其都是以BeanDefinationRegistry中的一个个的BeanDefination的形式存在，也就是Spring只有在我们需要依赖对象的时候才开启相应对象的实例化阶段。</p>
+<p>而如果我们不是选择懒加载的方式，容器启动阶段完成之后，将立即启动Bean实例化阶段，通过隐式的调用所有依赖对象的getBean方法来实例化所有配置的Bean并保存起来。</p>
+<h2 id="Spring-Bean-注册到容器有哪些方式？"><a href="#Spring-Bean-注册到容器有哪些方式？" class="headerlink" title="Spring Bean 注册到容器有哪些方式？"></a>Spring Bean 注册到容器有哪些方式？</h2><p>Spring Bean 注册到容器的方式主要包括以下几种：</p>
+<p>1）基于 XML 的配置</p>
+<p>使用 XML 文件配置 Bean，并定义 Bean 的依赖关系。</p>
+<p>2）基于 <code>@Component</code> 注解及其衍生注解</p>
+<p>使用注解如 <code>@Component</code>、<code>@Service</code> 、<code>@Controller</code>、<code>@Repository</code> 等进行配置。</p>
+<table>
+<thead>
+<tr>
+<th>声明</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>@Component</code></td>
+<td>当前类是组件，没有明确的意思，可以用于任何类，标记该类为 Spring 管理的 Bean。</td>
+</tr>
+<tr>
+<td><code>@Service</code></td>
+<td>当前类在业务逻辑层使用，用于标记服务类，以便于识别和管理业务逻辑组件。</td>
+</tr>
+<tr>
+<td><code>@Repository</code></td>
+<td>当前类在数据访问层</td>
+</tr>
+<tr>
+<td><code>@Controller</code></td>
+<td>当前类在展示层（MVC）使用，用于处理 HTTP 请求和响应。</td>
+</tr>
+</tbody></table>
+<p> 以上四种声明方式效果完全一致，使用不同的关键词是为了给阅读的人能够快速了解该类属于哪一层。</p>
+<p>3）基于 <code>@Configuration</code> 和 <code>@Bean</code> 注解</p>
+<p>使用 <code>@Configuration</code> 注解声明配置类，并使用 <code>@Bean</code> 注解定义 Bean。</p>
+<p>4）基于 <code>@Import</code> 注解</p>
+<p><code>@Import</code> 可以将普通类导入到 Spring 容器中，这些类会自动被注册为 Bean。</p>
+<h2 id="Bean-和-Component有什么区别？"><a href="#Bean-和-Component有什么区别？" class="headerlink" title="@Bean 和 @Component有什么区别？"></a>@Bean 和 @Component有什么区别？</h2><p>@Bean 和 @Component 都是用于定义 Spring 容器中的 Bean 的注解，但它们的使用场景和方式有所不同：</p>
+<ul>
+<li>@Bean 注解通常用于 Java 配置类的方法上，以声明一个 Bean 并将其添加到 Spring 容器中。</li>
+<li>@Component 注解用于类级别，将该类标记为 Spring 容器中的一个组件，自动检测并注册为 Bean（需要扫对应的包）。</li>
+</ul>
+<h2 id="Spring-的单例-Bean-是否有并发安全问题？"><a href="#Spring-的单例-Bean-是否有并发安全问题？" class="headerlink" title="Spring 的单例 Bean 是否有并发安全问题？"></a>Spring 的单例 Bean 是否有并发安全问题？</h2><p>Spring 的单例 Bean 默认是非线程安全的，但是只要我们避免在多个 Bean 之间共享一些数据，就不用害怕并发问题。</p>
+<h3 id="原因分析"><a href="#原因分析" class="headerlink" title="原因分析"></a>原因分析</h3><p>1）单例 Bean 的生命周期：Spring 容器在初始化时会创建并管理单例 Bean，这些 Bean 在整个应用程序生命周期内只会被创建一次，并且被多个线程共享使用。</p>
+<p>2）多线程访问：如果单例 Bean 中包含共享的可变状态（如实例变量），多个线程同时访问并修改这些共享状态时，可能会导致并发安全问题，如数据不一致、脏读、死锁等。</p>
+<h2 id="Spring-Bean如何保证并发安全？"><a href="#Spring-Bean如何保证并发安全？" class="headerlink" title="Spring Bean如何保证并发安全？"></a>Spring Bean如何保证并发安全？</h2><p>大致可以分三种方式：</p>
+<p>1）无状态 Bean：如果单例 Bean 不包含可变状态，或者仅包含只读状态，通常不会有并发安全问题。例如，所有方法都是无状态的纯函数，或者使用的是本地变量。</p>
+<p>2）线程安全设计：确保单例 Bean 中的方法是线程安全的。可以通过同步方法、使用线程安全的数据结构（如 ConcurrentHashMap）、或使用 java.util.concurrent 包中的其他并发工具类。</p>
+<p>3）@Scope(“prototype”)：对于需要状态的 Bean，可以将其作用域设置为原型（prototype），这样每次请求该 Bean 时，Spring 容器都会返回一个新的实例。</p>
+<h2 id="什么是循环依赖（常问）？"><a href="#什么是循环依赖（常问）？" class="headerlink" title="什么是循环依赖（常问）？"></a>什么是循环依赖（常问）？</h2><p>例如 A 要依赖 B，发现 B 还没创建，于是开始创建 B ，创建的过程发现 B 要依赖 A， 而 A 还没创建好呀，因为它要等 B 创建好，就这样<strong>它们俩就搁这卡 bug 了</strong>。</p>
+<h2 id="Spring-如何解决循环依赖？"><a href="#Spring-如何解决循环依赖？" class="headerlink" title="Spring 如何解决循环依赖？"></a>Spring 如何解决循环依赖？</h2><p>关键就是<strong>提前暴露未完全创建完毕的 Bean</strong>。</p>
+<p>在 Spring 中，只有同时满足以下两点才能解决循环依赖的问题：</p>
+<ol>
+<li>依赖的 Bean 必须都是单例</li>
+<li>依赖注入的方式，必须<strong>不全是</strong>构造器注入，且 beanName 字母序在前的不能是构造器注入</li>
+</ol>
+<h3 id="为什么必须都是单例"><a href="#为什么必须都是单例" class="headerlink" title="为什么必须都是单例"></a>为什么必须都是单例</h3><p>因为原型模式都需要创建新的对象，不能用以前的对象。如果是单例的话，创建 A 需要创建 B，而创建的 B 需要的是之前的 A， 不然就不叫单例了，对吧？</p>
+<p>也是基于这点， Spring 就能操作操作了。</p>
+<p>具体做法就是：先创建 A，此时的 A 是不完整的（没有注入 B），用个 map 保存这个不完整的 A，再创建 B ，B 需要 A，所以从那个 map 得到“不完整”的 A，此时的 B 就完整了，然后 A 就可以注入 B，然后 A 就完整了，B 也完整了，且它们是相互依赖的。</p>
+<h3 id="为什么不能全是构造器注入"><a href="#为什么不能全是构造器注入" class="headerlink" title="为什么不能全是构造器注入"></a>为什么不能全是构造器注入</h3><p>在 Spring 中创建 Bean 分三步:</p>
+<ol>
+<li>实例化，createBeanInstance，就是 new 了个对象</li>
+<li>属性注入，populateBean， 就是 set 一些属性值</li>
+<li>初始化，initializeBean，执行一些 aware 接口中的方法，initMethod，AOP代理等</li>
+</ol>
+<p>明确了上面这三点，再结合我上面说的“不完整的”，我们来理一下。</p>
+<p>如果全是构造器注入，比如<code>A(B b)</code>，那表明在 new 的时候，就需要得到 B，此时需要 new B ，但是 B 也是要在构造的时候注入 A ，即<code>B(A a)</code>，这时候 B 需要在一个 map 中找到不完整的 A ，发现找不到。</p>
+<p>为什么找不到？因为 A 还没 new 完呢，所以找不到完整的 A，<strong>因此如果全是构造器注入的话，那么 Spring 无法处理循环依赖</strong>。</p>
+<p>如果循环依赖不完全是构造器注入，则可能成功，可能失败，具体跟BeanName的字母序有关系。</p>
+<h3 id="Spring-解决循环依赖全流程"><a href="#Spring-解决循环依赖全流程" class="headerlink" title="Spring 解决循环依赖全流程"></a>Spring 解决循环依赖全流程</h3><p>明确了 Spring 创建 Bean 的三步骤之后，我们再来看看它为单例搞的三个 map：</p>
+<ol>
+<li>一级缓存，singletonObjects，存储所有已创建完毕的单例 Bean （完整的 Bean）</li>
+<li>二级缓存，earlySingletonObjects，存储所有仅完成实例化，但还未进行属性注入和初始化的 Bean</li>
+<li>三级缓存，singletonFactories，存储能建立这个 Bean 的一个工厂，通过工厂能获取这个 Bean，延迟化 Bean 的生成，工厂生成的 Bean 会塞入二级缓存</li>
+</ol>
+<p>这三个 map 是如何配合的呢？</p>
+<ol>
+<li>首先，获取单例 Bean 的时候会通过 BeanName 先去 singletonObjects（一级缓存） 查找完整的 Bean，如果找到则直接返回，否则进行步骤 2。</li>
+<li>看对应的 Bean 是否在创建中，如果不在直接返回找不到，如果是，则会去 earlySingletonObjects （二级缓存）查找 Bean，如果找到则返回，否则进行步骤 3</li>
+<li>去 singletonFactories （三级缓存）通过 BeanName 查找到对应的工厂，如果存着工厂则通过工厂创建 Bean ，并且放置到 earlySingletonObjects 中。</li>
+<li>如果三个缓存都没找到，则返回 null。</li>
+</ol>
+<p>从上面的步骤我们可以得知，如果查询发现 Bean 还未创建，到第二步就直接返回 null，不会继续查二级和三级缓存。</p>
+<p>返回 null 之后，说明这个 Bean 还未创建，这个时候会标记这个 Bean 正在创建中，然后再调用 createBean 来创建 Bean，而实际创建是调用方法 doCreateBean。</p>
+<p>doCreateBean 这个方法就会执行上面我们说的三步骤：</p>
+<ol>
+<li>实例化</li>
+<li>属性注入</li>
+<li>初始化</li>
+</ol>
+<p>在实例化 Bean 之后，<strong>会往 singletonFactories 塞入一个工厂，而调用这个工厂的 getObject 方法，就能得到这个 Bean</strong>。</p>
+<h3 id="为什么-Spring-循环依赖需要三级缓存，二级不够吗？"><a href="#为什么-Spring-循环依赖需要三级缓存，二级不够吗？" class="headerlink" title="为什么 Spring 循环依赖需要三级缓存，二级不够吗？"></a>为什么 Spring 循环依赖需要三级缓存，二级不够吗？</h3><p>我们思考下，解决循环依赖需要三级缓存吗？</p>
+<p>很明显，如果仅仅只是为了破解循环依赖，二级缓存够了，压根就不必要三级。</p>
+<p>你思考一下，在实例化 Bean A 之后，我在二级 map 里面塞入这个 A，然后继续属性注入，发现 A 依赖 B 所以要创建 Bean B，这时候 B 就能从二级 map 得到 A ，完成 B 的建立之后， A 自然而然能完成。</p>
+<p>所以<strong>为什么要搞个三级缓存，且里面存的是创建 Bean 的工厂呢</strong>？</p>
+<p><strong>问题就出在时机</strong>，这跟 Bean 的生命周期有关系。</p>
+<p>正常代理对象的生成是基于后置处理器，是<strong>在被代理的对象初始化后期调用生成的</strong>，<strong>所以如果你提早代理了其实是违背了 Bean 定义的生命周期</strong>。</p>
+<p>所以 Spring 先在一个三级缓存放置一个工厂，如果产生循环依赖，那么就调用这个工厂提早得到代理对象，如果没产生依赖，这个工厂根本不会被调用，所以 Bean 的生命周期就是对的。</p>
+<h2 id="什么是-AOP？"><a href="#什么是-AOP？" class="headerlink" title="什么是 AOP？"></a>什么是 AOP？</h2><p>AOP，Aspect Oriented Programming，面向切面编程。</p>
+<p>将一些通用的逻辑集中实现，然后通过 AOP 进行逻辑的切入，减少了零散的碎片化代码，提高了系统的可维护性。</p>
+<p>面向切面编程是一种通过将横切关注点（如日志记录、事务管理、安全检查等）与业务逻辑分离的技术。在传统的编程中，这些横切关注点通常会分散在各个业务逻辑模块中，导致代码的重复和难以维护。而在 Spring 中，通过 AOP 可以将这些横切关注点封装成切面，然后在需要的时候将切面织入到业务逻辑中，从而提高代码的可维护性和可扩展性。</p>
+<p>实现上代理大体上可以分为：<strong>动态代理</strong>和<strong>静态代理</strong>。</p>
+<ul>
+<li>动态代理，即<strong>在运行时</strong>将切面的逻辑进去，按照上面的逻辑就是你实现 A 类，然后定义要代理的切入点和切面的实现，程序会自动在运行时生成类似上面的代理类。</li>
+<li>静态代理，<strong>在编译时或者类加载时</strong>进行切面的织入，典型的 AspectJ 就是静态代理。</li>
+</ul>
+<h2 id="Spring-AOP-相关术语都有哪些？"><a href="#Spring-AOP-相关术语都有哪些？" class="headerlink" title="Spring AOP 相关术语都有哪些？"></a>Spring AOP 相关术语都有哪些？</h2><p>1）切面（Aspect）：其实就是定义了一个 java 类，里面包含了通知（advice）和切点（pointcut），定义了在何处以及何时执行通知，将切面的一些东西模块化了。</p>
+<p>2）通知（Advice）</p>
+<ul>
+<li>前置通知（Before advice）：在目标方法执行前执行。</li>
+<li>后置通知（After returning advice）：在目标方法成功执行后执行。</li>
+<li>后置异常通知（After throwing advice）：在目标方法抛出异常后执行。</li>
+<li>后置最终通知（After (finally) advice）：无论目标方法如何结束（正常返回或抛出异常），都会执行。</li>
+<li>环绕通知（Around advice）：在目标方法执行前后都执行，并且可以控制目标方法的执行过程，环绕通知可以用作日志打印或者权限校验。</li>
+</ul>
+<p>3）切点（Pointcut）：切点是一个表达式，用于定义在哪些连接点上执行通知，简单理解就是通过这个表达式可以找到想要织入的哪些方法。</p>
+<p>4）连接点（Join point）：连接点是程序执行过程中可以应用切面的点，例如方法的调用、方法的执行、异常的抛出等，可以拿到切入方法名等诸多属性。</p>
+<h2 id="Spring-一共有几种注入方式？"><a href="#Spring-一共有几种注入方式？" class="headerlink" title="Spring 一共有几种注入方式？"></a>Spring 一共有几种注入方式？</h2><ul>
+<li>构造器注入，<strong>Spring 倡导构造函数注入</strong>，因为构造器注入返回给客户端使用的时候一定是完整的。</li>
+<li>setter 注入，可选的注入方式，好处是在有变更的情况下，可以重新注入。</li>
+<li>字段注入，就是平日我们用 @Autowired <strong>标记字段</strong></li>
+<li>方法注入，就是平日我们用 @Autowired <strong>标记方法</strong></li>
+<li>接口回调注入，就是实现 Spring 定义的一些内建接口，例如 BeanFactoryAware，会进行 BeanFactory 的注入</li>
+</ul>
+<p>像字段注入其实官方是不推荐的使用的，因为依赖注解，后没有控制注入顺序且无法注入静态字段。</p>
+</article><div class="post-copyright"><div class="post-copyright__author_group"><a class="post-copyright__author_img" href="/about/"><img class="post-copyright__author_img_front" src= "/img/spin.svg" data-lazy-src="/img/avatar.jpg"></a><div class="post-copyright__author_name">Rean's Blog</div><div class="post-copyright__author_desc">Enjoy technology and music</div></div><div class="post-tools" id="post-tools"><div class="post-tools-left"><div id="quit-box" onclick="RemoveRewardMask()"></div></div></div><div class="post-copyright__notice"><span class="post-copyright-info">本文是原创文章，采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0</a>协议，完整转载请注明来自<a href="/">Rean's Blog</a></span></div></div><div class="post-tools-right"><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Spring/"><span class="tags-punctuation"></span>Spring<span class="tagsPageCount">5</span></a></div></div></div><nav class="needEndHide pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/p/21cdaec5/"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">【Spring】MVC &amp; 事务</div></div></a></div><div class="next-post pull-right"><a href="/p/a02febe4/"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">【MySQL】优化</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="solitude st-star-smile-fill"></i><span>喜欢这篇的人也看了</span><div class="relatedPosts-link"><a onclick="event.preventDefault(); toRandomPost();" href="javascript:void(0);" rel="external nofollow" data-pjax-state="">随便逛逛</a></div></div><div class="relatedPosts-list"><div><a href="/p/30cd73ca/" title="【SpringBoot】基础"><img class="cover" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/cover3.jpg" alt="cover"><div class="content is-center"><div class="title">【SpringBoot】基础</div></div></a></div><div><a href="/p/21cdaec5/" title="【Spring】MVC &amp; 事务"><img class="cover" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/230431-15854078711a18.jpg" alt="cover"><div class="content is-center"><div class="title">【Spring】MVC &amp; 事务</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-content"><div class="card-info-avatar is-center"><div class="author-info__top-group"><div class="author-info__sayhi" id="author-info__sayhi" onclick="sco.changeSayHelloText()">sayhello.morning</div></div></div><div class="avatar-img-group"><img class="avatar-img" alt="头像" src= "/img/spin.svg" data-lazy-src="/img/avatar.jpg"><div class="avatar-sticker"><img class="avatar-sticker-img" src= "/img/spin.svg" data-lazy-src="https://7.isyangs.cn/34/65f2e4e0423cc-34.png" alt="心情贴纸"></div></div><div class="author-info__description_group"><div class="author-info__description">分享自己对编程的<b>热爱</b>，对知识海洋<b>探索历程</b>，随机掉落<b>无参配布</b>以及<b>翻调</b>（主要是音综类，在B站因为版权基本过不了审（。</div><div class="author-info__description2">相信你可以在这里找到对你有用的知识和教程。</div></div><div class="author-info__bottom-group"><a class="author-info__bottom-group-left" href="/about/"><div class="author-info__name">Rean</div><div class="author-info__desc">Enjoy technology and music</div></a><div class="card-info-social-icons is-center"><a class="social-icon" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze" title="Github"><i class="solitude  st-github-line"></i></a><a class="social-icon" target="_blank" rel="noopener" href="https://space.bilibili.com/6531436" title="Bilibili"><i class="solitude  st-bilibili-line"></i></a></div></div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="solitude st-menu-line"></i><span>文章目录</span></div><div class="toc-content" id="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-Spring-Bean%EF%BC%9F"><span class="toc-text">什么是 Spring Bean？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-Spring-IoC%EF%BC%9F"><span class="toc-text">什么是 Spring IoC？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spring-%E4%B8%AD%E7%9A%84-DI-%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">Spring 中的 DI 是什么？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spring-IOC-%E6%9C%89%E4%BB%80%E4%B9%88%E5%A5%BD%E5%A4%84%EF%BC%9F"><span class="toc-text">Spring IOC 有什么好处？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spring-%E4%B8%AD%E7%9A%84-FactoryBean-%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">Spring 中的 FactoryBean 是什么？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spring-Bean-%E4%B8%80%E5%85%B1%E6%9C%89%E5%87%A0%E7%A7%8D%E4%BD%9C%E7%94%A8%E5%9F%9F%EF%BC%9F"><span class="toc-text">Spring Bean 一共有几种作用域？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%B4%E4%B8%8B-Spring-Bean-%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%EF%BC%9F"><span class="toc-text">说下 Spring Bean 的生命周期？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#PostConstruct-%E5%92%8C-PreDestroy-%E6%B3%A8%E8%A7%A3%E7%9A%84%E4%BD%9C%E7%94%A8%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">@PostConstruct 和 @PreDestroy 注解的作用是什么？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spring-%E7%9A%84%E5%90%AF%E5%8A%A8%E8%BF%87%E7%A8%8B%EF%BC%9F"><span class="toc-text">Spring 的启动过程？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spring-Bean-%E6%B3%A8%E5%86%8C%E5%88%B0%E5%AE%B9%E5%99%A8%E6%9C%89%E5%93%AA%E4%BA%9B%E6%96%B9%E5%BC%8F%EF%BC%9F"><span class="toc-text">Spring Bean 注册到容器有哪些方式？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bean-%E5%92%8C-Component%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%EF%BC%9F"><span class="toc-text">@Bean 和 @Component有什么区别？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spring-%E7%9A%84%E5%8D%95%E4%BE%8B-Bean-%E6%98%AF%E5%90%A6%E6%9C%89%E5%B9%B6%E5%8F%91%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98%EF%BC%9F"><span class="toc-text">Spring 的单例 Bean 是否有并发安全问题？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0%E5%88%86%E6%9E%90"><span class="toc-text">原因分析</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spring-Bean%E5%A6%82%E4%BD%95%E4%BF%9D%E8%AF%81%E5%B9%B6%E5%8F%91%E5%AE%89%E5%85%A8%EF%BC%9F"><span class="toc-text">Spring Bean如何保证并发安全？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%EF%BC%88%E5%B8%B8%E9%97%AE%EF%BC%89%EF%BC%9F"><span class="toc-text">什么是循环依赖（常问）？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spring-%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%EF%BC%9F"><span class="toc-text">Spring 如何解决循环依赖？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BF%85%E9%A1%BB%E9%83%BD%E6%98%AF%E5%8D%95%E4%BE%8B"><span class="toc-text">为什么必须都是单例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E8%83%BD%E5%85%A8%E6%98%AF%E6%9E%84%E9%80%A0%E5%99%A8%E6%B3%A8%E5%85%A5"><span class="toc-text">为什么不能全是构造器注入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Spring-%E8%A7%A3%E5%86%B3%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E5%85%A8%E6%B5%81%E7%A8%8B"><span class="toc-text">Spring 解决循环依赖全流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88-Spring-%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E9%9C%80%E8%A6%81%E4%B8%89%E7%BA%A7%E7%BC%93%E5%AD%98%EF%BC%8C%E4%BA%8C%E7%BA%A7%E4%B8%8D%E5%A4%9F%E5%90%97%EF%BC%9F"><span class="toc-text">为什么 Spring 循环依赖需要三级缓存，二级不够吗？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-AOP%EF%BC%9F"><span class="toc-text">什么是 AOP？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spring-AOP-%E7%9B%B8%E5%85%B3%E6%9C%AF%E8%AF%AD%E9%83%BD%E6%9C%89%E5%93%AA%E4%BA%9B%EF%BC%9F"><span class="toc-text">Spring AOP 相关术语都有哪些？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spring-%E4%B8%80%E5%85%B1%E6%9C%89%E5%87%A0%E7%A7%8D%E6%B3%A8%E5%85%A5%E6%96%B9%E5%BC%8F%EF%BC%9F"><span class="toc-text">Spring 一共有几种注入方式？</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="solitude st-map-line"></i><span>最近发布</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/p/5871d67/" title="woff 字体反扒方案"><img alt="woff 字体反扒方案" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/221228-15574975489aa1.jpg"></a><div class="content"><a class="title" href="/p/5871d67/" title="woff 字体反扒方案">woff 字体反扒方案</a><a class="article-recent_post_categories" href="/p/5871d67/">研究</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/204d99f1/" title="【MyBatis】生命周期"><img alt="【MyBatis】生命周期" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/235335-1549900415dcc9.jpg"></a><div class="content"><a class="title" href="/p/204d99f1/" title="【MyBatis】生命周期">【MyBatis】生命周期</a><a class="article-recent_post_categories" href="/p/204d99f1/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/b585efd0/" title="敏感词过滤方案总结"><img alt="敏感词过滤方案总结" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture5.jpg"></a><div class="content"><a class="title" href="/p/b585efd0/" title="敏感词过滤方案总结">敏感词过滤方案总结</a><a class="article-recent_post_categories" href="/p/b585efd0/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/122902e7/" title="【并发】高并发下库存扣减如何避免超卖和少卖？"><img alt="【并发】高并发下库存扣减如何避免超卖和少卖？" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/cover8.JPG"></a><div class="content"><a class="title" href="/p/122902e7/" title="【并发】高并发下库存扣减如何避免超卖和少卖？">【并发】高并发下库存扣减如何避免超卖和少卖？</a><a class="article-recent_post_categories" href="/p/122902e7/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/683f7c8e/" title="网易云音乐歌名&amp;歌词获取方案收集"><img alt="网易云音乐歌名&amp;歌词获取方案收集" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture1.jpg"></a><div class="content"><a class="title" href="/p/683f7c8e/" title="网易云音乐歌名&amp;歌词获取方案收集">网易云音乐歌名&amp;歌词获取方案收集</a><a class="article-recent_post_categories" href="/p/683f7c8e/">教程</a></div></div></div></div></div></div></main><footer id="footer"><div id="st-footer-bar"><div class="footer-logo"><span class="solitude">Rean's Blog</span></div><div class="footer-bar-description">来自Rean's Blog - Enjoy technology and music的文章</div><a class="footer-bar-link" href="/">了解更多</a></div><div id="footer_deal"><a class="deal_link" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze" title="Github"><i class="solitude  st-github-line"></i></a><a class="deal_link" target="_blank" rel="noopener" href="https://space.bilibili.com/6531436" title="Bilibili"><i class="solitude  st-bilibili-line"></i></a></div><div id="st-footer"></div><div id="footer-bar"><div class="footer-bar-links"><div class="footer-bar-left"><div class="copyright">© 2024 By&nbsp;<a class="footer-bar-link" href="/">Rean</a></div></div><div class="footer-bar-right"><a class="footer-bar-link" target="_blank" rel="noopener" href="https://github.com/valor-x/hexo-theme-solitude" alt="主题">主题</a><a class="footer-bar-link cc" href="/null" aria-label="copyright"><i class="solitude st-copyright-line"></i><i class="solitude st-creative-commons-by-line"></i><i class="solitude st-creative-commons-nc-line"></i><i class="solitude st-creative-commons-nd-line"></i></a></div></div></div></footer></div><!-- right_menu--><div id="rightMenu"><div class="rightMenu-group rightMenu-small"><div class="rightMenu-item" id="menu-backward"><i class="solitude st-arrow-left-line"></i></div><div class="rightMenu-item" id="menu-forward"><i class="solitude st-arrow-right-line"></i></div><div class="rightMenu-item" id="menu-refresh"><i class="solitude st-restart-line"></i></div><div class="rightMenu-item" id="menu-top"><i class="solitude st-arrow-up-line"></i></div></div><div class="rightMenu-group rightMenu-line rightMenuPlugin"><div class="rightMenu-item" id="menu-copytext"><i class="solitude st-copy-fill"></i><span>复制选中文本</span></div><div class="rightMenu-item" id="menu-pastetext"><i class="solitude st-clipboard-fill"></i><span>粘贴文本</span></div><div class="rightMenu-item" id="menu-newwindow"><i class="solitude st-window-fill"></i><span>新窗口打开</span></div><div class="rightMenu-item" id="menu-copylink"><i class="solitude st-link-line"></i><span>复制链接地址</span></div><div class="rightMenu-item" id="menu-copyimg"><i class="solitude st-copy-fill"></i><span>复制此图片</span></div><div class="rightMenu-item" id="menu-downloadimg"><i class="solitude st-download-cloud-fill"></i><span>下载此图片</span></div><div class="rightMenu-item" id="menu-search"><i class="solitude st-search-line"></i><span>站内搜索</span></div><div class="rightMenu-item" id="menu-music-toggle"><i class="solitude st-play-fill"></i><span>播放音乐</span></div><div class="rightMenu-item" id="menu-music-back"><i class="solitude st-skip-back-fill"></i><span>切换到上一首</span></div><div class="rightMenu-item" id="menu-music-forward"><i class="solitude st-skip-forward-fill"></i><span>切换到下一首</span></div><div class="rightMenu-item" id="menu-music-copyMusicName"><i class="solitude st-copy-fill"></i><span>复制歌名</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><div class="rightMenu-item" id="menu-randomPost" onclick="toRandomPost()||rm.hideRightMenu()"><i class="solitude st-signal-tower-fill"></i><span>随机短文</span></div><div class="rightMenu-item" onclick="pjax.loadUrl('/categories/')||rm.hideRightMenu()"><i class="solitude st-checkbox-multiple-blank-fill"></i><span>全部分类</span></div><div class="rightMenu-item" onclick="pjax.loadUrl('/tags/')||rm.hideRightMenu()"><i class="solitude st-price-tag-fill"></i><span>全部标签</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><div class="rightMenu-item" id="menu-darkmode" onclick="sco.switchDarkMode()"><i class="solitude st-moon-clear-fill"></i><span class="menu-darkmode-text">深色模式</span></div><div class="rightMenu-item" id="menu-translate"><i class="solitude st-panben-line"></i><span>轉為繁體</span></div></div></div><div id="rightmenu-mask"></div><!-- inject body--><div><script src="/js/utils.js?v=1.8.10"></script><script src="/js/main.js?v=1.8.10"></script><script src="/js/third_party/waterfall.min.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/pjax/0.2.8/pjax.min.js"></script><script src="/js/third_party/universe.min.js?v=1.8.10"></script><script>dark()
+</script><script src="/js/tw_cn.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/vanilla-lazyload/19.1.3/lazyload.iife.min.js"></script><script src="https://cdn.staticfile.net/node-snackbar/0.1.16/snackbar.min.js"></script><script src="https://cdn.staticfile.net/fancyapps-ui/5.0.36/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.staticfile.net/Swiper/11.0.5/swiper-bundle.min.js"></script><script>var meting_api = 'https://meting.qjqq.cn/?server=:server&type=:type&id=:id&auth=:auth&r=:r';</script><script src="https://cdn.staticfile.net/aplayer/1.10.1/APlayer.min.js"></script><script src="https://cdn.staticfile.net/meting/2.0.1/Meting.min.js"></script><script>const coverColorConfig = {
+    api: 'https://api.qjqq.cn/api/Imgcolor?img=',
+    time: 43200000
+}</script><script src="/js/covercolor/api.js?v=1.8.10"></script><script src="/js/music.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/pace/1.2.4/pace.min.js"></script><script src="/js/right_menu.js?v=1.8.10"></script><div class="js-pjax"><script defer pjax src="https://cdn.staticfile.net/pearssauce-busuanzi/1.0.0/bsz.pure.min.js"></script></div></div><!-- newest comment--><!-- pjax--><script>const pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: ['title','#body-wrap','#site-config','meta[name="description"]','.js-pjax','meta[property^="og:"]','#config-diff'],
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+})
+
+document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+})
+
+document.addEventListener('pjax:complete', () => {
+    window.refreshFn()
+
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+        const newScript = document.createElement('script')
+        const content = item.text || item.textContent || item.innerHTML || ""
+        Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+        newScript.appendChild(document.createTextNode(content))
+        item.parentNode.replaceChild(newScript, item)
+    })
+
+    GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+})
+
+document.addEventListener('pjax:error', (e) => {
+    if (e.request.status === 404) {
+        pjax.loadUrl('/404.html')
+    }
+})</script><!-- theme--><script>initTheme = () => {
+    let isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const cachedMode = utils.saveToLocal.get('theme');
+    if (cachedMode === undefined) {
+        const nowMode =
+            isDarkMode ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', nowMode);
+    } else {
+        document.documentElement.setAttribute('data-theme', cachedMode);
+    }
+    is_rm && rm.mode(cachedMode === 'dark' && isDarkMode)
+}
+initTheme()</script><!-- google adsense--><!-- search--><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><button class="search-close-button"><i class="solitude st-close-fill"></i></button></nav><div class="search-wrap"><div class="search-box"><input class="search-box-input" id="search-input" type="text" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="输入关键词快速查找"></div><div id="search-results"><div id="search-hits"></div></div><div id="search-pagination"></div><div id="search-tips"></div></div></div><div id="search-mask"></div></div><script src="/js/search/local.js?v=1.8.10"></script><!-- music--><div class="needEndHide" id="nav-music" onclick="sco.musicToggle()"><div id="nav-music-hoverTips">音乐已暂停</div><meting-js id="421801417" server="netease" type="playlist" mutex="true" preload="none" data-lrctype="0" order="random" theme="var(--efu-main)"></meting-js></div></body></html><script>const posts=["p/5871d67/","p/204d99f1/","p/b585efd0/","p/122902e7/","p/683f7c8e/","p/36b252a1/","p/bbd98f0d/","p/1b320550/","p/30cd73ca/","p/332adb42/","p/4f877c1e/","p/677c7789/","p/f7f0a5f3/","p/9b5a538c/","p/37360bc0/","p/bb996d5/","p/364ea8cc/","p/a027699d/","p/21cdaec5/","p/37c37880/","p/a02febe4/","p/d1ec0e4e/","p/25d2b878/","p/8324e4bc/","p/6021f67a/","p/305331f0/","p/66be4b4/","p/de2d10bc/","p/e6628f8e/","p/4131eeff/","p/27705e17/","p/74e1a37c/","p/b5223f80/","p/9b8bc45a/","p/c9cb7159/","p/82c942ab/","p/4c19fcc6/","p/27446c6a/","p/9f38852a/","p/2516f5f2/","p/b27c77b3/","p/7a3264f/","p/7beadfaa/","p/e1d9906f/","p/a440b512/","p/a46aa116/","p/fe8dd3bd/","p/51c99199/","p/91b418a/","p/421add40/","p/9d7a18c7/","p/26345198/","p/fa30e874/","p/dea9a817/","p/59203ba6/","p/e5616c72/","p/971e9859/","p/d7f6ccff/","p/1b2ec1c2/","p/a0d1cef9/","p/a58b6af0/","p/9381aa6d/","p/38b8becb/","p/d0a26095/","p/2b3bdada/","p/ba70636/","p/374630f5/","p/a964a243/","p/a06e9899/","p/ef9a99de/","p/108f7c52/","p/a91c1846/","p/413576cf/","p/9ee60c65/","p/e74db628/","p/888c8bf3/","p/477dbe08/","p/38e8a510/","p/dfb41864/","p/b0e3506b/","p/e17fd725/","p/e1fe458c/","p/636cfdea/","p/7b854cb7/","p/b3a61240/","p/64f43fb4/","p/800f9a11/","p/4a48b34c/","p/b3641215/","p/53bc1fc9/","p/fc02f9ee/","p/25b929f6/","p/dd30b42/","p/3aa261db/","p/fc078742/","p/22c9d1d0/","p/33fc02d2/","p/70335ae0/","p/f32ef110/","p/f756486c/","p/8dd4b91f/","p/a290d941/","p/61a8a4ef/","p/c2d0bb20/","p/9770d71c/","p/41bd2aed/","p/bfebe40b/","p/6b4006e6/","p/b5696360/","p/53ab7115/","p/e6fa9b9/","p/866abf45/","p/b718b92a/","p/d26f4c21/","p/bc5d6bbe/","p/5a18917b/","p/5f2b1e2f/","p/2532a2ee/","p/4337b2c0/","p/e042d029/","p/9b4a91e5/","p/9d8ce868/","p/a69f6a48/","p/f9b9edb2/","p/cbe55d0/","p/156c59d0/","p/d4d6f818/","p/2574cf15/","p/a0efc292/","p/ec2ecf28/","p/85f11265/","p/db95e6f5/","p/a8296e6d/","p/4cc89a71/","p/d0fe2d0f/","p/ffab2f6b/","p/95d9f91e/","p/7f869365/","p/5b246b1b/","p/a9c92fa9/","p/7d49fec0/","p/a9a25fcd/","p/43bb383e/","p/b9aeb4/","p/52eaf228/","p/4be90d2f/","p/ed500d41/","p/dcfbc8e5/","p/240e5e52/","p/18cda1b3/","p/66a6c396/","p/5f33341/","p/f9bef31e/","p/acac46b/","p/a4189438/","p/ae6b0147/","p/4e982f2d/","p/403e0cac/","p/495b9f0f/","p/8e966ab9/","p/f6e1007e/","p/6f562d19/","p/10eac329/","p/cc53cf58/","p/4f2beac6/","p/73e2aa1/","p/c677e75e/","p/3f13b766/","p/cc30f00/","p/807cab5e/","p/5b5991e4/","p/e941ffc/"];function toRandomPost(){ pjax.loadUrl('/'+posts[Math.floor(Math.random()*posts.length)]); }</script>

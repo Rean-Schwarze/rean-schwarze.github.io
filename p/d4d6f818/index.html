@@ -1,0 +1,539 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><title>【TCP】重传、滑动窗口、流量控制、拥塞控制 | Rean's Blog</title><noscript>开启JavaScript才能访问本站哦~</noscript><link rel="icon" href="/img/favicon.png"><!-- index.css--><link rel="stylesheet" href="/css/index.css?v=1.8.10"><!-- inject head--><link rel="stylesheet" href="https://cdn2.codesign.qq.com/icons/7pOrz0WXB5ZWJPX/latest/iconfont.css"><!-- aplayer--><link rel="stylesheet" href="https://cdn.staticfile.net/aplayer/1.10.1/APlayer.min.css"><!-- swiper--><link rel="stylesheet" href="https://cdn.staticfile.net/Swiper/11.0.5/swiper-bundle.min.css"><!-- fancybox ui--><link rel="stylesheet" href="https://cdn.staticfile.net/fancyapps-ui/5.0.36/fancybox/fancybox.min.css"><!-- katex--><!-- Open Graph--><meta name="description" content="TCP 为了实现可靠性传输，需要考虑很多事情，例如数据的破坏、丢包、重复以及分片顺序混乱等问题。如不能解决这些问题，也就无从谈起可靠传输。 那么，TCP 是通过序列号、确认应答、重发控制、连接管理以及窗口控制等机制实现可靠性传输的。 今天，将重点介绍 TCP 的重传机制、滑动窗口、流量控制、拥塞控制"><!-- pwa--><meta name="apple-mobile-web-app-capable" content="Rean's Blog"><meta name="theme-color" content="var(--efu-main)"><meta name="apple-mobile-web-app-status-bar-style" content="var(--efu-main)"><link rel="bookmark" href="/img/favicon.png"><link rel="apple-touch-icon" href="/img/favicon.png" sizes="180x180"><script>console.log(
+    "%c Program: Hexo %c Theme: Solitude %c Version: v1.8.10",
+    "border-radius:5px 0 0 5px;padding: 5px 10px;color:white;background:#ff3842;",
+    "padding: 5px 10px;color:white;background:#3e9f50;",
+    "padding: 5px 10px;color:white;background:#0084ff;",
+)
+</script><script>(()=>{
+        const saveToLocal = {
+            set: function setWithExpiry(key, value, ttl) {
+                if (ttl === 0)
+                    return
+                const now = new Date()
+                const expiryDay = ttl * 86400000
+                const item = {
+                    value: value,
+                    expiry: now.getTime() + expiryDay
+                }
+                localStorage.setItem(key, JSON.stringify(item))
+            },
+            get: function getWithExpiry(key) {
+                const itemStr = localStorage.getItem(key)
+    
+                if (!itemStr) {
+                    return undefined
+                }
+                const item = JSON.parse(itemStr)
+                const now = new Date()
+    
+                if (now.getTime() > item.expiry) {
+                    localStorage.removeItem(key)
+                    return undefined
+                }
+                return item.value
+            }
+        };
+        window.utils = {
+            saveToLocal: saveToLocal,
+            getCSS: (url, id = false) => new Promise((resolve, reject) => {
+              const link = document.createElement('link')
+              link.rel = 'stylesheet'
+              link.href = url
+              if (id) link.id = id
+              link.onerror = reject
+              link.onload = link.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                link.onload = link.onreadystatechange = null
+                resolve()
+              }
+              document.head.appendChild(link)
+            }),
+            getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+              const script = document.createElement('script')
+              script.src = url
+              script.async = true
+              script.onerror = reject
+              script.onload = script.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                script.onload = script.onreadystatechange = null
+                resolve()
+              }
+    
+              Object.keys(attr).forEach(key => {
+                script.setAttribute(key, attr[key])
+              })
+    
+              document.head.appendChild(script)
+            }),
+            addGlobalFn: (key, fn, name = false, parent = window) => {
+                const globalFn = parent.globalFn || {}
+                const keyObj = globalFn[key] || {}
+        
+                if (name && keyObj[name]) return
+        
+                name = name || Object.keys(keyObj).length
+                keyObj[name] = fn
+                globalFn[key] = keyObj
+                parent.globalFn = globalFn
+            },
+        }
+    })()</script><!-- global head--><script>const GLOBAL_CONFIG = {
+    root: '/',
+    algolia: undefined,
+    localsearch: {"preload":false,"path":"/search.xml"},
+    runtime: '2024-01-05 00:00:00',
+    lazyload: {
+        enable: true,
+        error: '/img/error_load.png'
+    },
+    copyright: {"limit":50,"author":"作者: Rean","link":"链接: ","source":"来源: Rean's Blog","info":"著作权归作者所有。 商业转载请联系作者获得授权，非商业转载请注明出处。"},
+    highlight: {
+        enable: true,
+        limit: 200,
+        expand: true,
+        copy: true,
+        syntax: 'highlight.js'
+    },
+    randomlink: false,
+    lang: {"theme":{"dark":"已切换至深色模式","light":"已切换至浅色模式"},"copy":{"success":"复制成功","error":"复制失败"},"backtop":"返回顶部","time":{"day":"天前","hour":"小时前","just":"刚刚","min":"分钟前","month":"个月前"},"f12":"开发者模式已打开，请遵循GPL协议。","totalk":"无需删除空行，直接输入评论即可","search":{"empty":"找不到你查询的内容：${query}","hit":"找到 ${hits} 条结果，用时 ${time} 毫秒","placeholder":"输入关键词快速查找","count":"共 <b>${count}</b> 条结果。"}},
+    aside: {
+        sayhello: {
+            morning: '一日之计在于晨',
+            noon: '吃饱了才有力气干活',
+            afternoon: '集中精力，攻克难关',
+            night: '不要太劳累了，早睡更健康',
+            goodnight: '睡个好觉，保证精力充沛',
+        },
+        sayhello2: ["🤖️ 数码科技爱好者","🔍 分享与热心帮助","🔨 设计开发一条龙","🎮 游戏爱好者"],
+    },
+    covercolor: {
+        enable: true
+    },
+    comment: false,
+    lightbox: 'fancybox',
+    post_ai: false,
+    right_menu: {"mode":{"dark":"深色模式","light":"浅色模式"},"img_error":"此图片无法复制与下载","music":{"start":"播放音乐","stop":"暂停音乐"},"translate":{"translateDelay":0,"defaultEncoding":2}},
+};</script><!-- page-config head--><script id="config-diff">var PAGE_CONFIG = {
+    is_post: true,
+    is_page: false,
+    is_home: false,
+    page: '',
+    toc: true,
+    comment: false,
+    ai_text: false,
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body id="body"><!-- universe--><canvas id="universe"></canvas><!-- loading--><!-- console--><div id="console"><div class="close-btn" onclick="sco.hideConsole()"><i class="solitude st-close-fill"></i></div><div class="button-group"><div class="console-btn-item"><span class="darkmode_switchbutton" onclick="sco.switchDarkMode()" title="昼夜切换"><i class="solitude st-moon-clear-fill"></i></span></div><div class="console-btn-item" id="consoleHideAside"><span class="asideSwitch" onclick="sco.switchHideAside()" title="边栏显示控制"><i class="solitude st-side-bar-fill"></i></span></div><div class="console-btn-item" id="consoleMusic" onclick="sco.musicToggle()"><span class="music-switch" title="音乐开关"><i class="solitude st-disc-fill"></i></span></div></div><div class="console-mask" onclick="sco.hideConsole()"></div></div><!-- sidebar--><div id="sidebar" style="zoom: 1;"><div id="menu-mask" style="display: none;"></div><div id="sidebar-menus"><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">172</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">11</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">155</div></a></div></div></div><span class="sidebar-menu-item-title">功能</span><div class="sidebar-menu-item"><span class="darkmode_switchbutton menu-child" onclick="sco.switchDarkMode()"><i class="solitude st-moon-clear-fill"></i><span>显示模式</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文章</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  st-folder-fill"></i><span>文章列表</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  st-checkbox-multiple-blank-fill"></i><span>分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  st-price-tag-fill"></i><span>标签</span></a></li><li><a class="site-page child" href="/study/"><i class="solitude  st-gift-fill"></i><span>学习</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>我的</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="solitude  st-disc-fill"></i><span>音乐馆</span></a></li><li><a class="site-page child" href="/essay/"><span>即刻短文</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>关于本站</span></a></li></ul></div></div><span class="sidebar-menu-item-title">标签</span><div class="card-widget card-tags card-archives card-webinfo card-allinfo"><div class="card-tag-cloud"><a href="/tags/%E8%85%BE%E8%AE%AF/">腾讯<sup>1</sup></a><a href="/tags/%E5%90%8E%E5%8F%B0%E5%BC%80%E5%8F%91/">后台开发<sup>1</sup></a><a href="/tags/Markdown/">Markdown<sup>1</sup></a><a href="/tags/Butterfly/">Butterfly<sup>2</sup></a><a href="/tags/PyCharm/">PyCharm<sup>1</sup></a><a href="/tags/IDEA/">IDEA<sup>1</sup></a><a href="/tags/Git/">Git<sup>2</sup></a><a href="/tags/Halo/">Halo<sup>1</sup></a><a href="/tags/GitHub/">GitHub<sup>1</sup></a><a href="/tags/JavaFx/">JavaFx<sup>2</sup></a><a href="/tags/SpringBoot/">SpringBoot<sup>7</sup></a><a href="/tags/Java/">Java<sup>18</sup></a><a href="/tags/MyBatis/">MyBatis<sup>4</sup></a><a href="/tags/Hexo/">Hexo<sup>3</sup></a><a href="/tags/SyncTV/">SyncTV<sup>1</sup></a><a href="/tags/AList/">AList<sup>1</sup></a><a href="/tags/%E5%AE%9D%E5%A1%94/">宝塔<sup>3</sup></a><a href="/tags/Vue/">Vue<sup>18</sup></a><a href="/tags/Vite/">Vite<sup>6</sup></a><a href="/tags/JavaScript/">JavaScript<sup>4</sup></a><a href="/tags/TypeScript/">TypeScript<sup>3</sup></a><a href="/tags/Electron/">Electron<sup>4</sup></a><a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习<sup>1</sup></a><a href="/tags/scikit-learn/">scikit-learn<sup>1</sup></a><a href="/tags/vocalremover/">vocalremover<sup>1</sup></a><a href="/tags/BPM/">BPM<sup>1</sup></a><a href="/tags/%E9%BB%91%E7%A5%9E%E8%AF%9D%EF%BC%9A%E6%82%9F%E7%A9%BA/">黑神话：悟空<sup>1</sup></a><a href="/tags/HTTP/">HTTP<sup>5</sup></a><a href="/tags/HTTPS/">HTTPS<sup>2</sup></a><a href="/tags/%E7%9F%AD%E9%93%BE/">短链<sup>1</sup></a><a href="/tags/%E8%A7%86%E9%A2%91/">视频<sup>1</sup></a><a href="/tags/HTTP-1-1/">HTTP/1.1<sup>1</sup></a><a href="/tags/LaTex/">LaTex<sup>1</sup></a><a href="/tags/%E5%8A%A0%E5%AF%86/">加密<sup>1</sup></a><a href="/tags/IP/">IP<sup>2</sup></a><a href="/tags/ICMP/">ICMP<sup>1</sup></a><a href="/tags/I-O/">I/O<sup>2</sup></a><a href="/tags/JVM/">JVM<sup>2</sup></a><a href="/tags/Springboot/">Springboot<sup>1</sup></a><a href="/tags/ThreadLocal/">ThreadLocal<sup>1</sup></a><a href="/tags/UUID/">UUID<sup>1</sup></a><a href="/tags/%E5%B9%B6%E5%8F%91/">并发<sup>4</sup></a><a href="/tags/%E7%BA%A2%E9%BB%91%E6%A0%91/">红黑树<sup>2</sup></a><a href="/tags/%E9%93%BE%E8%A1%A8/">链表<sup>1</sup></a><a href="/tags/%E5%8A%9B%E6%89%A3/">力扣<sup>1</sup></a><a href="/tags/LeetCode/">LeetCode<sup>1</sup></a><a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库<sup>8</sup></a><a href="/tags/NLP/">NLP<sup>6</sup></a><a href="/tags/spaCy/">spaCy<sup>4</sup></a><a href="/tags/Python/">Python<sup>1</sup></a><a href="/tags/Redis/">Redis<sup>10</sup></a><a href="/tags/RDB/">RDB<sup>1</sup></a><a href="/tags/AOF/">AOF<sup>1</sup></a><a href="/tags/%E7%BA%BF%E7%A8%8B/">线程<sup>2</sup></a><a href="/tags/I-O%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">I/O多路复用<sup>2</sup></a><a href="/tags/Spring/">Spring<sup>5</sup></a><a href="/tags/TCP/">TCP<sup>7</sup></a><a href="/tags/UDP/">UDP<sup>1</sup></a><a href="/tags/Socket/">Socket<sup>1</sup></a><a href="/tags/FFMpeg/">FFMpeg<sup>1</sup></a><a href="/tags/%E6%A0%B7%E5%BC%8F/">样式<sup>1</sup></a><a href="/tags/ECMAScript/">ECMAScript<sup>2</sup></a><a href="/tags/Element/">Element<sup>3</sup></a><a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">分布式锁<sup>1</sup></a><a href="/tags/%E5%91%A8%E6%B7%B1/">周深<sup>5</sup></a><a href="/tags/%E5%BE%B5%E7%BE%BD%E6%91%A9%E6%9F%AF/">徵羽摩柯<sup>1</sup></a><a href="/tags/%E9%9F%B3%E4%B9%90%E7%BC%98%E8%AE%A1%E5%88%92/">音乐缘计划<sup>1</sup></a><a href="/tags/%E5%A5%A5%E6%96%AF%E5%8D%A1/">奥斯卡<sup>3</sup></a><a href="/tags/%E5%BC%A0%E6%9D%B0/">张杰<sup>2</sup></a><a href="/tags/%E5%A3%B0%E7%94%9F%E4%B8%8D%E6%81%AF%C2%B7%E5%AE%9D%E5%B2%9B%E5%AD%A3/">声生不息·宝岛季<sup>3</sup></a><a href="/tags/%E5%BE%90%E4%BD%B3%E8%8E%B9/">徐佳莹<sup>1</sup></a><a href="/tags/SynthV/">SynthV<sup>15</sup></a><a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统<sup>4</sup></a><a href="/tags/%E6%B0%B8%E5%A4%9CMinus/">永夜Minus<sup>4</sup></a><a href="/tags/%E9%9F%A6%E7%A4%BC%E5%AE%89/">韦礼安<sup>1</sup></a><a href="/tags/%E8%94%A1%E4%BE%9D%E6%9E%97/">蔡依林<sup>1</sup></a><a href="/tags/%E6%97%A0%E5%8F%82/">无参<sup>45</sup></a><a href="/tags/%E5%8F%A4%E9%A3%8E/">古风<sup>11</sup></a><a href="/tags/%E4%B8%89%E6%97%A0Marblue/">三无Marblue<sup>1</sup></a><a href="/tags/%E7%B4%A2%E5%BC%95/">索引<sup>1</sup></a><a href="/tags/B%E6%A0%91/">B树<sup>1</sup></a><a href="/tags/B-%E6%A0%91/">B+树<sup>1</sup></a><a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构<sup>1</sup></a><a href="/tags/%E6%A0%91/">树<sup>1</sup></a><a href="/tags/%E4%BA%8C%E5%8F%89%E6%A0%91/">二叉树<sup>1</sup></a><a href="/tags/%E8%AE%B8%E9%92%A7/">许钧<sup>1</sup></a><a href="/tags/%E6%AD%8C%E6%89%8B2024/">歌手2024<sup>37</sup></a><a href="/tags/Chante-Moore/">Chanté Moore<sup>2</sup></a><a href="/tags/%E9%BB%84%E5%AE%A3/">黄宣<sup>1</sup></a><a href="/tags/Faouzia/">Faouzia<sup>4</sup></a><a href="/tags/Lenka/">Lenka<sup>1</sup></a><a href="/tags/%E5%BC%A0%E9%92%B0%E7%90%AA/">张钰琪<sup>1</sup></a><a href="/tags/%E9%82%A3%E8%8B%B1/">那英<sup>9</sup></a><a href="/tags/%E5%B0%A4%E9%95%BF%E9%9D%96/">尤长靖<sup>2</sup></a><a href="/tags/%E5%AD%99%E6%A5%A0/">孙楠<sup>5</sup></a><a href="/tags/%E8%B0%AD%E7%BB%B4%E7%BB%B4/">谭维维<sup>3</sup></a><a href="/tags/%E5%B4%A9%E5%9D%8F%EF%BC%9A%E6%98%9F%E7%A9%B9%E9%93%81%E9%81%93/">崩坏：星穹铁道<sup>4</sup></a><a href="/tags/%E8%B5%A4%E7%BE%BD/">赤羽<sup>1</sup></a><a href="/tags/%E6%B1%AA%E8%8B%8F%E6%B3%B7/">汪苏泷<sup>4</sup></a><a href="/tags/%E5%A3%B0%E7%94%9F%E4%B8%8D%E6%81%AF%C2%B7%E5%AE%B6%E5%B9%B4%E5%8D%8E/">声生不息·家年华<sup>2</sup></a><a href="/tags/%E9%99%88%E6%A5%9A%E7%94%9F/">陈楚生<sup>2</sup></a><a href="/tags/%E9%99%88%E4%BA%A6%E6%B4%BA/">陈亦洺<sup>1</sup></a><a href="/tags/%E5%B0%9A%E8%BE%B0/">尚辰<sup>1</sup></a><a href="/tags/%E5%BF%98%E5%B7%9D%E9%A3%8E%E5%8D%8E%E5%BD%95/">忘川风华录<sup>2</sup></a><a href="/tags/%E4%B9%90%E6%AD%A3%E9%BE%99%E7%89%99/">乐正龙牙<sup>1</sup></a><a href="/tags/%E6%98%9F%E5%B0%98Infinity/">星尘Infinity<sup>1</sup></a><a href="/tags/%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F/">明日方舟<sup>2</sup></a><a href="/tags/%E7%A5%96%E5%A8%85%E7%BA%B3%E6%83%9C/">祖娅纳惜<sup>1</sup></a><a href="/tags/%E7%94%B5%E5%AD%90/">电子<sup>1</sup></a><a href="/tags/%E6%98%9F%E5%B0%98/">星尘<sup>3</sup></a><a href="/tags/%E5%BC%A0%E4%BF%A1%E5%93%B2/">张信哲<sup>2</sup></a><a href="/tags/%E9%93%B6%E4%B8%B4/">银临<sup>1</sup></a><a href="/tags/%E6%9D%8E%E5%B8%B8%E8%B6%85/">李常超<sup>1</sup></a><a href="/tags/%E5%B1%B1%E8%89%B2%E6%9C%89%E6%97%A0%E4%B8%AD/">山色有无中<sup>1</sup></a><a href="/tags/%E5%91%A8%E6%9D%B0%E4%BC%A6/">周杰伦<sup>1</sup></a><a href="/tags/%E9%BB%84%E9%9C%84%E9%9B%B2/">黄霄雲<sup>1</sup></a><a href="/tags/%E5%AE%B9%E7%A5%96%E5%84%BF/">容祖儿<sup>1</sup></a><a href="/tags/%E6%88%91%E6%98%AF%E6%AD%8C%E6%89%8B%C2%B7%E7%AC%AC%E5%9B%9B%E5%AD%A3/">我是歌手·第四季<sup>1</sup></a><a href="/tags/%E6%9D%8E%E5%85%8B%E5%8B%A4/">李克勤<sup>1</sup></a><a href="/tags/%E7%B2%A4%E8%AF%AD/">粤语<sup>2</sup></a><a href="/tags/%E9%BB%84%E4%B8%BD%E7%8E%B2/">黄丽玲<sup>1</sup></a><a href="/tags/G-E-M-%E9%82%93%E7%B4%AB%E6%A3%8B/">G.E.M.邓紫棋<sup>6</sup></a><a href="/tags/T-I-M-E/">T.I.M.E.<sup>4</sup></a><a href="/tags/%E6%97%B6%E5%85%89%E9%9F%B3%E4%B9%90%E4%BC%9A%C2%B7%E8%80%81%E5%8F%8B%E8%AE%B0/">时光音乐会·老友记<sup>4</sup></a><a href="/tags/%E5%BC%A0%E5%AD%A6%E5%8F%8B/">张学友<sup>1</sup></a><a href="/tags/%E6%9D%A8%E4%B8%9E%E7%90%B3/">杨丞琳<sup>1</sup></a><a href="/tags/%E6%B1%AA%E5%B3%B0/">汪峰<sup>1</sup></a><a href="/tags/%E6%9C%AA%E5%AE%9A%E4%BA%8B%E4%BB%B6%E7%B0%BF/">未定事件簿<sup>1</sup></a><a href="/tags/%E5%BC%A0%E8%BF%9C/">张远<sup>1</sup></a><a href="/tags/%E5%AD%99%E7%87%95%E5%A7%BF/">孙燕姿<sup>1</sup></a><a href="/tags/%E6%B5%B7%E6%9D%A5%E9%98%BF%E6%9C%A8/">海来阿木<sup>1</sup></a><a href="/tags/%E6%9B%B9%E6%9D%A8/">曹杨<sup>2</sup></a><a href="/tags/%E4%B8%8B%E4%B8%80%E6%88%98%E6%AD%8C%E6%89%8B/">下一战歌手<sup>2</sup></a><a href="/tags/Fine%E4%B9%90%E5%9B%A2/">Fine乐团<sup>1</sup></a><a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络<sup>4</sup></a><a href="/tags/DNS/">DNS<sup>1</sup></a><a href="/tags/MAC/">MAC<sup>1</sup></a><a href="/tags/Adam-Lambert/">Adam Lambert<sup>1</sup></a><a href="/tags/%E4%BA%9A%E5%BD%93%C2%B7%E5%85%B0%E4%BC%AF%E7%89%B9/">亚当·兰伯特<sup>1</sup></a><a href="/tags/Hayden/">Hayden<sup>1</sup></a><a href="/tags/%E6%9A%AE%E5%A4%9C/">暮夜<sup>1</sup></a><a href="/tags/ACE-Studio/">ACE Studio<sup>2</sup></a><a href="/tags/%E5%B0%9A%E9%9B%AF%E5%A9%95/">尚雯婕<sup>1</sup></a><a href="/tags/%E4%B8%9C%E6%96%B9%E6%A0%80%E5%AD%90/">东方栀子<sup>2</sup></a><a href="/tags/%E9%BB%84%E7%BB%AE%E7%8F%8A/">黄绮珊<sup>1</sup></a><a href="/tags/%E5%8D%8E%E6%99%A8%E5%AE%87/">华晨宇<sup>1</sup></a><a href="/tags/JUN/">JUN<sup>1</sup></a><a href="/tags/%E6%9E%97%E5%BF%86%E8%8E%B2/">林忆莲<sup>1</sup></a><a href="/tags/UTAU/">UTAU<sup>1</sup></a><a href="/tags/Sheena/">Sheena<sup>1</sup></a><a href="/tags/%E5%89%A7%E5%A5%BD%E5%90%AC%E7%9A%84%E6%AD%8C/">剧好听的歌<sup>1</sup></a><a href="/tags/Syncthing/">Syncthing<sup>1</sup></a><a href="/tags/%E5%90%8C%E6%AD%A5/">同步<sup>1</sup></a><a href="/tags/%E6%94%AF%E4%BB%98%E5%AE%9D/">支付宝<sup>1</sup></a><a href="/tags/Apifox/">Apifox<sup>2</sup></a></div></div></div></div><!-- keyboard--><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav class="show" id="nav"><div id="nav-group"><div id="blog_name"><a id="site-name" href="/" title="返回博客主页"><span class="title">Rean's Blog</span></a></div><div id="page-name-mask"><div id="page-name"><a id="page-name-text" onclick="sco.toTop()">【TCP】重传、滑动窗口、流量控制、拥塞控制</a></div></div><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文章</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  st-folder-fill"></i><span>文章列表</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  st-checkbox-multiple-blank-fill"></i><span>分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  st-price-tag-fill"></i><span>标签</span></a></li><li><a class="site-page child" href="/study/"><i class="solitude  st-gift-fill"></i><span>学习</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>我的</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="solitude  st-disc-fill"></i><span>音乐馆</span></a></li><li><a class="site-page child" href="/essay/"><span>即刻短文</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>关于本站</span></a></li></ul></div></div></div><div id="nav-left"></div><div id="nav-right"><div class="nav-button" id="randomPost_button"><a class="site-page" onclick="toRandomPost()" title="随机一篇文章" href="javascript:void(0);"><i class="solitude st-signal-tower-fill"></i></a></div><div class="nav-button" id="search-button"><a class="site-page social-icon search" href="javascript:void(0);" title="搜索"><i class="solitude st-search-line"></i></a></div><div class="nav-button" id="nav-console"><a class="console_switchbutton" onclick="sco.showConsole()" title="中控台" href="javascript:void(0);"><i class="solitude st-dashboard-fill"></i></a></div><div class="nav-button" id="nav-totop" onclick="sco.toTop()"><a class="totopbtn"><i class="solitude st-arrow-up-line"></i><span id="percent">0</span></a></div><div id="toggle-menu"><a class="site-page"><i class="solitude st-menu-line"></i></a></div></div></div></nav><div class="coverdiv" id="coverdiv"><img class="nolazyload" id="post-cover" src="https://npm.elemecdn.com/justlovesmile-photo/cover5.JPG" alt="【TCP】重传、滑动窗口、流量控制、拥塞控制"></div><div id="post-info"><div id="post-firstinfo"><div class="meta-firstline"><a class="post-meta-original" title="该文章为原创文章，注意版权协议">原创</a><span class="post-meta-categories"><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a></span><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/TCP/"><span class="tags-name tags-punctuation">TCP</span></a></div></div></div></div><h1 class="post-title">【TCP】重传、滑动窗口、流量控制、拥塞控制</h1><div id="post-meta"><div class="meta-secondline"><span class="post-meta-date" title="发布于 2024-03-19 15:12:22"><i class="post-meta-icon solitude st-calendar-todo-fill"></i><time datetime="2024-03-19T07:12:22.000Z">2024-03-19T07:12:22.000Z</time></span><span class="post-meta-date" title="最后更新于 2024-07-08 17:07:36"><i class="post-meta-icon solitude st-refresh-line"></i><time datetime="2024-07-08T09:07:36.796Z">2024-07-08T09:07:36.796Z</time></span><span class="post-meta-wordcount"><i class="post-meta-icon solitude st-word-fill" title="文章字数"></i><span class="word-count">9.2k</span><span class="post-meta-separator"></span><i class="post-meta-icon solitude st-clock-fill" title="阅读耗时"></i><span>32 min</span></span><a class="post-meta-pv" href="/p/d4d6f818/" title="文章热度"><i class="post-meta-icon solitude st-fire-fill"></i><span id="busuanzi_page_pv"><i class="solitude st-loading-line"></i></span></a></div></div></div><section class="main-hero-waves-area waves-area"><svg class="waves-svg" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto"><defs><path id="gentle-wave" d="M -160 44 c 30 0 58 -18 88 -18 s 58 18 88 18 s 58 -18 88 -18 s 58 18 88 18 v 44 h -352 Z"></path></defs><g class="parallax"><use href="#gentle-wave" x="48" y="0"></use><use href="#gentle-wave" x="48" y="3"></use><use href="#gentle-wave" x="48" y="5"></use><use href="#gentle-wave" x="48" y="7"></use></g></svg></section></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>TCP 为了实现可靠性传输，需要考虑很多事情，例如数据的破坏、丢包、重复以及分片顺序混乱等问题。如不能解决这些问题，也就无从谈起可靠传输。</p>
+<p>那么，TCP 是通过序列号、确认应答、重发控制、连接管理以及窗口控制等机制实现可靠性传输的。</p>
+<p>今天，将重点介绍 TCP 的<strong>重传机制、滑动窗口、流量控制、拥塞控制。</strong></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP-%E5%8F%AF%E9%9D%A0%E7%89%B9%E6%80%A7/3.jpg?image_process=watermark,text_5YWs5LyX5Y-377ya5bCP5p6XY29kaW5n,type_ZnpsdHpoaw,x_10,y_10,g_se,size_20,color_0000CD,t_70,fill_0" alt="img"></p>
+<h1 id="重传机制"><a href="#重传机制" class="headerlink" title="重传机制"></a>重传机制</h1><p>TCP 实现可靠传输的方式之一，是通过序列号与确认应答。</p>
+<p>在 TCP 中，当发送端的数据到达接收主机时，接收端主机会返回一个确认应答消息，表示已收到消息。</p>
+<p>但在错综复杂的网络，并不一定能如上图那么顺利能正常的数据传输，万一数据在传输过程中丢失了呢？</p>
+<p>所以 TCP 针对数据包丢失的情况，会用<strong>重传机制</strong>解决。</p>
+<p>接下来说说常见的重传机制：</p>
+<ul>
+<li>超时重传</li>
+<li>快速重传</li>
+<li>SACK</li>
+<li>D-SACK</li>
+</ul>
+<h2 id="超时重传"><a href="#超时重传" class="headerlink" title="超时重传"></a>超时重传</h2><p>重传机制的其中一个方式，就是在发送数据时，设定一个定时器，当超过指定的时间后，没有收到对方的 <code>ACK</code> 确认应答报文，就会重发该数据，也就是我们常说的<strong>超时重传</strong>。</p>
+<p>TCP 会在以下两种情况发生超时重传：</p>
+<ul>
+<li>数据包丢失</li>
+<li>确认应答丢失</li>
+</ul>
+<p>超时重传时间是以 <code>RTO</code> （Retransmission Timeout 超时重传时间）表示。</p>
+<p>那么超时时间应该设置为多少呢？</p>
+<div class="note  flat info"><p>先来了解一下什么是 <code>RTT</code>（Round-Trip Time 往返时延）：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP-%E5%8F%AF%E9%9D%A0%E7%89%B9%E6%80%A7/6.jpg" alt="RTT"></p>
+<p><code>RTT</code> 指的是<strong>数据发送时刻到接收到确认的时刻的差值</strong>，也就是包的往返时间。</p>
+</div>
+
+<p>假设在重传的情况下，超时时间 <code>RTO</code> 「较长或较短」时，会发生什么事情呢？</p>
+<ul>
+<li>当超时时间 <strong>RTO 较大</strong>时，重发就慢，丢了老半天才重发，没有效率，性能差；</li>
+<li>当超时时间 <strong>RTO 较小</strong>时，会导致可能并没有丢就重发，于是重发的就快，会增加网络拥塞，导致更多的超时，更多的超时导致更多的重发。</li>
+</ul>
+<p>精确的测量超时时间 <code>RTO</code> 的值是非常重要的，这可让我们的重传机制更高效。</p>
+<p>根据上述的两种情况，我们可以得知，<strong>超时重传时间 RTO 的值应该略大于报文往返 RTT 的值</strong>。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP-%E5%8F%AF%E9%9D%A0%E7%89%B9%E6%80%A7/8.jpg?image_process=watermark,text_5YWs5LyX5Y-377ya5bCP5p6XY29kaW5n,type_ZnpsdHpoaw,x_10,y_10,g_se,size_20,color_0000CD,t_70,fill_0" alt="RTO 应略大于 RTT"></p>
+<p>实际上「报文往返 RTT 的值」是经常变化的，因为我们的网络也是时常变化的。也就因为「报文往返 RTT 的值」 是经常波动变化的，所以「超时重传时间 RTO 的值」应该是一个<strong>动态变化的值</strong>。</p>
+<p>我们来看看 Linux 是如何计算 <code>RTO</code> 的呢？</p>
+<p>估计往返时间，通常需要采样以下两个：</p>
+<ul>
+<li>需要 TCP 通过采样 RTT 的时间，然后进行加权平均，算出一个平滑 RTT 的值，而且这个值还是要不断变化的，因为网络状况不断地变化。</li>
+<li>除了采样 RTT，还要采样 RTT 的波动范围，这样就避免如果 RTT 有一个大的波动的话，很难被发现的情况。</li>
+</ul>
+<p>如果超时重发的数据，再次超时的时候，又需要重传的时候，TCP 的策略是<strong>超时间隔加倍。</strong></p>
+<p>也就是<strong>每当遇到一次超时重传的时候，都会将下一次超时时间间隔设为先前值的两倍。两次超时，就说明网络环境差，不宜频繁反复发送。</strong></p>
+<p>超时触发重传存在的问题是，超时周期可能相对较长。那是不是可以有更快的方式呢？</p>
+<p>于是就可以用「快速重传」机制来解决超时重发的时间等待。</p>
+<h2 id="快速重传"><a href="#快速重传" class="headerlink" title="快速重传"></a>快速重传</h2><p>TCP 还有另外一种<strong>快速重传（Fast Retransmit）机制</strong>，它<strong>不以时间为驱动，而是以数据驱动重传</strong>。</p>
+<p>快速重传机制，是如何工作的呢？其实很简单，一图胜千言。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP-%E5%8F%AF%E9%9D%A0%E7%89%B9%E6%80%A7/10.jpg?image_process=watermark,text_5YWs5LyX5Y-377ya5bCP5p6XY29kaW5n,type_ZnpsdHpoaw,x_10,y_10,g_se,size_20,color_0000CD,t_70,fill_0" alt="快速重传机制"></p>
+<p>在上图，发送方发出了 1，2，3，4，5 份数据：</p>
+<ul>
+<li>第一份 Seq1 先送到了，于是就 Ack 回 2；</li>
+<li>结果 Seq2 因为某些原因没收到，Seq3 到达了，于是还是 Ack 回 2；</li>
+<li>后面的 Seq4 和 Seq5 都到了，但还是 Ack 回 2，因为 Seq2 还是没有收到；</li>
+<li><strong>发送端收到了三个 Ack &#x3D; 2 的确认，知道了 Seq2 还没有收到，就会在定时器过期之前，重传丢失的 Seq2。</strong></li>
+<li>最后，收到了 Seq2，此时因为 Seq3，Seq4，Seq5 都收到了，于是 Ack 回 6 。</li>
+</ul>
+<p>所以，快速重传的工作方式是当收到三个相同的 ACK 报文时，会在定时器过期之前，重传丢失的报文段。</p>
+<p>快速重传机制只解决了一个问题，就是超时时间的问题，但是它依然面临着另外一个问题。就是<strong>重传的时候，是重传一个，还是重传所有的问题。</strong></p>
+<p>举个例子，假设发送方发了 6 个数据，编号的顺序是 Seq1 ~ Seq6 ，但是 Seq2、Seq3 都丢失了，那么接收方在收到 Seq4、Seq5、Seq6 时，都是回复 ACK2 给发送方，但是发送方并不清楚这连续的 ACK2 是接收方收到哪个报文而回复的， 那是选择重传 Seq2 一个报文，还是重传 Seq2 之后已发送的所有报文呢（Seq2、Seq3、 Seq4、Seq5、 Seq6） 呢？</p>
+<ul>
+<li>如果只选择重传 Seq2 一个报文，那么重传的效率很低。因为对于丢失的 Seq3 报文，还得在后续收到三个重复的 ACK3 才能触发重传。</li>
+<li>如果选择重传 Seq2 之后已发送的所有报文，虽然能同时重传已丢失的 Seq2 和 Seq3 报文，但是 Seq4、Seq5、Seq6 的报文是已经被接收过了，对于重传 Seq4 ～Seq6 折部分数据相当于做了一次无用功，浪费资源。</li>
+</ul>
+<p>可以看到，不管是重传一个报文，还是重传已发送的报文，都存在问题。</p>
+<p>为了解决不知道该重传哪些 TCP 报文，于是就有 <code>SACK</code> 方法。</p>
+<h2 id="SACK-方法"><a href="#SACK-方法" class="headerlink" title="SACK 方法"></a>SACK 方法</h2><p>还有一种实现重传机制的方式叫：<code>SACK</code>（Selective Acknowledgment）， <strong>选择性确认</strong>。</p>
+<p>这种方式需要在 TCP 头部「选项」字段里加一个 <code>SACK</code> 的东西，它<strong>可以将已收到的数据的信息发送给「发送方」</strong>，这样发送方就可以知道哪些数据收到了，哪些数据没收到，知道了这些信息，就可以<strong>只重传丢失的数据</strong>。</p>
+<p>如下图，发送方收到了三次同样的 ACK 确认报文，于是就会触发快速重发机制，通过 <code>SACK</code> 信息发现只有 <code>200~299</code> 这段数据丢失，则重发时，就只选择了这个 TCP 段进行重复。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP-%E5%8F%AF%E9%9D%A0%E7%89%B9%E6%80%A7/11.jpg?image_process=watermark,text_5YWs5LyX5Y-377ya5bCP5p6XY29kaW5n,type_ZnpsdHpoaw,x_10,y_10,g_se,size_20,color_0000CD,t_70,fill_0" alt="选择性确认"></p>
+<p>如果要支持 <code>SACK</code>，必须双方都要支持。在 Linux 下，可以通过 <code>net.ipv4.tcp_sack</code> 参数打开这个功能（Linux 2.4 后默认打开）。</p>
+<h2 id="Duplicate-SACK"><a href="#Duplicate-SACK" class="headerlink" title="Duplicate SACK"></a>Duplicate SACK</h2><p>Duplicate SACK 又称 <code>D-SACK</code>，其主要<strong>使用了 SACK 来告诉「发送方」有哪些数据被重复接收了。</strong></p>
+<p>下面举例两个栗子，来说明 <code>D-SACK</code> 的作用。</p>
+<p><em>栗子一号：ACK 丢包</em></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP-%E5%8F%AF%E9%9D%A0%E7%89%B9%E6%80%A7/12.jpg?image_process=watermark,text_5YWs5LyX5Y-377ya5bCP5p6XY29kaW5n,type_ZnpsdHpoaw,x_10,y_10,g_se,size_20,color_0000CD,t_70,fill_0" alt="ACK 丢包"></p>
+<ul>
+<li>「接收方」发给「发送方」的两个 ACK 确认应答都丢失了，所以发送方超时后，重传第一个数据包（3000 ~ 3499）</li>
+<li><strong>于是「接收方」发现数据是重复收到的，于是回了一个 SACK &#x3D; 3000~3500</strong>，告诉「发送方」 3000~3500 的数据早已被接收了，因为 ACK 都到了 4000 了，已经意味着 4000 之前的所有数据都已收到，所以这个 SACK 就代表着 <code>D-SACK</code>。</li>
+<li>这样「发送方」就知道了，数据没有丢，是「接收方」的 ACK 确认报文丢了。</li>
+</ul>
+<p><em>栗子二号：网络延时</em></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP-%E5%8F%AF%E9%9D%A0%E7%89%B9%E6%80%A7/13.jpg?image_process=watermark,text_5YWs5LyX5Y-377ya5bCP5p6XY29kaW5n,type_ZnpsdHpoaw,x_10,y_10,g_se,size_20,color_0000CD,t_70,fill_0" alt="网络延时"></p>
+<ul>
+<li>数据包（1000~1499） 被网络延迟了，导致「发送方」没有收到 Ack 1500 的确认报文。</li>
+<li>而后面报文到达的三个相同的 ACK 确认报文，就触发了快速重传机制，但是在重传后，被延迟的数据包（1000~1499）又到了「接收方」；</li>
+<li><strong>所以「接收方」回了一个 SACK&#x3D;1000~1500，因为 ACK 已经到了 3000，所以这个 SACK 是 D-SACK，表示收到了重复的包。</strong></li>
+<li>这样发送方就知道快速重传触发的原因不是发出去的包丢了，也不是因为回应的 ACK 包丢了，而是因为网络延迟了。</li>
+</ul>
+<p>可见，<code>D-SACK</code> 有这么几个好处：</p>
+<ol>
+<li>可以让「发送方」知道，是发出去的包丢了，还是接收方回应的 ACK 包丢了;</li>
+<li>可以知道是不是「发送方」的数据包被网络延迟了;</li>
+<li>可以知道网络中是不是把「发送方」的数据包给复制了;</li>
+</ol>
+<p>在 Linux 下可以通过 <code>net.ipv4.tcp_dsack</code> 参数开启&#x2F;关闭这个功能（Linux 2.4 后默认打开）。</p>
+<h1 id="滑动窗口"><a href="#滑动窗口" class="headerlink" title="滑动窗口"></a>滑动窗口</h1><div class="note  flat info"><p>引入窗口的原因</p>
+<br>
+
+<p>我们都知道 TCP 是每发送一个数据，都要进行一次确认应答。当上一个数据包收到了应答了， 再发送下一个。</p>
+<p>这样的传输方式有一个缺点：数据包的<strong>往返时间越长，通信的效率就越低</strong>。</p>
+<p>为解决这个问题，TCP 引入了<strong>窗口</strong>这个概念。即使在往返时间较长的情况下，它也不会降低网络通信的效率。</p>
+<p>有了窗口，就可以指定窗口大小，窗口大小就是指<strong>无需等待确认应答，而可以继续发送数据的最大值</strong>。</p>
+</div>
+
+<p>窗口的实现实际上是操作系统开辟的一个缓存空间，发送方主机在等到确认应答返回之前，必须在缓冲区中保留已发送的数据。如果按期收到确认应答，此时数据就可以从缓存区清除。</p>
+<p>假设窗口大小为 <code>3</code> 个 TCP 段，那么发送方就可以「连续发送」 <code>3</code> 个 TCP 段，并且中途若有 ACK 丢失，可以通过「下一个确认应答进行确认」。如下图：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP-%E5%8F%AF%E9%9D%A0%E7%89%B9%E6%80%A7/15.jpg?image_process=watermark,text_5YWs5LyX5Y-377ya5bCP5p6XY29kaW5n,type_ZnpsdHpoaw,x_10,y_10,g_se,size_20,color_0000CD,t_70,fill_0" alt="用滑动窗口方式并行处理"></p>
+<p>图中的 ACK 600 确认应答报文丢失，也没关系，因为可以通过下一个确认应答进行确认，只要发送方收到了 ACK 700 确认应答，就意味着 700 之前的所有数据「接收方」都收到了。这个模式就叫<strong>累计确认</strong>或者<strong>累计应答</strong>。</p>
+<h2 id="发送方的滑动窗口"><a href="#发送方的滑动窗口" class="headerlink" title="发送方的滑动窗口"></a>发送方的滑动窗口</h2><p>我们先来看看发送方的窗口，下图就是发送方缓存的数据，根据处理的情况分成四个部分，其中深蓝色方框是发送窗口，紫色方框是可用窗口：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP-%E5%8F%AF%E9%9D%A0%E7%89%B9%E6%80%A7/16.jpg" alt="img"></p>
+<ul>
+<li>#1 是已发送并收到 ACK确认的数据：1~31 字节</li>
+<li>#2 是已发送但未收到 ACK确认的数据：32~45 字节</li>
+<li>#3 是未发送但总大小在接收方处理范围内（接收方还有空间）：46~51字节</li>
+<li>#4 是未发送但总大小超过接收方处理范围（接收方没有空间）：52字节以后</li>
+</ul>
+<p>在下图，当发送方把数据「全部」都一下发送出去后，可用窗口的大小就为 0 了，表明可用窗口耗尽，在没收到 ACK 确认之前是无法继续发送数据了。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP-%E5%8F%AF%E9%9D%A0%E7%89%B9%E6%80%A7/17.jpg" alt="可用窗口耗尽"></p>
+<p>在下图，当收到之前发送的数据 <code>32~36</code> 字节的 ACK 确认应答后，如果发送窗口的大小没有变化，则<strong>滑动窗口往右边移动 5 个字节，因为有 5 个字节的数据被应答确认</strong>，接下来 <code>52~56</code> 字节又变成了可用窗口，那么后续也就可以发送 <code>52~56</code> 这 5 个字节的数据了。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP-%E5%8F%AF%E9%9D%A0%E7%89%B9%E6%80%A7/18.jpg" alt="32 ~ 36 字节已确认"></p>
+<h2 id="接收方的滑动窗口"><a href="#接收方的滑动窗口" class="headerlink" title="接收方的滑动窗口"></a>接收方的滑动窗口</h2><p>接下来我们看看接收方的窗口，接收窗口相对简单一些，根据处理的情况划分成三个部分：</p>
+<ul>
+<li>#1 + #2 是已成功接收并确认的数据（等待应用进程读取）；</li>
+<li>#3 是未收到数据但可以接收的数据；</li>
+<li>#4 未收到数据并不可以接收的数据；</li>
+</ul>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP-%E5%8F%AF%E9%9D%A0%E7%89%B9%E6%80%A7/20.jpg" alt="接收窗口"></p>
+<p>其中三个接收部分，使用两个指针进行划分:</p>
+<ul>
+<li><code>RCV.WND</code>：表示接收窗口的大小，它会通告给发送方。</li>
+<li><code>RCV.NXT</code>：是一个指针，它指向期望从发送方发送来的下一个数据字节的序列号，也就是 #3 的第一个字节。</li>
+<li>指向 #4 的第一个字节是个相对指针，它需要 <code>RCV.NXT</code> 指针加上 <code>RCV.WND</code> 大小的偏移量，就可以指向 #4 的第一个字节了。</li>
+</ul>
+<h1 id="流量控制"><a href="#流量控制" class="headerlink" title="流量控制"></a>流量控制</h1><p>发送方不能无脑的发数据给接收方，要考虑接收方处理能力。</p>
+<p>如果一直无脑的发数据给对方，但对方处理不过来，那么就会导致触发重发机制，从而导致网络流量的无端的浪费。</p>
+<p>为了解决这种现象发生，<strong>TCP 提供一种机制可以让「发送方」根据「接收方」的实际接收能力控制发送的数据量，这就是所谓的流量控制。</strong></p>
+<h2 id="操作系统缓冲区与滑动窗口的关系"><a href="#操作系统缓冲区与滑动窗口的关系" class="headerlink" title="操作系统缓冲区与滑动窗口的关系"></a>操作系统缓冲区与滑动窗口的关系</h2><p>实际上，发送窗口和接收窗口中所存放的字节数，都是放在操作系统内存缓冲区中的，而操作系统的缓冲区，会<strong>被操作系统调整</strong>。</p>
+<p>当应用进程没办法及时读取缓冲区的内容时，也会对我们的缓冲区造成影响。</p>
+<br>
+
+<p><em>我们先来看看第一个例子。</em></p>
+<p>当应用程序没有及时读取缓存时，发送窗口和接收窗口的变化。</p>
+<p>考虑以下场景：</p>
+<ul>
+<li>客户端作为发送方，服务端作为接收方，发送窗口和接收窗口初始大小为 <code>360</code>；</li>
+<li>服务端非常的繁忙，当收到客户端的数据时，应用层不能及时读取数据。</li>
+</ul>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP-%E5%8F%AF%E9%9D%A0%E7%89%B9%E6%80%A7/22.jpg?image_process=watermark,text_5YWs5LyX5Y-377ya5bCP5p6XY29kaW5n,type_ZnpsdHpoaw,x_10,y_10,g_se,size_20,color_0000CD,t_70,fill_0" alt="img"></p>
+<p>根据上图的流量控制，说明下每个过程：</p>
+<ol>
+<li>客户端发送 140 字节数据后，可用窗口变为 220 （360 - 140）。</li>
+<li>服务端收到 140 字节数据，<strong>但是服务端非常繁忙，应用进程只读取了 40 个字节，还有 100 字节占用着缓冲区，于是接收窗口收缩到了 260 （360 - 100）</strong>，最后发送确认信息时，将窗口大小通告给客户端。</li>
+<li>客户端收到确认和窗口通告报文后，发送窗口减少为 260。</li>
+<li>客户端发送 180 字节数据，此时可用窗口减少到 80。</li>
+<li>服务端收到 180 字节数据，<strong>但是应用程序没有读取任何数据，这 180 字节直接就留在了缓冲区，于是接收窗口收缩到了 80 （260 - 180）</strong>，并在发送确认信息时，通过窗口大小给客户端。</li>
+<li>客户端收到确认和窗口通告报文后，发送窗口减少为 80。</li>
+<li>客户端发送 80 字节数据后，可用窗口耗尽。</li>
+<li>服务端收到 80 字节数据，<strong>但是应用程序依然没有读取任何数据，这 80 字节留在了缓冲区，于是接收窗口收缩到了 0</strong>，并在发送确认信息时，通过窗口大小给客户端。</li>
+<li>客户端收到确认和窗口通告报文后，发送窗口减少为 0。</li>
+</ol>
+<p>可见最后窗口都收缩为 0 了，也就是发生了窗口关闭。当发送方可用窗口变为 0 时，发送方实际上会定时发送窗口探测报文，以便知道接收方的窗口是否发生了改变，这个内容后面会说，这里先简单提一下。</p>
+<br>
+
+<p><em>我们再来看看第二个例子。</em></p>
+<p>当服务端系统资源非常紧张的时候，操作系统可能会直接减少了接收缓冲区大小，这时应用程序又无法及时读取缓存数据，那么这时候就有严重的事情发生了，会出现数据包丢失的现象。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP-%E5%8F%AF%E9%9D%A0%E7%89%B9%E6%80%A7/23.jpg?image_process=watermark,text_5YWs5LyX5Y-377ya5bCP5p6XY29kaW5n,type_ZnpsdHpoaw,x_10,y_10,g_se,size_20,color_0000CD,t_70,fill_0" alt="img"></p>
+<p>说明下每个过程：</p>
+<ol>
+<li>客户端发送 140 字节的数据，于是可用窗口减少到了 220。</li>
+<li><strong>服务端因为现在非常的繁忙，操作系统于是就把接收缓存减少了 120 字节，当收到 140 字节数据后，又因为应用程序没有读取任何数据，所以 140 字节留在了缓冲区中，于是接收窗口大小从 360 收缩成了 100</strong>，最后发送确认信息时，通告窗口大小给对方。</li>
+<li>此时客户端因为还没有收到服务端的通告窗口报文，所以不知道此时接收窗口收缩成了 100，客户端只会看自己的可用窗口还有 220，所以客户端就发送了 180 字节数据，于是可用窗口减少到 40。</li>
+<li>服务端收到了 180 字节数据时，<strong>发现数据大小超过了接收窗口的大小，于是就把数据包丢失了。</strong></li>
+<li>客户端收到第 2 步时，服务端发送的确认报文和通告窗口报文，尝试减少发送窗口到 100，把窗口的右端向左收缩了 80，此时可用窗口的大小就会出现诡异的负值。</li>
+</ol>
+<p>所以，如果发生了先减少缓存，再收缩窗口，就会出现丢包的现象。</p>
+<p><strong>为了防止这种情况发生，TCP 规定是不允许同时减少缓存又收缩窗口的，而是采用先收缩窗口，过段时间再减少缓存，这样就可以避免了丢包情况。</strong></p>
+<h2 id="窗口关闭"><a href="#窗口关闭" class="headerlink" title="窗口关闭"></a>窗口关闭</h2><p>在前面我们都看到了，TCP 通过让接收方指明希望从发送方接收的数据大小（窗口大小）来进行流量控制。</p>
+<p><strong>如果窗口大小为 0 时，就会阻止发送方给接收方传递数据，直到窗口变为非 0 为止，这就是窗口关闭。</strong></p>
+<div class="note  flat info"><p>潜在危险</p>
+<br>
+
+<p>接收方向发送方通告窗口大小时，是通过 <code>ACK</code> 报文来通告的。</p>
+<p>那么，当发生窗口关闭时，接收方处理完数据后，会向发送方通告一个窗口非 0 的 ACK 报文，如果这个通告窗口的 ACK 报文在网络中丢失了，那麻烦就大了。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP-%E5%8F%AF%E9%9D%A0%E7%89%B9%E6%80%A7/24.jpg?image_process=watermark,text_5YWs5LyX5Y-377ya5bCP5p6XY29kaW5n,type_ZnpsdHpoaw,x_10,y_10,g_se,size_20,color_0000CD,t_70,fill_0" alt="窗口关闭潜在的危险"></p>
+<p>这会导致发送方一直等待接收方的非 0 窗口通知，接收方也一直等待发送方的数据，如不采取措施，这种相互等待的过程，会造成了死锁的现象。</p>
+</div>
+
+<h3 id="TCP-是如何解决窗口关闭时，潜在的死锁现象呢？"><a href="#TCP-是如何解决窗口关闭时，潜在的死锁现象呢？" class="headerlink" title="TCP 是如何解决窗口关闭时，潜在的死锁现象呢？"></a>TCP 是如何解决窗口关闭时，潜在的死锁现象呢？</h3><p>为了解决这个问题，TCP 为每个连接设有一个持续定时器，<strong>只要 TCP 连接一方收到对方的零窗口通知，就启动持续计时器。</strong></p>
+<p>如果持续计时器超时，就会发送<strong>窗口探测 ( Window probe ) 报文</strong>，而对方在确认这个探测报文时，给出自己现在的接收窗口大小。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP-%E5%8F%AF%E9%9D%A0%E7%89%B9%E6%80%A7/25.jpg?image_process=watermark,text_5YWs5LyX5Y-377ya5bCP5p6XY29kaW5n,type_ZnpsdHpoaw,x_10,y_10,g_se,size_20,color_0000CD,t_70,fill_0" alt="窗口探测"></p>
+<ul>
+<li>如果接收窗口仍然为 0，那么收到这个报文的一方就会重新启动持续计时器；</li>
+<li>如果接收窗口不是 0，那么死锁的局面就可以被打破了。</li>
+</ul>
+<p>窗口探测的次数一般为 3 次，每次大约 30-60 秒（不同的实现可能会不一样）。如果 3 次过后接收窗口还是 0 的话，有的 TCP 实现就会发 <code>RST</code> 报文来中断连接。</p>
+<h2 id="糊涂窗口综合症"><a href="#糊涂窗口综合症" class="headerlink" title="糊涂窗口综合症"></a>糊涂窗口综合症</h2><p>如果接收方太忙了，来不及取走接收窗口里的数据，那么就会导致发送方的发送窗口越来越小。</p>
+<p>到最后，<strong>如果接收方腾出几个字节并告诉发送方现在有几个字节的窗口，而发送方会义无反顾地发送这几个字节，这就是糊涂窗口综合症</strong>。</p>
+<p>要知道，我们的 <code>TCP + IP</code> 头有 <code>40</code> 个字节，为了传输那几个字节的数据，要搭上这么大的开销，这太不经济了。</p>
+<p>就好像一个可以承载 50 人的大巴车，每次来了一两个人，就直接发车。除非家里有矿的大巴司机，才敢这样玩，不然迟早破产。要解决这个问题也不难，大巴司机等乘客数量超过了 25 个，才认定可以发车。</p>
+<p>现举个糊涂窗口综合症的栗子，考虑以下场景：</p>
+<p>接收方的窗口大小是 360 字节，但接收方由于某些原因陷入困境，假设接收方的应用层读取的能力如下：</p>
+<ul>
+<li>接收方每接收 3 个字节，应用程序就只能从缓冲区中读取 1 个字节的数据；</li>
+<li>在下一个发送方的 TCP 段到达之前，应用程序还从缓冲区中读取了 40 个额外的字节；</li>
+</ul>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP-%E5%8F%AF%E9%9D%A0%E7%89%B9%E6%80%A7/26.png?image_process=watermark,text_5YWs5LyX5Y-377ya5bCP5p6XY29kaW5n,type_ZnpsdHpoaw,x_10,y_10,g_se,size_20,color_0000CD,t_70,fill_0" alt="糊涂窗口综合症"></p>
+<p>每个过程的窗口大小的变化，在图中都描述的很清楚了，可以发现窗口不断减少了，并且发送的数据都是比较小的了。</p>
+<p>所以，糊涂窗口综合症的现象是可以发生在发送方和接收方：</p>
+<ul>
+<li>接收方可以通告一个小的窗口</li>
+<li>而发送方可以发送小数据</li>
+</ul>
+<p>于是，要解决糊涂窗口综合症，就要同时解决上面两个问题就可以了：</p>
+<ul>
+<li>让接收方不通告小窗口给发送方</li>
+<li>让发送方避免发送小数据</li>
+</ul>
+<h3 id="让接收方不通告小窗口给发送方"><a href="#让接收方不通告小窗口给发送方" class="headerlink" title="让接收方不通告小窗口给发送方"></a>让接收方不通告小窗口给发送方</h3><p>接收方通常的策略如下:</p>
+<p>当「窗口大小」小于 min( MSS，缓存空间&#x2F;2 ) ，也就是小于 MSS 与 1&#x2F;2 缓存大小中的最小值时，就会向发送方通告窗口为 <code>0</code>，也就阻止了发送方再发数据过来。</p>
+<p>等到接收方处理了一些数据后，窗口大小 &gt;&#x3D; MSS，或者接收方缓存空间有一半可以使用，就可以把窗口打开让发送方发送数据过来。</p>
+<h3 id="让发送方避免发送小数据"><a href="#让发送方避免发送小数据" class="headerlink" title="让发送方避免发送小数据"></a>让发送方避免发送小数据</h3><p>发送方通常的策略如下:</p>
+<p>使用 Nagle 算法，该算法的思路是延时处理，只有满足下面两个条件中的任意一个条件，才可以发送数据：</p>
+<ul>
+<li>条件一：要等到窗口大小 &gt;&#x3D; <code>MSS</code> 并且 数据大小 &gt;&#x3D; <code>MSS</code>；</li>
+<li>条件二：收到之前发送数据的 <code>ack</code> 回包；</li>
+</ul>
+<p>只要上面两个条件都不满足，发送方一直在囤积数据，直到满足上面的发送条件。</p>
+<h1 id="拥塞控制"><a href="#拥塞控制" class="headerlink" title="拥塞控制"></a>拥塞控制</h1><p>前面的流量控制是避免「发送方」的数据填满「接收方」的缓存，但是并不知道网络的中发生了什么。</p>
+<p>一般来说，计算机网络都处在一个共享的环境。因此也有可能会因为其他主机之间的通信使得网络拥堵。</p>
+<p><strong>在网络出现拥堵时，如果继续发送大量数据包，可能会导致数据包时延、丢失等，这时 TCP 就会重传数据，但是一重传就会导致网络的负担更重，于是会导致更大的延迟以及更多的丢包，这个情况就会进入恶性循环被不断地放大….</strong></p>
+<p>所以，TCP 不能忽略网络上发生的事，它被设计成一个无私的协议，当网络发送拥塞时，TCP 会自我牺牲，降低发送的数据量。</p>
+<p>于是，就有了<strong>拥塞控制</strong>，控制的目的就是<strong>避免「发送方」的数据填满整个网络。</strong></p>
+<p>为了在「发送方」调节所要发送数据的量，定义了一个叫做「<strong>拥塞窗口</strong>」的概念。</p>
+<p><strong>拥塞窗口 cwnd</strong>是发送方维护的一个的状态变量，它会根据<strong>网络的拥塞程度动态变化的</strong>。</p>
+<p>我们在前面提到过发送窗口 <code>swnd</code> 和接收窗口 <code>rwnd</code> 是约等于的关系，那么由于加入了拥塞窗口的概念后，此时发送窗口的值是swnd &#x3D; min(cwnd, rwnd)，也就是拥塞窗口和接收窗口中的最小值。</p>
+<p>拥塞窗口 <code>cwnd</code> 变化的规则：</p>
+<ul>
+<li>只要网络中没有出现拥塞，<code>cwnd</code> 就会增大；</li>
+<li>但网络中出现了拥塞，<code>cwnd</code> 就减少；</li>
+</ul>
+<p>只要「发送方」没有在规定时间内接收到 ACK 应答报文，也就是<strong>发生了超时重传，就会认为网络出现了拥塞。</strong></p>
+<p>拥塞控制主要是四个算法：</p>
+<ul>
+<li>慢启动</li>
+<li>拥塞避免</li>
+<li>拥塞发生</li>
+<li>快速恢复</li>
+</ul>
+<h2 id="慢启动"><a href="#慢启动" class="headerlink" title="慢启动"></a>慢启动</h2><p>TCP 在刚建立连接完成后，首先是有个慢启动的过程，这个慢启动的意思就是一点一点的提高发送数据包的数量，如果一上来就发大量的数据，这不是给网络添堵吗？</p>
+<p>慢启动的算法记住一个规则就行：<strong>当发送方每收到一个 ACK，拥塞窗口 cwnd 的大小就会加 1。</strong></p>
+<p>这里假定拥塞窗口 <code>cwnd</code> 和发送窗口 <code>swnd</code> 相等，下面举个栗子：</p>
+<ul>
+<li>连接建立完成后，一开始初始化 <code>cwnd = 1</code>，表示可以传一个 <code>MSS</code> 大小的数据。</li>
+<li>当收到一个 ACK 确认应答后，cwnd 增加 1，于是一次能够发送 2 个</li>
+<li>当收到 2 个的 ACK 确认应答后， cwnd 增加 2，于是就可以比之前多发2 个，所以这一次能够发送 4 个</li>
+<li>当这 4 个的 ACK 确认到来的时候，每个确认 cwnd 增加 1， 4 个确认 cwnd 增加 4，于是就可以比之前多发 4 个，所以这一次能够发送 8 个。</li>
+</ul>
+<p>慢启动算法的变化过程如下图：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP-%E5%8F%AF%E9%9D%A0%E7%89%B9%E6%80%A7/27.jpg?image_process=watermark,text_5YWs5LyX5Y-377ya5bCP5p6XY29kaW5n,type_ZnpsdHpoaw,x_10,y_10,g_se,size_20,color_0000CD,t_70,fill_0" alt="慢启动算法"></p>
+<p>可以看出慢启动算法，发包的个数是<strong>指数性的增长</strong>。</p>
+<div class="note  flat info no-icon"><p>那慢启动涨到什么时候是个头呢？</p>
+</div>
+
+<p>有一个叫慢启动门限 <code>ssthresh</code> （slow start threshold）状态变量。</p>
+<ul>
+<li>当 <code>cwnd</code> &lt; <code>ssthresh</code> 时，使用慢启动算法。</li>
+<li>当 <code>cwnd</code> &gt;&#x3D; <code>ssthresh</code> 时，就会使用「拥塞避免算法」。</li>
+</ul>
+<h2 id="拥塞避免算法"><a href="#拥塞避免算法" class="headerlink" title="拥塞避免算法"></a>拥塞避免算法</h2><p>一般来说 <code>ssthresh</code> 的大小是 <code>65535</code> 字节。</p>
+<p>那么进入拥塞避免算法后，它的规则是：<strong>每当收到一个 ACK 时，cwnd 增加 1&#x2F;cwnd。</strong></p>
+<p>接上前面的慢启动的栗子，现假定 <code>ssthresh</code> 为 <code>8</code>：</p>
+<ul>
+<li>当 8 个 ACK 应答确认到来时，每个确认增加 1&#x2F;8，8 个 ACK 确认 cwnd 一共增加 1，于是这一次能够发送 9 个 <code>MSS</code> 大小的数据，变成了<strong>线性增长。</strong></li>
+</ul>
+<p>拥塞避免算法的变化过程如下图：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP-%E5%8F%AF%E9%9D%A0%E7%89%B9%E6%80%A7/28.jpg?image_process=watermark,text_5YWs5LyX5Y-377ya5bCP5p6XY29kaW5n,type_ZnpsdHpoaw,x_10,y_10,g_se,size_20,color_0000CD,t_70,fill_0" alt="拥塞避免"></p>
+<p>所以，我们可以发现，拥塞避免算法就是将原本慢启动算法的指数增长变成了线性增长，还是增长阶段，但是增长速度缓慢了一些。</p>
+<p>就这么一直增长着后，网络就会慢慢进入了拥塞的状况了，于是就会出现丢包现象，这时就需要对丢失的数据包进行重传。</p>
+<p>当触发了重传机制，也就进入了「拥塞发生算法」。</p>
+<h2 id="拥塞发生"><a href="#拥塞发生" class="headerlink" title="拥塞发生"></a>拥塞发生</h2><p>当发生了「超时重传」，则就会使用拥塞发生算法。</p>
+<p>这个时候，ssthresh 和 cwnd 的值会发生变化：</p>
+<ul>
+<li><code>ssthresh</code> 设为 <code>cwnd/2</code>，</li>
+<li><code>cwnd</code> 重置为 <code>1</code> （是恢复为 cwnd 初始化值，我这里假定 cwnd 初始化值 1）</li>
+</ul>
+<div class="note  flat info"><p>怎么查看系统的 cwnd 初始化值？</p>
+<br>
+
+<p>Linux 针对每一个 TCP 连接的 cwnd 初始化值是 10，也就是 10 个 MSS，我们可以用 ss -nli 命令查看每一个 TCP 连接的 cwnd 初始化值，如下图</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP-%E5%8F%AF%E9%9D%A0%E7%89%B9%E6%80%A7/cwnd.png" alt="img"></p>
+</div>
+
+<p>拥塞发生算法的变化如下图：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/TCP-%E5%8F%AF%E9%9D%A0%E7%89%B9%E6%80%A7/29.jpg?image_process=watermark,text_5YWs5LyX5Y-377ya5bCP5p6XY29kaW5n,type_ZnpsdHpoaw,x_10,y_10,g_se,size_20,color_0000CD,t_70,fill_0" alt="拥塞发送 —— 超时重传"></p>
+<p>接着，就重新开始慢启动，慢启动是会突然减少数据流的。这真是一旦「超时重传」，马上回到解放前。但是这种方式太激进了，反应也很强烈，会造成网络卡顿。</p>
+<h2 id="快速恢复"><a href="#快速恢复" class="headerlink" title="快速恢复"></a>快速恢复</h2><p>还有更好的方式，前面我们讲过「快速重传算法」。当接收方发现丢了一个中间包的时候，发送三次前一个包的 ACK，于是发送端就会快速地重传，不必等待超时再重传。</p>
+<p>TCP 认为这种情况不严重，因为大部分没丢，只丢了一小部分，则 <code>ssthresh</code> 和 <code>cwnd</code> 变化如下：</p>
+<ul>
+<li><code>cwnd = cwnd/2</code> ，也就是设置为原来的一半;</li>
+<li><code>ssthresh = cwnd</code>;</li>
+</ul>
+<p>然后，进入快速恢复算法如下：</p>
+<ul>
+<li>拥塞窗口 <code>cwnd = ssthresh + 3</code> （ 3 的意思是确认有 3 个数据包被收到了）；</li>
+<li>重传丢失的数据包；</li>
+<li>如果再收到重复的 ACK，那么 cwnd 增加 1；</li>
+<li>如果收到新数据的 ACK 后，把 cwnd 设置为第一步中的 ssthresh 的值，原因是该 ACK 确认了新的数据，说明从 duplicated ACK 时的数据都已收到，该恢复过程已经结束，可以回到恢复之前的状态了，也即再次进入拥塞避免状态；</li>
+</ul>
+<p>快速恢复算法的变化过程如下图：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost4@main/%E7%BD%91%E7%BB%9C/%E6%8B%A5%E5%A1%9E%E5%8F%91%E7%94%9F-%E5%BF%AB%E9%80%9F%E9%87%8D%E4%BC%A0.drawio.png?image_process=watermark,text_5YWs5LyX5Y-377ya5bCP5p6XY29kaW5n,type_ZnpsdHpoaw,x_10,y_10,g_se,size_20,color_0000CD,t_70,fill_0" alt="快速重传和快速恢复"></p>
+<p>也就是没有像「超时重传」一夜回到解放前，而是还在比较高的值，后续呈线性增长。</p>
+<div class="note  flat info"><p><strong>首先，快速恢复是拥塞发生后慢启动的优化，其首要目的仍然是降低 cwnd 来减缓拥塞，所以必然会出现 cwnd 从大到小的改变。</strong></p>
+<p><strong>其次，过程2（cwnd逐渐加1）的存在是为了尽快将丢失的数据包发给目标，从而解决拥塞的根本问题（三次相同的 ACK 导致的快速重传），所以这一过程中 cwnd 反而是逐渐增大的。</strong></p>
+</div>
+
+<h1 id="用了-TCP-协议，数据一定不会丢吗？"><a href="#用了-TCP-协议，数据一定不会丢吗？" class="headerlink" title="用了 TCP 协议，数据一定不会丢吗？"></a>用了 TCP 协议，数据一定不会丢吗？</h1><h2 id="数据包的发送流程"><a href="#数据包的发送流程" class="headerlink" title="数据包的发送流程"></a>数据包的发送流程</h2><p>首先，我们两个手机的绿皮聊天软件客户端，要通信，中间会通过它们家服务器。大概长这样。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/1d0a1d60ca4f720423911cf8f25c4ac3.png" alt="聊天软件三端通信"></p>
+<p>但为了<strong>简化模型</strong>，我们把中间的服务器给省略掉，假设这是个端到端的通信。且为了保证消息的可靠性，我们盲猜它们之间用的是<strong>TCP协议</strong>进行通信。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/7e8bae365b8d27560aac1cd28f501156.png" alt="聊天软件两端通信"></p>
+<p>为了发送数据包，两端首先会通过<strong>三次握手</strong>，建立TCP连接。</p>
+<p>一个数据包，从聊天框里发出，消息会从<strong>聊天软件</strong>所在的<strong>用户空间</strong>拷贝到<strong>内核空间</strong>的<strong>发送缓冲区（send buffer）</strong>，数据包就这样顺着<strong>传输层、网络层，进入到数据链路层，在这里数据包会经过流控（qdisc），再通过RingBuffer发到物理层的网卡</strong>。数据就这样顺着<strong>网卡</strong>发到了<strong>纷繁复杂</strong>的网络世界里。这里头数据会经过n多个<strong>路由器和交换机</strong>之间的跳转，最后到达<strong>目的机器的网卡</strong>处。</p>
+<p>此时目的机器的网卡会通知<strong>DMA</strong>将数据包信息放到<code>RingBuffer</code>中，再触发一个<strong>硬中断</strong>给<code>CPU</code>，<code>CPU</code>触发<strong>软中断</strong>让<code>ksoftirqd</code>去<code>RingBuffer</code>收包，于是一个数据包就这样顺着<strong>物理层，数据链路层，网络层，传输层</strong>，最后从内核空间拷贝到用户空间里的<strong>聊天软件</strong>里。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/28e4d6b004530fbf75fe346d181baa81.png" alt="网络发包收包全景图"></p>
+<h2 id="一定不会丢包吗？"><a href="#一定不会丢包吗？" class="headerlink" title="一定不会丢包吗？"></a>一定不会丢包吗？</h2><p>我们知道TCP位于<strong>传输层</strong>，在它的上面还有各种<strong>应用层协议</strong>，比如常见的HTTP或者各类RPC协议。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/c6794dd51c8780f12e4022fc964ebb0a.png" alt="四层网络协议"></p>
+<p>TCP保证的可靠性，是<strong>传输层的可靠性</strong>。也就是说，<strong>TCP只保证数据从A机器的传输层可靠地发到B机器的传输层。</strong></p>
+<p>至于数据到了接收端的传输层之后，能不能保证到应用层，TCP并不管。</p>
+<p>假设现在，我们输入一条消息，从聊天框发出，走到<strong>传输层TCP协议的发送缓冲区</strong>，不管中间有没有丢包，最后通过重传都保证发到了对方的<strong>传输层TCP接收缓冲区</strong>，此时接收端回复了一个<code>ack</code>，发送端收到这个<code>ack</code>后就会将自己<strong>发送缓冲区</strong>里的消息给扔掉。到这里TCP的任务就结束了。</p>
+<p>TCP任务是结束了，但聊天软件的任务没结束。</p>
+<p><strong>聊天软件还需要将数据从TCP的接收缓冲区里读出来，如果在读出来这一刻，手机由于内存不足或其他各种原因，导致软件崩溃闪退了。</strong></p>
+<p>发送端以为自己发的消息已经发给对方了，但接收端却并没有收到这条消息。</p>
+<p>于是乎，<strong>消息就丢了。</strong></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/9286ab84bcaa74576bc11c8e9322fee9.png" alt="使用TCP协议却发生丢包"></p>
+<p><strong>虽然概率很小，但它就是发生了</strong>。</p>
+<h2 id="建立连接时丢包"><a href="#建立连接时丢包" class="headerlink" title="建立连接时丢包"></a>建立连接时丢包</h2><p>在服务端，第一次握手之后，会先建立个<strong>半连接</strong>，然后再发出第二次握手。这时候需要有个地方可以<strong>暂存</strong>这些半连接。这个地方就叫<strong>半连接队列</strong>。</p>
+<p>如果之后第三次握手来了，半连接就会升级为全连接，然后暂存到另外一个叫<strong>全连接队列</strong>的地方，坐等程序执行<code>accept()</code>方法将其取走使用。</p>
+<p>是队列就有长度，有长度就有可能会满，如果它们<strong>满了</strong>，那新来的包就会被<strong>丢弃</strong>。</p>
+<p>从现象来看就是连接建立失败。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/591d630098b4fc5316a5005f1e94b844.png" alt="图片"></p>
+<h2 id="流量控制丢包"><a href="#流量控制丢包" class="headerlink" title="流量控制丢包"></a>流量控制丢包</h2><p>应用层能发网络数据包的软件有那么多，如果所有数据不加控制一股脑冲入到网卡，网卡会吃不消，那怎么办？让数据按一定的规则排个队依次处理，也就是所谓的<strong>qdisc</strong>(<strong>Q</strong>ueueing <strong>Disc</strong>iplines，排队规则)，这也是我们常说的<strong>流量控制</strong>机制。</p>
+<p>排队，得先有个队列，而队列有个<strong>长度</strong>。</p>
+<p>我们可以通过下面的<code>ifconfig</code>命令查看到，里面涉及到的<code>txqueuelen</code>后面的数字<code>1000</code>，其实就是流控队列的长度。</p>
+<p>当发送数据过快，流控队列长度<code>txqueuelen</code>又不够大时，就容易出现<strong>丢包</strong>现象。</p>
+<p>还有其他类型的丢包，这里先不复制（？）了，看原文吧！</p>
+<h2 id="这类丢包问题如何解决？"><a href="#这类丢包问题如何解决？" class="headerlink" title="这类丢包问题如何解决？"></a>这类丢包问题如何解决？</h2><p>大家应该还记得我们文章开头提到过，<strong>为了简单</strong>，就将服务器那一方给省略了，从三端通信变成了两端通信，所以才有了这个丢包问题。</p>
+<p><strong>现在我们重新将服务器加回来。</strong></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/d53659df39d64db4780d2816bd8314d1.png" alt="聊天软件三端通信"></p>
+<p>大家有没有发现，有时候我们在手机里聊了一大堆内容，然后登录电脑版，它能将最近的聊天记录都同步到电脑版上。也就是说服务器<strong>可能</strong>记录了我们最近发过什么数据，假设<strong>每条消息都有个id</strong>，服务器和聊天软件每次都拿<strong>最新消息的id</strong>进行对比，就能知道两端消息是否一致，就像<strong>对账</strong>一样。</p>
+<p>对于<strong>发送方</strong>，只要定时跟服务端的内容对账一下，就知道哪条消息没发送成功，直接重发就好了。</p>
+<p>如果<strong>接收方</strong>的聊天软件崩溃了，重启后跟服务器稍微通信一下就知道少了哪条数据，同步上来就是了，所以也不存在上面提到的丢包情况。</p>
+<p>可以看出，<strong>TCP只保证传输层的消息可靠性，并不保证应用层的消息可靠性。如果我们还想保证应用层的消息可靠性，就需要应用层自己去实现逻辑做保证。</strong></p>
+<p>那么问题叒来了，<strong>两端通信的时候也能对账，为什么还要引入第三端服务器？</strong></p>
+<p>主要有三个原因。</p>
+<ul>
+<li>第一，如果是两端通信，你聊天软件里有<code>1000个</code>好友，你就得建立<code>1000个</code>连接。但如果引入服务端，你只需要跟服务器建立<code>1个</code>连接就够了，<strong>聊天软件消耗的资源越少，手机就越省电</strong>。</li>
+<li>第二，就是<strong>安全问题</strong>，如果还是两端通信，随便一个人找你对账一下，你就把聊天记录给同步过去了，这并不合适吧。如果对方别有用心，信息就泄露了。引入第三方服务端就可以很方便的做各种<strong>鉴权</strong>校验。</li>
+<li>第三，是<strong>软件版本问题</strong>。软件装到用户手机之后，软件更不更新就是由用户说了算了。如果还是两端通信，且两端的<strong>软件版本跨度太大</strong>，很容易产生各种兼容性问题，但引入第三端服务器，就可以强制部分过低版本升级，否则不能使用软件。但对于大部分兼容性问题，给服务端加兼容逻辑就好了，不需要强制用户更新软件。</li>
+</ul>
+<p>所以看到这里大家应该明白了，我把服务端去掉，并不单纯是<strong>为了简单</strong>。</p>
+<h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><p><a target="_blank" rel="noopener" href="https://www.xiaolincoding.com/network/3_tcp/tcp_feature.html#%E9%87%8D%E4%BC%A0%E6%9C%BA%E5%88%B6">4.2 TCP 重传、滑动窗口、流量控制、拥塞控制 | 小林coding (xiaolincoding.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.xiaolincoding.com/network/3_tcp/tcp_drop.html#%E6%95%B0%E6%8D%AE%E5%8C%85%E7%9A%84%E5%8F%91%E9%80%81%E6%B5%81%E7%A8%8B">4.21 用了 TCP 协议，数据一定不会丢吗？ | 小林coding (xiaolincoding.com)</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author_group"><a class="post-copyright__author_img" href="/about/"><img class="post-copyright__author_img_front" src= "/img/spin.svg" data-lazy-src="/img/avatar.jpg"></a><div class="post-copyright__author_name">Rean's Blog</div><div class="post-copyright__author_desc">Enjoy technology and music</div></div><div class="post-tools" id="post-tools"><div class="post-tools-left"><div id="quit-box" onclick="RemoveRewardMask()"></div></div></div><div class="post-copyright__notice"><span class="post-copyright-info">本文是原创文章，采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0</a>协议，完整转载请注明来自<a href="/">Rean's Blog</a></span></div></div><div class="post-tools-right"><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/TCP/"><span class="tags-punctuation"></span>TCP<span class="tagsPageCount">7</span></a></div></div></div><nav class="needEndHide pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/p/156c59d0/"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">【分布式】CAP理论 &amp; 分布式锁</div></div></a></div><div class="next-post pull-right"><a href="/p/2574cf15/"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">【Hexo】永久短链生成 &amp; 插入视频</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="solitude st-star-smile-fill"></i><span>喜欢这篇的人也看了</span><div class="relatedPosts-link"><a onclick="event.preventDefault(); toRandomPost();" href="javascript:void(0);" rel="external nofollow" data-pjax-state="">随便逛逛</a></div></div><div class="relatedPosts-list"><div><a href="/p/413576cf/" title="【TCP】TCP 和 UDP 可以使用同一个端口吗？"><img class="cover" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/cover7.JPG" alt="cover"><div class="content is-center"><div class="title">【TCP】TCP 和 UDP 可以使用同一个端口吗？</div></div></a></div><div><a href="/p/9ee60c65/" title="【TCP&#x2F;HTTP】TCP Keepalive 和 HTTP Keep-Alive 是一个东西吗？"><img class="cover" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture5.jpg" alt="cover"><div class="content is-center"><div class="title">【TCP&#x2F;HTTP】TCP Keepalive 和 HTTP Keep-Alive 是一个东西吗？</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-content"><div class="card-info-avatar is-center"><div class="author-info__top-group"><div class="author-info__sayhi" id="author-info__sayhi" onclick="sco.changeSayHelloText()">sayhello.morning</div></div></div><div class="avatar-img-group"><img class="avatar-img" alt="头像" src= "/img/spin.svg" data-lazy-src="/img/avatar.jpg"><div class="avatar-sticker"><img class="avatar-sticker-img" src= "/img/spin.svg" data-lazy-src="https://7.isyangs.cn/34/65f2e4e0423cc-34.png" alt="心情贴纸"></div></div><div class="author-info__description_group"><div class="author-info__description">分享自己对编程的<b>热爱</b>，对知识海洋<b>探索历程</b>，随机掉落<b>无参配布</b>以及<b>翻调</b>（主要是音综类，在B站因为版权基本过不了审（。</div><div class="author-info__description2">相信你可以在这里找到对你有用的知识和教程。</div></div><div class="author-info__bottom-group"><a class="author-info__bottom-group-left" href="/about/"><div class="author-info__name">Rean</div><div class="author-info__desc">Enjoy technology and music</div></a><div class="card-info-social-icons is-center"><a class="social-icon" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze" title="Github"><i class="solitude  st-github-line"></i></a><a class="social-icon" target="_blank" rel="noopener" href="https://space.bilibili.com/6531436" title="Bilibili"><i class="solitude  st-bilibili-line"></i></a></div></div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="solitude st-menu-line"></i><span>文章目录</span></div><div class="toc-content" id="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%87%8D%E4%BC%A0%E6%9C%BA%E5%88%B6"><span class="toc-text">重传机制</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B6%85%E6%97%B6%E9%87%8D%E4%BC%A0"><span class="toc-text">超时重传</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BF%AB%E9%80%9F%E9%87%8D%E4%BC%A0"><span class="toc-text">快速重传</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SACK-%E6%96%B9%E6%B3%95"><span class="toc-text">SACK 方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Duplicate-SACK"><span class="toc-text">Duplicate SACK</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3"><span class="toc-text">滑动窗口</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%91%E9%80%81%E6%96%B9%E7%9A%84%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3"><span class="toc-text">发送方的滑动窗口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8E%A5%E6%94%B6%E6%96%B9%E7%9A%84%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3"><span class="toc-text">接收方的滑动窗口</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6"><span class="toc-text">流量控制</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%BC%93%E5%86%B2%E5%8C%BA%E4%B8%8E%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-text">操作系统缓冲区与滑动窗口的关系</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AA%97%E5%8F%A3%E5%85%B3%E9%97%AD"><span class="toc-text">窗口关闭</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#TCP-%E6%98%AF%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E7%AA%97%E5%8F%A3%E5%85%B3%E9%97%AD%E6%97%B6%EF%BC%8C%E6%BD%9C%E5%9C%A8%E7%9A%84%E6%AD%BB%E9%94%81%E7%8E%B0%E8%B1%A1%E5%91%A2%EF%BC%9F"><span class="toc-text">TCP 是如何解决窗口关闭时，潜在的死锁现象呢？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B3%8A%E6%B6%82%E7%AA%97%E5%8F%A3%E7%BB%BC%E5%90%88%E7%97%87"><span class="toc-text">糊涂窗口综合症</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A9%E6%8E%A5%E6%94%B6%E6%96%B9%E4%B8%8D%E9%80%9A%E5%91%8A%E5%B0%8F%E7%AA%97%E5%8F%A3%E7%BB%99%E5%8F%91%E9%80%81%E6%96%B9"><span class="toc-text">让接收方不通告小窗口给发送方</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A9%E5%8F%91%E9%80%81%E6%96%B9%E9%81%BF%E5%85%8D%E5%8F%91%E9%80%81%E5%B0%8F%E6%95%B0%E6%8D%AE"><span class="toc-text">让发送方避免发送小数据</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8B%A5%E5%A1%9E%E6%8E%A7%E5%88%B6"><span class="toc-text">拥塞控制</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%85%A2%E5%90%AF%E5%8A%A8"><span class="toc-text">慢启动</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8B%A5%E5%A1%9E%E9%81%BF%E5%85%8D%E7%AE%97%E6%B3%95"><span class="toc-text">拥塞避免算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8B%A5%E5%A1%9E%E5%8F%91%E7%94%9F"><span class="toc-text">拥塞发生</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BF%AB%E9%80%9F%E6%81%A2%E5%A4%8D"><span class="toc-text">快速恢复</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%94%A8%E4%BA%86-TCP-%E5%8D%8F%E8%AE%AE%EF%BC%8C%E6%95%B0%E6%8D%AE%E4%B8%80%E5%AE%9A%E4%B8%8D%E4%BC%9A%E4%B8%A2%E5%90%97%EF%BC%9F"><span class="toc-text">用了 TCP 协议，数据一定不会丢吗？</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%8C%85%E7%9A%84%E5%8F%91%E9%80%81%E6%B5%81%E7%A8%8B"><span class="toc-text">数据包的发送流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E5%AE%9A%E4%B8%8D%E4%BC%9A%E4%B8%A2%E5%8C%85%E5%90%97%EF%BC%9F"><span class="toc-text">一定不会丢包吗？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B%E8%BF%9E%E6%8E%A5%E6%97%B6%E4%B8%A2%E5%8C%85"><span class="toc-text">建立连接时丢包</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6%E4%B8%A2%E5%8C%85"><span class="toc-text">流量控制丢包</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%99%E7%B1%BB%E4%B8%A2%E5%8C%85%E9%97%AE%E9%A2%98%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%EF%BC%9F"><span class="toc-text">这类丢包问题如何解决？</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="toc-text">参考链接</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="solitude st-map-line"></i><span>最近发布</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/p/5871d67/" title="woff 字体反扒方案"><img alt="woff 字体反扒方案" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/221228-15574975489aa1.jpg"></a><div class="content"><a class="title" href="/p/5871d67/" title="woff 字体反扒方案">woff 字体反扒方案</a><a class="article-recent_post_categories" href="/p/5871d67/">研究</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/204d99f1/" title="【MyBatis】生命周期"><img alt="【MyBatis】生命周期" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/235335-1549900415dcc9.jpg"></a><div class="content"><a class="title" href="/p/204d99f1/" title="【MyBatis】生命周期">【MyBatis】生命周期</a><a class="article-recent_post_categories" href="/p/204d99f1/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/b585efd0/" title="敏感词过滤方案总结"><img alt="敏感词过滤方案总结" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture5.jpg"></a><div class="content"><a class="title" href="/p/b585efd0/" title="敏感词过滤方案总结">敏感词过滤方案总结</a><a class="article-recent_post_categories" href="/p/b585efd0/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/122902e7/" title="【并发】高并发下库存扣减如何避免超卖和少卖？"><img alt="【并发】高并发下库存扣减如何避免超卖和少卖？" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/cover8.JPG"></a><div class="content"><a class="title" href="/p/122902e7/" title="【并发】高并发下库存扣减如何避免超卖和少卖？">【并发】高并发下库存扣减如何避免超卖和少卖？</a><a class="article-recent_post_categories" href="/p/122902e7/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/683f7c8e/" title="网易云音乐歌名&amp;歌词获取方案收集"><img alt="网易云音乐歌名&amp;歌词获取方案收集" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture1.jpg"></a><div class="content"><a class="title" href="/p/683f7c8e/" title="网易云音乐歌名&amp;歌词获取方案收集">网易云音乐歌名&amp;歌词获取方案收集</a><a class="article-recent_post_categories" href="/p/683f7c8e/">教程</a></div></div></div></div></div></div></main><footer id="footer"><div id="st-footer-bar"><div class="footer-logo"><span class="solitude">Rean's Blog</span></div><div class="footer-bar-description">来自Rean's Blog - Enjoy technology and music的文章</div><a class="footer-bar-link" href="/">了解更多</a></div><div id="footer_deal"><a class="deal_link" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze" title="Github"><i class="solitude  st-github-line"></i></a><a class="deal_link" target="_blank" rel="noopener" href="https://space.bilibili.com/6531436" title="Bilibili"><i class="solitude  st-bilibili-line"></i></a></div><div id="st-footer"></div><div id="footer-bar"><div class="footer-bar-links"><div class="footer-bar-left"><div class="copyright">© 2024 By&nbsp;<a class="footer-bar-link" href="/">Rean</a></div></div><div class="footer-bar-right"><a class="footer-bar-link" target="_blank" rel="noopener" href="https://github.com/valor-x/hexo-theme-solitude" alt="主题">主题</a><a class="footer-bar-link cc" href="/null" aria-label="copyright"><i class="solitude st-copyright-line"></i><i class="solitude st-creative-commons-by-line"></i><i class="solitude st-creative-commons-nc-line"></i><i class="solitude st-creative-commons-nd-line"></i></a></div></div></div></footer></div><!-- right_menu--><div id="rightMenu"><div class="rightMenu-group rightMenu-small"><div class="rightMenu-item" id="menu-backward"><i class="solitude st-arrow-left-line"></i></div><div class="rightMenu-item" id="menu-forward"><i class="solitude st-arrow-right-line"></i></div><div class="rightMenu-item" id="menu-refresh"><i class="solitude st-restart-line"></i></div><div class="rightMenu-item" id="menu-top"><i class="solitude st-arrow-up-line"></i></div></div><div class="rightMenu-group rightMenu-line rightMenuPlugin"><div class="rightMenu-item" id="menu-copytext"><i class="solitude st-copy-fill"></i><span>复制选中文本</span></div><div class="rightMenu-item" id="menu-pastetext"><i class="solitude st-clipboard-fill"></i><span>粘贴文本</span></div><div class="rightMenu-item" id="menu-newwindow"><i class="solitude st-window-fill"></i><span>新窗口打开</span></div><div class="rightMenu-item" id="menu-copylink"><i class="solitude st-link-line"></i><span>复制链接地址</span></div><div class="rightMenu-item" id="menu-copyimg"><i class="solitude st-copy-fill"></i><span>复制此图片</span></div><div class="rightMenu-item" id="menu-downloadimg"><i class="solitude st-download-cloud-fill"></i><span>下载此图片</span></div><div class="rightMenu-item" id="menu-search"><i class="solitude st-search-line"></i><span>站内搜索</span></div><div class="rightMenu-item" id="menu-music-toggle"><i class="solitude st-play-fill"></i><span>播放音乐</span></div><div class="rightMenu-item" id="menu-music-back"><i class="solitude st-skip-back-fill"></i><span>切换到上一首</span></div><div class="rightMenu-item" id="menu-music-forward"><i class="solitude st-skip-forward-fill"></i><span>切换到下一首</span></div><div class="rightMenu-item" id="menu-music-copyMusicName"><i class="solitude st-copy-fill"></i><span>复制歌名</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><div class="rightMenu-item" id="menu-randomPost" onclick="toRandomPost()||rm.hideRightMenu()"><i class="solitude st-signal-tower-fill"></i><span>随机短文</span></div><div class="rightMenu-item" onclick="pjax.loadUrl('/categories/')||rm.hideRightMenu()"><i class="solitude st-checkbox-multiple-blank-fill"></i><span>全部分类</span></div><div class="rightMenu-item" onclick="pjax.loadUrl('/tags/')||rm.hideRightMenu()"><i class="solitude st-price-tag-fill"></i><span>全部标签</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><div class="rightMenu-item" id="menu-darkmode" onclick="sco.switchDarkMode()"><i class="solitude st-moon-clear-fill"></i><span class="menu-darkmode-text">深色模式</span></div><div class="rightMenu-item" id="menu-translate"><i class="solitude st-panben-line"></i><span>轉為繁體</span></div></div></div><div id="rightmenu-mask"></div><!-- inject body--><div><script src="/js/utils.js?v=1.8.10"></script><script src="/js/main.js?v=1.8.10"></script><script src="/js/third_party/waterfall.min.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/pjax/0.2.8/pjax.min.js"></script><script src="/js/third_party/universe.min.js?v=1.8.10"></script><script>dark()
+</script><script src="/js/tw_cn.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/vanilla-lazyload/19.1.3/lazyload.iife.min.js"></script><script src="https://cdn.staticfile.net/node-snackbar/0.1.16/snackbar.min.js"></script><script src="https://cdn.staticfile.net/fancyapps-ui/5.0.36/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.staticfile.net/Swiper/11.0.5/swiper-bundle.min.js"></script><script>var meting_api = 'https://meting.qjqq.cn/?server=:server&type=:type&id=:id&auth=:auth&r=:r';</script><script src="https://cdn.staticfile.net/aplayer/1.10.1/APlayer.min.js"></script><script src="https://cdn.staticfile.net/meting/2.0.1/Meting.min.js"></script><script>const coverColorConfig = {
+    api: 'https://api.qjqq.cn/api/Imgcolor?img=',
+    time: 43200000
+}</script><script src="/js/covercolor/api.js?v=1.8.10"></script><script src="/js/music.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/pace/1.2.4/pace.min.js"></script><script src="/js/right_menu.js?v=1.8.10"></script><div class="js-pjax"><script defer pjax src="https://cdn.staticfile.net/pearssauce-busuanzi/1.0.0/bsz.pure.min.js"></script></div></div><!-- newest comment--><!-- pjax--><script>const pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: ['title','#body-wrap','#site-config','meta[name="description"]','.js-pjax','meta[property^="og:"]','#config-diff'],
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+})
+
+document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+})
+
+document.addEventListener('pjax:complete', () => {
+    window.refreshFn()
+
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+        const newScript = document.createElement('script')
+        const content = item.text || item.textContent || item.innerHTML || ""
+        Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+        newScript.appendChild(document.createTextNode(content))
+        item.parentNode.replaceChild(newScript, item)
+    })
+
+    GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+})
+
+document.addEventListener('pjax:error', (e) => {
+    if (e.request.status === 404) {
+        pjax.loadUrl('/404.html')
+    }
+})</script><!-- theme--><script>initTheme = () => {
+    let isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const cachedMode = utils.saveToLocal.get('theme');
+    if (cachedMode === undefined) {
+        const nowMode =
+            isDarkMode ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', nowMode);
+    } else {
+        document.documentElement.setAttribute('data-theme', cachedMode);
+    }
+    is_rm && rm.mode(cachedMode === 'dark' && isDarkMode)
+}
+initTheme()</script><!-- google adsense--><!-- search--><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><button class="search-close-button"><i class="solitude st-close-fill"></i></button></nav><div class="search-wrap"><div class="search-box"><input class="search-box-input" id="search-input" type="text" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="输入关键词快速查找"></div><div id="search-results"><div id="search-hits"></div></div><div id="search-pagination"></div><div id="search-tips"></div></div></div><div id="search-mask"></div></div><script src="/js/search/local.js?v=1.8.10"></script><!-- music--><div class="needEndHide" id="nav-music" onclick="sco.musicToggle()"><div id="nav-music-hoverTips">音乐已暂停</div><meting-js id="421801417" server="netease" type="playlist" mutex="true" preload="none" data-lrctype="0" order="random" theme="var(--efu-main)"></meting-js></div></body></html><script>const posts=["p/5871d67/","p/204d99f1/","p/b585efd0/","p/122902e7/","p/683f7c8e/","p/36b252a1/","p/bbd98f0d/","p/1b320550/","p/30cd73ca/","p/332adb42/","p/4f877c1e/","p/677c7789/","p/f7f0a5f3/","p/9b5a538c/","p/37360bc0/","p/bb996d5/","p/364ea8cc/","p/a027699d/","p/21cdaec5/","p/37c37880/","p/a02febe4/","p/d1ec0e4e/","p/25d2b878/","p/8324e4bc/","p/6021f67a/","p/305331f0/","p/66be4b4/","p/de2d10bc/","p/e6628f8e/","p/4131eeff/","p/27705e17/","p/74e1a37c/","p/b5223f80/","p/9b8bc45a/","p/c9cb7159/","p/82c942ab/","p/4c19fcc6/","p/27446c6a/","p/9f38852a/","p/2516f5f2/","p/b27c77b3/","p/7a3264f/","p/7beadfaa/","p/e1d9906f/","p/a440b512/","p/a46aa116/","p/fe8dd3bd/","p/51c99199/","p/91b418a/","p/421add40/","p/9d7a18c7/","p/26345198/","p/fa30e874/","p/dea9a817/","p/59203ba6/","p/e5616c72/","p/971e9859/","p/d7f6ccff/","p/1b2ec1c2/","p/a0d1cef9/","p/a58b6af0/","p/9381aa6d/","p/38b8becb/","p/d0a26095/","p/2b3bdada/","p/ba70636/","p/374630f5/","p/a964a243/","p/a06e9899/","p/ef9a99de/","p/108f7c52/","p/a91c1846/","p/413576cf/","p/9ee60c65/","p/e74db628/","p/888c8bf3/","p/477dbe08/","p/38e8a510/","p/dfb41864/","p/b0e3506b/","p/e17fd725/","p/e1fe458c/","p/636cfdea/","p/7b854cb7/","p/b3a61240/","p/64f43fb4/","p/800f9a11/","p/4a48b34c/","p/b3641215/","p/53bc1fc9/","p/fc02f9ee/","p/25b929f6/","p/dd30b42/","p/3aa261db/","p/fc078742/","p/22c9d1d0/","p/33fc02d2/","p/70335ae0/","p/f32ef110/","p/f756486c/","p/8dd4b91f/","p/a290d941/","p/61a8a4ef/","p/c2d0bb20/","p/9770d71c/","p/41bd2aed/","p/bfebe40b/","p/6b4006e6/","p/b5696360/","p/53ab7115/","p/e6fa9b9/","p/866abf45/","p/b718b92a/","p/d26f4c21/","p/bc5d6bbe/","p/5a18917b/","p/5f2b1e2f/","p/2532a2ee/","p/4337b2c0/","p/e042d029/","p/9b4a91e5/","p/9d8ce868/","p/a69f6a48/","p/f9b9edb2/","p/cbe55d0/","p/156c59d0/","p/d4d6f818/","p/2574cf15/","p/a0efc292/","p/ec2ecf28/","p/85f11265/","p/db95e6f5/","p/a8296e6d/","p/4cc89a71/","p/d0fe2d0f/","p/ffab2f6b/","p/95d9f91e/","p/7f869365/","p/5b246b1b/","p/a9c92fa9/","p/7d49fec0/","p/a9a25fcd/","p/43bb383e/","p/b9aeb4/","p/52eaf228/","p/4be90d2f/","p/ed500d41/","p/dcfbc8e5/","p/240e5e52/","p/18cda1b3/","p/66a6c396/","p/5f33341/","p/f9bef31e/","p/acac46b/","p/a4189438/","p/ae6b0147/","p/4e982f2d/","p/403e0cac/","p/495b9f0f/","p/8e966ab9/","p/f6e1007e/","p/6f562d19/","p/10eac329/","p/cc53cf58/","p/4f2beac6/","p/73e2aa1/","p/c677e75e/","p/3f13b766/","p/cc30f00/","p/807cab5e/","p/5b5991e4/","p/e941ffc/"];function toRandomPost(){ pjax.loadUrl('/'+posts[Math.floor(Math.random()*posts.length)]); }</script>

@@ -1,0 +1,472 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><title>【操作系统】内存管理 | Rean's Blog</title><noscript>开启JavaScript才能访问本站哦~</noscript><link rel="icon" href="/img/favicon.png"><!-- index.css--><link rel="stylesheet" href="/css/index.css?v=1.8.10"><!-- inject head--><link rel="stylesheet" href="https://cdn2.codesign.qq.com/icons/7pOrz0WXB5ZWJPX/latest/iconfont.css"><!-- aplayer--><link rel="stylesheet" href="https://cdn.staticfile.net/aplayer/1.10.1/APlayer.min.css"><!-- swiper--><link rel="stylesheet" href="https://cdn.staticfile.net/Swiper/11.0.5/swiper-bundle.min.css"><!-- fancybox ui--><link rel="stylesheet" href="https://cdn.staticfile.net/fancyapps-ui/5.0.36/fancybox/fancybox.min.css"><!-- katex--><!-- Open Graph--><meta name="description" content="为什么要有虚拟内存？虚拟内存虚拟内存是操作系统提供给每个运行中程序的一种地址空间，每个程序在运行时认为自己拥有的内存空间就是虚拟内存，其大小可以远远大于物理内存的大小。虚拟内存通过将程序的地址空间划分成若干个固定大小的页或段，并将这些页或者段映射到物理内存中的不同位置，从而使得程序在运行时可以更高效"><!-- pwa--><meta name="apple-mobile-web-app-capable" content="Rean's Blog"><meta name="theme-color" content="var(--efu-main)"><meta name="apple-mobile-web-app-status-bar-style" content="var(--efu-main)"><link rel="bookmark" href="/img/favicon.png"><link rel="apple-touch-icon" href="/img/favicon.png" sizes="180x180"><script>console.log(
+    "%c Program: Hexo %c Theme: Solitude %c Version: v1.8.10",
+    "border-radius:5px 0 0 5px;padding: 5px 10px;color:white;background:#ff3842;",
+    "padding: 5px 10px;color:white;background:#3e9f50;",
+    "padding: 5px 10px;color:white;background:#0084ff;",
+)
+</script><script>(()=>{
+        const saveToLocal = {
+            set: function setWithExpiry(key, value, ttl) {
+                if (ttl === 0)
+                    return
+                const now = new Date()
+                const expiryDay = ttl * 86400000
+                const item = {
+                    value: value,
+                    expiry: now.getTime() + expiryDay
+                }
+                localStorage.setItem(key, JSON.stringify(item))
+            },
+            get: function getWithExpiry(key) {
+                const itemStr = localStorage.getItem(key)
+    
+                if (!itemStr) {
+                    return undefined
+                }
+                const item = JSON.parse(itemStr)
+                const now = new Date()
+    
+                if (now.getTime() > item.expiry) {
+                    localStorage.removeItem(key)
+                    return undefined
+                }
+                return item.value
+            }
+        };
+        window.utils = {
+            saveToLocal: saveToLocal,
+            getCSS: (url, id = false) => new Promise((resolve, reject) => {
+              const link = document.createElement('link')
+              link.rel = 'stylesheet'
+              link.href = url
+              if (id) link.id = id
+              link.onerror = reject
+              link.onload = link.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                link.onload = link.onreadystatechange = null
+                resolve()
+              }
+              document.head.appendChild(link)
+            }),
+            getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+              const script = document.createElement('script')
+              script.src = url
+              script.async = true
+              script.onerror = reject
+              script.onload = script.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                script.onload = script.onreadystatechange = null
+                resolve()
+              }
+    
+              Object.keys(attr).forEach(key => {
+                script.setAttribute(key, attr[key])
+              })
+    
+              document.head.appendChild(script)
+            }),
+            addGlobalFn: (key, fn, name = false, parent = window) => {
+                const globalFn = parent.globalFn || {}
+                const keyObj = globalFn[key] || {}
+        
+                if (name && keyObj[name]) return
+        
+                name = name || Object.keys(keyObj).length
+                keyObj[name] = fn
+                globalFn[key] = keyObj
+                parent.globalFn = globalFn
+            },
+        }
+    })()</script><!-- global head--><script>const GLOBAL_CONFIG = {
+    root: '/',
+    algolia: undefined,
+    localsearch: {"preload":false,"path":"/search.xml"},
+    runtime: '2024-01-05 00:00:00',
+    lazyload: {
+        enable: true,
+        error: '/img/error_load.png'
+    },
+    copyright: {"limit":50,"author":"作者: Rean","link":"链接: ","source":"来源: Rean's Blog","info":"著作权归作者所有。 商业转载请联系作者获得授权，非商业转载请注明出处。"},
+    highlight: {
+        enable: true,
+        limit: 200,
+        expand: true,
+        copy: true,
+        syntax: 'highlight.js'
+    },
+    randomlink: false,
+    lang: {"theme":{"dark":"已切换至深色模式","light":"已切换至浅色模式"},"copy":{"success":"复制成功","error":"复制失败"},"backtop":"返回顶部","time":{"day":"天前","hour":"小时前","just":"刚刚","min":"分钟前","month":"个月前"},"f12":"开发者模式已打开，请遵循GPL协议。","totalk":"无需删除空行，直接输入评论即可","search":{"empty":"找不到你查询的内容：${query}","hit":"找到 ${hits} 条结果，用时 ${time} 毫秒","placeholder":"输入关键词快速查找","count":"共 <b>${count}</b> 条结果。"}},
+    aside: {
+        sayhello: {
+            morning: '一日之计在于晨',
+            noon: '吃饱了才有力气干活',
+            afternoon: '集中精力，攻克难关',
+            night: '不要太劳累了，早睡更健康',
+            goodnight: '睡个好觉，保证精力充沛',
+        },
+        sayhello2: ["🤖️ 数码科技爱好者","🔍 分享与热心帮助","🔨 设计开发一条龙","🎮 游戏爱好者"],
+    },
+    covercolor: {
+        enable: true
+    },
+    comment: false,
+    lightbox: 'fancybox',
+    post_ai: false,
+    right_menu: {"mode":{"dark":"深色模式","light":"浅色模式"},"img_error":"此图片无法复制与下载","music":{"start":"播放音乐","stop":"暂停音乐"},"translate":{"translateDelay":0,"defaultEncoding":2}},
+};</script><!-- page-config head--><script id="config-diff">var PAGE_CONFIG = {
+    is_post: true,
+    is_page: false,
+    is_home: false,
+    page: '',
+    toc: true,
+    comment: false,
+    ai_text: false,
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body id="body"><!-- universe--><canvas id="universe"></canvas><!-- loading--><!-- console--><div id="console"><div class="close-btn" onclick="sco.hideConsole()"><i class="solitude st-close-fill"></i></div><div class="button-group"><div class="console-btn-item"><span class="darkmode_switchbutton" onclick="sco.switchDarkMode()" title="昼夜切换"><i class="solitude st-moon-clear-fill"></i></span></div><div class="console-btn-item" id="consoleHideAside"><span class="asideSwitch" onclick="sco.switchHideAside()" title="边栏显示控制"><i class="solitude st-side-bar-fill"></i></span></div><div class="console-btn-item" id="consoleMusic" onclick="sco.musicToggle()"><span class="music-switch" title="音乐开关"><i class="solitude st-disc-fill"></i></span></div></div><div class="console-mask" onclick="sco.hideConsole()"></div></div><!-- sidebar--><div id="sidebar" style="zoom: 1;"><div id="menu-mask" style="display: none;"></div><div id="sidebar-menus"><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">172</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">11</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">155</div></a></div></div></div><span class="sidebar-menu-item-title">功能</span><div class="sidebar-menu-item"><span class="darkmode_switchbutton menu-child" onclick="sco.switchDarkMode()"><i class="solitude st-moon-clear-fill"></i><span>显示模式</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文章</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  st-folder-fill"></i><span>文章列表</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  st-checkbox-multiple-blank-fill"></i><span>分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  st-price-tag-fill"></i><span>标签</span></a></li><li><a class="site-page child" href="/study/"><i class="solitude  st-gift-fill"></i><span>学习</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>我的</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="solitude  st-disc-fill"></i><span>音乐馆</span></a></li><li><a class="site-page child" href="/essay/"><span>即刻短文</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>关于本站</span></a></li></ul></div></div><span class="sidebar-menu-item-title">标签</span><div class="card-widget card-tags card-archives card-webinfo card-allinfo"><div class="card-tag-cloud"><a href="/tags/%E8%85%BE%E8%AE%AF/">腾讯<sup>1</sup></a><a href="/tags/%E5%90%8E%E5%8F%B0%E5%BC%80%E5%8F%91/">后台开发<sup>1</sup></a><a href="/tags/Markdown/">Markdown<sup>1</sup></a><a href="/tags/Butterfly/">Butterfly<sup>2</sup></a><a href="/tags/PyCharm/">PyCharm<sup>1</sup></a><a href="/tags/IDEA/">IDEA<sup>1</sup></a><a href="/tags/Git/">Git<sup>2</sup></a><a href="/tags/Halo/">Halo<sup>1</sup></a><a href="/tags/GitHub/">GitHub<sup>1</sup></a><a href="/tags/JavaFx/">JavaFx<sup>2</sup></a><a href="/tags/SpringBoot/">SpringBoot<sup>7</sup></a><a href="/tags/Java/">Java<sup>18</sup></a><a href="/tags/MyBatis/">MyBatis<sup>4</sup></a><a href="/tags/Hexo/">Hexo<sup>3</sup></a><a href="/tags/SyncTV/">SyncTV<sup>1</sup></a><a href="/tags/AList/">AList<sup>1</sup></a><a href="/tags/%E5%AE%9D%E5%A1%94/">宝塔<sup>3</sup></a><a href="/tags/Vue/">Vue<sup>18</sup></a><a href="/tags/Vite/">Vite<sup>6</sup></a><a href="/tags/JavaScript/">JavaScript<sup>4</sup></a><a href="/tags/TypeScript/">TypeScript<sup>3</sup></a><a href="/tags/Electron/">Electron<sup>4</sup></a><a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习<sup>1</sup></a><a href="/tags/scikit-learn/">scikit-learn<sup>1</sup></a><a href="/tags/vocalremover/">vocalremover<sup>1</sup></a><a href="/tags/BPM/">BPM<sup>1</sup></a><a href="/tags/%E9%BB%91%E7%A5%9E%E8%AF%9D%EF%BC%9A%E6%82%9F%E7%A9%BA/">黑神话：悟空<sup>1</sup></a><a href="/tags/HTTP/">HTTP<sup>5</sup></a><a href="/tags/HTTPS/">HTTPS<sup>2</sup></a><a href="/tags/%E7%9F%AD%E9%93%BE/">短链<sup>1</sup></a><a href="/tags/%E8%A7%86%E9%A2%91/">视频<sup>1</sup></a><a href="/tags/HTTP-1-1/">HTTP/1.1<sup>1</sup></a><a href="/tags/LaTex/">LaTex<sup>1</sup></a><a href="/tags/%E5%8A%A0%E5%AF%86/">加密<sup>1</sup></a><a href="/tags/IP/">IP<sup>2</sup></a><a href="/tags/ICMP/">ICMP<sup>1</sup></a><a href="/tags/I-O/">I/O<sup>2</sup></a><a href="/tags/JVM/">JVM<sup>2</sup></a><a href="/tags/Springboot/">Springboot<sup>1</sup></a><a href="/tags/ThreadLocal/">ThreadLocal<sup>1</sup></a><a href="/tags/UUID/">UUID<sup>1</sup></a><a href="/tags/%E5%B9%B6%E5%8F%91/">并发<sup>4</sup></a><a href="/tags/%E7%BA%A2%E9%BB%91%E6%A0%91/">红黑树<sup>2</sup></a><a href="/tags/%E9%93%BE%E8%A1%A8/">链表<sup>1</sup></a><a href="/tags/%E5%8A%9B%E6%89%A3/">力扣<sup>1</sup></a><a href="/tags/LeetCode/">LeetCode<sup>1</sup></a><a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库<sup>8</sup></a><a href="/tags/NLP/">NLP<sup>6</sup></a><a href="/tags/spaCy/">spaCy<sup>4</sup></a><a href="/tags/Python/">Python<sup>1</sup></a><a href="/tags/Redis/">Redis<sup>10</sup></a><a href="/tags/RDB/">RDB<sup>1</sup></a><a href="/tags/AOF/">AOF<sup>1</sup></a><a href="/tags/%E7%BA%BF%E7%A8%8B/">线程<sup>2</sup></a><a href="/tags/I-O%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">I/O多路复用<sup>2</sup></a><a href="/tags/Spring/">Spring<sup>5</sup></a><a href="/tags/TCP/">TCP<sup>7</sup></a><a href="/tags/UDP/">UDP<sup>1</sup></a><a href="/tags/Socket/">Socket<sup>1</sup></a><a href="/tags/FFMpeg/">FFMpeg<sup>1</sup></a><a href="/tags/%E6%A0%B7%E5%BC%8F/">样式<sup>1</sup></a><a href="/tags/ECMAScript/">ECMAScript<sup>2</sup></a><a href="/tags/Element/">Element<sup>3</sup></a><a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">分布式锁<sup>1</sup></a><a href="/tags/%E5%91%A8%E6%B7%B1/">周深<sup>5</sup></a><a href="/tags/%E5%BE%B5%E7%BE%BD%E6%91%A9%E6%9F%AF/">徵羽摩柯<sup>1</sup></a><a href="/tags/%E9%9F%B3%E4%B9%90%E7%BC%98%E8%AE%A1%E5%88%92/">音乐缘计划<sup>1</sup></a><a href="/tags/%E5%A5%A5%E6%96%AF%E5%8D%A1/">奥斯卡<sup>3</sup></a><a href="/tags/%E5%BC%A0%E6%9D%B0/">张杰<sup>2</sup></a><a href="/tags/%E5%A3%B0%E7%94%9F%E4%B8%8D%E6%81%AF%C2%B7%E5%AE%9D%E5%B2%9B%E5%AD%A3/">声生不息·宝岛季<sup>3</sup></a><a href="/tags/%E5%BE%90%E4%BD%B3%E8%8E%B9/">徐佳莹<sup>1</sup></a><a href="/tags/SynthV/">SynthV<sup>15</sup></a><a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统<sup>4</sup></a><a href="/tags/%E6%B0%B8%E5%A4%9CMinus/">永夜Minus<sup>4</sup></a><a href="/tags/%E9%9F%A6%E7%A4%BC%E5%AE%89/">韦礼安<sup>1</sup></a><a href="/tags/%E8%94%A1%E4%BE%9D%E6%9E%97/">蔡依林<sup>1</sup></a><a href="/tags/%E6%97%A0%E5%8F%82/">无参<sup>45</sup></a><a href="/tags/%E5%8F%A4%E9%A3%8E/">古风<sup>11</sup></a><a href="/tags/%E4%B8%89%E6%97%A0Marblue/">三无Marblue<sup>1</sup></a><a href="/tags/%E7%B4%A2%E5%BC%95/">索引<sup>1</sup></a><a href="/tags/B%E6%A0%91/">B树<sup>1</sup></a><a href="/tags/B-%E6%A0%91/">B+树<sup>1</sup></a><a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构<sup>1</sup></a><a href="/tags/%E6%A0%91/">树<sup>1</sup></a><a href="/tags/%E4%BA%8C%E5%8F%89%E6%A0%91/">二叉树<sup>1</sup></a><a href="/tags/%E8%AE%B8%E9%92%A7/">许钧<sup>1</sup></a><a href="/tags/%E6%AD%8C%E6%89%8B2024/">歌手2024<sup>37</sup></a><a href="/tags/Chante-Moore/">Chanté Moore<sup>2</sup></a><a href="/tags/%E9%BB%84%E5%AE%A3/">黄宣<sup>1</sup></a><a href="/tags/Faouzia/">Faouzia<sup>4</sup></a><a href="/tags/Lenka/">Lenka<sup>1</sup></a><a href="/tags/%E5%BC%A0%E9%92%B0%E7%90%AA/">张钰琪<sup>1</sup></a><a href="/tags/%E9%82%A3%E8%8B%B1/">那英<sup>9</sup></a><a href="/tags/%E5%B0%A4%E9%95%BF%E9%9D%96/">尤长靖<sup>2</sup></a><a href="/tags/%E5%AD%99%E6%A5%A0/">孙楠<sup>5</sup></a><a href="/tags/%E8%B0%AD%E7%BB%B4%E7%BB%B4/">谭维维<sup>3</sup></a><a href="/tags/%E5%B4%A9%E5%9D%8F%EF%BC%9A%E6%98%9F%E7%A9%B9%E9%93%81%E9%81%93/">崩坏：星穹铁道<sup>4</sup></a><a href="/tags/%E8%B5%A4%E7%BE%BD/">赤羽<sup>1</sup></a><a href="/tags/%E6%B1%AA%E8%8B%8F%E6%B3%B7/">汪苏泷<sup>4</sup></a><a href="/tags/%E5%A3%B0%E7%94%9F%E4%B8%8D%E6%81%AF%C2%B7%E5%AE%B6%E5%B9%B4%E5%8D%8E/">声生不息·家年华<sup>2</sup></a><a href="/tags/%E9%99%88%E6%A5%9A%E7%94%9F/">陈楚生<sup>2</sup></a><a href="/tags/%E9%99%88%E4%BA%A6%E6%B4%BA/">陈亦洺<sup>1</sup></a><a href="/tags/%E5%B0%9A%E8%BE%B0/">尚辰<sup>1</sup></a><a href="/tags/%E5%BF%98%E5%B7%9D%E9%A3%8E%E5%8D%8E%E5%BD%95/">忘川风华录<sup>2</sup></a><a href="/tags/%E4%B9%90%E6%AD%A3%E9%BE%99%E7%89%99/">乐正龙牙<sup>1</sup></a><a href="/tags/%E6%98%9F%E5%B0%98Infinity/">星尘Infinity<sup>1</sup></a><a href="/tags/%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F/">明日方舟<sup>2</sup></a><a href="/tags/%E7%A5%96%E5%A8%85%E7%BA%B3%E6%83%9C/">祖娅纳惜<sup>1</sup></a><a href="/tags/%E7%94%B5%E5%AD%90/">电子<sup>1</sup></a><a href="/tags/%E6%98%9F%E5%B0%98/">星尘<sup>3</sup></a><a href="/tags/%E5%BC%A0%E4%BF%A1%E5%93%B2/">张信哲<sup>2</sup></a><a href="/tags/%E9%93%B6%E4%B8%B4/">银临<sup>1</sup></a><a href="/tags/%E6%9D%8E%E5%B8%B8%E8%B6%85/">李常超<sup>1</sup></a><a href="/tags/%E5%B1%B1%E8%89%B2%E6%9C%89%E6%97%A0%E4%B8%AD/">山色有无中<sup>1</sup></a><a href="/tags/%E5%91%A8%E6%9D%B0%E4%BC%A6/">周杰伦<sup>1</sup></a><a href="/tags/%E9%BB%84%E9%9C%84%E9%9B%B2/">黄霄雲<sup>1</sup></a><a href="/tags/%E5%AE%B9%E7%A5%96%E5%84%BF/">容祖儿<sup>1</sup></a><a href="/tags/%E6%88%91%E6%98%AF%E6%AD%8C%E6%89%8B%C2%B7%E7%AC%AC%E5%9B%9B%E5%AD%A3/">我是歌手·第四季<sup>1</sup></a><a href="/tags/%E6%9D%8E%E5%85%8B%E5%8B%A4/">李克勤<sup>1</sup></a><a href="/tags/%E7%B2%A4%E8%AF%AD/">粤语<sup>2</sup></a><a href="/tags/%E9%BB%84%E4%B8%BD%E7%8E%B2/">黄丽玲<sup>1</sup></a><a href="/tags/G-E-M-%E9%82%93%E7%B4%AB%E6%A3%8B/">G.E.M.邓紫棋<sup>6</sup></a><a href="/tags/T-I-M-E/">T.I.M.E.<sup>4</sup></a><a href="/tags/%E6%97%B6%E5%85%89%E9%9F%B3%E4%B9%90%E4%BC%9A%C2%B7%E8%80%81%E5%8F%8B%E8%AE%B0/">时光音乐会·老友记<sup>4</sup></a><a href="/tags/%E5%BC%A0%E5%AD%A6%E5%8F%8B/">张学友<sup>1</sup></a><a href="/tags/%E6%9D%A8%E4%B8%9E%E7%90%B3/">杨丞琳<sup>1</sup></a><a href="/tags/%E6%B1%AA%E5%B3%B0/">汪峰<sup>1</sup></a><a href="/tags/%E6%9C%AA%E5%AE%9A%E4%BA%8B%E4%BB%B6%E7%B0%BF/">未定事件簿<sup>1</sup></a><a href="/tags/%E5%BC%A0%E8%BF%9C/">张远<sup>1</sup></a><a href="/tags/%E5%AD%99%E7%87%95%E5%A7%BF/">孙燕姿<sup>1</sup></a><a href="/tags/%E6%B5%B7%E6%9D%A5%E9%98%BF%E6%9C%A8/">海来阿木<sup>1</sup></a><a href="/tags/%E6%9B%B9%E6%9D%A8/">曹杨<sup>2</sup></a><a href="/tags/%E4%B8%8B%E4%B8%80%E6%88%98%E6%AD%8C%E6%89%8B/">下一战歌手<sup>2</sup></a><a href="/tags/Fine%E4%B9%90%E5%9B%A2/">Fine乐团<sup>1</sup></a><a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络<sup>4</sup></a><a href="/tags/DNS/">DNS<sup>1</sup></a><a href="/tags/MAC/">MAC<sup>1</sup></a><a href="/tags/Adam-Lambert/">Adam Lambert<sup>1</sup></a><a href="/tags/%E4%BA%9A%E5%BD%93%C2%B7%E5%85%B0%E4%BC%AF%E7%89%B9/">亚当·兰伯特<sup>1</sup></a><a href="/tags/Hayden/">Hayden<sup>1</sup></a><a href="/tags/%E6%9A%AE%E5%A4%9C/">暮夜<sup>1</sup></a><a href="/tags/ACE-Studio/">ACE Studio<sup>2</sup></a><a href="/tags/%E5%B0%9A%E9%9B%AF%E5%A9%95/">尚雯婕<sup>1</sup></a><a href="/tags/%E4%B8%9C%E6%96%B9%E6%A0%80%E5%AD%90/">东方栀子<sup>2</sup></a><a href="/tags/%E9%BB%84%E7%BB%AE%E7%8F%8A/">黄绮珊<sup>1</sup></a><a href="/tags/%E5%8D%8E%E6%99%A8%E5%AE%87/">华晨宇<sup>1</sup></a><a href="/tags/JUN/">JUN<sup>1</sup></a><a href="/tags/%E6%9E%97%E5%BF%86%E8%8E%B2/">林忆莲<sup>1</sup></a><a href="/tags/UTAU/">UTAU<sup>1</sup></a><a href="/tags/Sheena/">Sheena<sup>1</sup></a><a href="/tags/%E5%89%A7%E5%A5%BD%E5%90%AC%E7%9A%84%E6%AD%8C/">剧好听的歌<sup>1</sup></a><a href="/tags/Syncthing/">Syncthing<sup>1</sup></a><a href="/tags/%E5%90%8C%E6%AD%A5/">同步<sup>1</sup></a><a href="/tags/%E6%94%AF%E4%BB%98%E5%AE%9D/">支付宝<sup>1</sup></a><a href="/tags/Apifox/">Apifox<sup>2</sup></a></div></div></div></div><!-- keyboard--><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav class="show" id="nav"><div id="nav-group"><div id="blog_name"><a id="site-name" href="/" title="返回博客主页"><span class="title">Rean's Blog</span></a></div><div id="page-name-mask"><div id="page-name"><a id="page-name-text" onclick="sco.toTop()">【操作系统】内存管理</a></div></div><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文章</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  st-folder-fill"></i><span>文章列表</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  st-checkbox-multiple-blank-fill"></i><span>分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  st-price-tag-fill"></i><span>标签</span></a></li><li><a class="site-page child" href="/study/"><i class="solitude  st-gift-fill"></i><span>学习</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>我的</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="solitude  st-disc-fill"></i><span>音乐馆</span></a></li><li><a class="site-page child" href="/essay/"><span>即刻短文</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>关于本站</span></a></li></ul></div></div></div><div id="nav-left"></div><div id="nav-right"><div class="nav-button" id="randomPost_button"><a class="site-page" onclick="toRandomPost()" title="随机一篇文章" href="javascript:void(0);"><i class="solitude st-signal-tower-fill"></i></a></div><div class="nav-button" id="search-button"><a class="site-page social-icon search" href="javascript:void(0);" title="搜索"><i class="solitude st-search-line"></i></a></div><div class="nav-button" id="nav-console"><a class="console_switchbutton" onclick="sco.showConsole()" title="中控台" href="javascript:void(0);"><i class="solitude st-dashboard-fill"></i></a></div><div class="nav-button" id="nav-totop" onclick="sco.toTop()"><a class="totopbtn"><i class="solitude st-arrow-up-line"></i><span id="percent">0</span></a></div><div id="toggle-menu"><a class="site-page"><i class="solitude st-menu-line"></i></a></div></div></div></nav><div class="coverdiv" id="coverdiv"><img class="nolazyload" id="post-cover" src="https://npm.elemecdn.com/justlovesmile-photo/221228-15574975489aa1.jpg" alt="【操作系统】内存管理"></div><div id="post-info"><div id="post-firstinfo"><div class="meta-firstline"><a class="post-meta-original" title="该文章为原创文章，注意版权协议">原创</a><span class="post-meta-categories"><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a></span><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"><span class="tags-name tags-punctuation">操作系统</span></a></div></div></div></div><h1 class="post-title">【操作系统】内存管理</h1><div id="post-meta"><div class="meta-secondline"><span class="post-meta-date" title="发布于 2024-08-06 14:16:36"><i class="post-meta-icon solitude st-calendar-todo-fill"></i><time datetime="2024-08-06T06:16:36.000Z">2024-08-06T06:16:36.000Z</time></span><span class="post-meta-date" title="最后更新于 2024-08-12 15:20:36"><i class="post-meta-icon solitude st-refresh-line"></i><time datetime="2024-08-12T07:20:36.032Z">2024-08-12T07:20:36.032Z</time></span><span class="post-meta-wordcount"><i class="post-meta-icon solitude st-word-fill" title="文章字数"></i><span class="word-count">10k</span><span class="post-meta-separator"></span><i class="post-meta-icon solitude st-clock-fill" title="阅读耗时"></i><span>34 min</span></span><a class="post-meta-pv" href="/p/e1d9906f/" title="文章热度"><i class="post-meta-icon solitude st-fire-fill"></i><span id="busuanzi_page_pv"><i class="solitude st-loading-line"></i></span></a></div></div></div><section class="main-hero-waves-area waves-area"><svg class="waves-svg" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto"><defs><path id="gentle-wave" d="M -160 44 c 30 0 58 -18 88 -18 s 58 18 88 18 s 58 -18 88 -18 s 58 18 88 18 v 44 h -352 Z"></path></defs><g class="parallax"><use href="#gentle-wave" x="48" y="0"></use><use href="#gentle-wave" x="48" y="3"></use><use href="#gentle-wave" x="48" y="5"></use><use href="#gentle-wave" x="48" y="7"></use></g></svg></section></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="为什么要有虚拟内存？"><a href="#为什么要有虚拟内存？" class="headerlink" title="为什么要有虚拟内存？"></a>为什么要有虚拟内存？</h1><h2 id="虚拟内存"><a href="#虚拟内存" class="headerlink" title="虚拟内存"></a>虚拟内存</h2><p>虚拟内存是操作系统提供给每个运行中程序的一种地址空间，每个程序在运行时认为自己拥有的内存空间就是虚拟内存，其大小可以远远大于物理内存的大小。虚拟内存通过将程序的地址空间划分成若干个固定大小的页或段，并将这些页或者段映射到物理内存中的不同位置，从而使得程序在运行时可以更高效地利用物理内存。</p>
+<p>而物理内存是计算机实际存在的内存，是计算机中的实际硬件部件。</p>
+<p>如果两个程序都引用了绝对物理地址，第一个程序在 2000 的位置写入一个新的值，将会擦掉第二个程序存放在相同位置上的所有内容。</p>
+<p>我们可以把进程所使用的地址「隔离」开来，即让操作系统为每个进程分配独立的一套「<strong>虚拟地址</strong>」，人人都有，大家自己玩自己的地址就行，互不干涉。但是有个前提每个进程都不能访问物理地址，至于虚拟地址最终怎么落到物理内存里，对进程来说是透明的，操作系统已经把这些都安排的明明白白了。</p>
+<p><strong>操作系统会提供一种机制，将不同进程的虚拟地址和不同内存的物理地址映射起来。</strong></p>
+<p>如果程序要访问虚拟地址的时候，由操作系统转换成不同的物理地址，这样不同的进程运行的时候，写入的是不同的物理地址，这样就不会冲突了。</p>
+<p>于是，这里就引出了两种地址的概念：</p>
+<ul>
+<li>我们程序所使用的内存地址叫做<strong>虚拟内存地址</strong>（<em>Virtual Memory Address</em>）</li>
+<li>实际存在硬件里面的空间地址叫<strong>物理内存地址</strong>（<em>Physical Memory Address</em>）</li>
+</ul>
+<h3 id="物理地址"><a href="#物理地址" class="headerlink" title="物理地址"></a>物理地址</h3><p>物理地址是内存中存储单元的实际地址，也称为真实地址。它是指计算机系统中 RAM 中的每个存储单元的唯一标识。物理地址是硬件层面上的地址，用于实际的数据存储和访问。在操作系统的内存管理中，物理地址是指内存中实际存放数据的位置，由硬件控制器直接访问。</p>
+<h3 id="逻辑地址"><a href="#逻辑地址" class="headerlink" title="逻辑地址"></a>逻辑地址</h3><p>逻辑地址是程序中使用的虚拟地址，也称为虚拟地址。它是指程序中对内存的抽象表示，与实际的物理存储位置无关。逻辑地址由程序员或操作系统定义，用于访问内存中的数据。在计算机系统中，逻辑地址被映射到物理地址上，这个过程由内存管理单元(MMU)负责完成。逻辑地址空间可以大于物理地址空间，因为使用了分页或分段等技术，允许对内存进行灵活的管理和地址映射。</p>
+<h4 id="逻辑地址的作用"><a href="#逻辑地址的作用" class="headerlink" title="逻辑地址的作用"></a>逻辑地址的作用</h4><ol>
+<li>内存管理：逻辑地址提供了一种抽象的方式来管理内存。通过使用逻辑地址，程序可以将其内存访问操作与实际的物理存储位置解耦。这使得操作系统能够对内存进行更灵活的管理，包括内存的分配回收和保护。</li>
+<li>地址空间隔离：逻辑地址空间可以使不同的程序或进程彼此隔离，从而确保它们不会相互干扰或访问对方的内存空间。每个程序都有自己的逻辑地址空间，其中包含了程序执行所需的代码、数据和堆栈等信息。</li>
+<li>虚拟化和抽象：逻辑地址提供了一种虚拟化和抽象的方式，使得程序员可以更方便地编写和管理程序，而无需关注底层的物理硬件细节。这种抽象使得程序能够在不同的计算机系统上运行，而无需修改其代码。</li>
+</ol>
+<p>操作系统引入了虚拟内存，进程持有的虚拟地址会通过 CPU 芯片中的内存管理单元（MMU）的映射关系，来转换变成物理地址，然后再通过物理地址访问内存，如下图所示：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/72ab76ba697e470b8ceb14d5fc5688d9.png" alt="内存映射"></p>
+<h2 id="程序的内存布局是怎么样的？"><a href="#程序的内存布局是怎么样的？" class="headerlink" title="程序的内存布局是怎么样的？"></a>程序的内存布局是怎么样的？</h2><p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//picgo/image-20240725233029022.png" alt="image-20240725233029022"></p>
+<p>通过这张图你可以看到，用户空间内存，从<strong>低到高</strong>分别是6种不同的内存段：</p>
+<ul>
+<li>代码段：包括二进制可执行代码；</li>
+<li>数据段：包括已初始化的静态常量和全局变量；</li>
+<li>BSS段：包括未初始化的静态变量和全局变量；</li>
+<li>堆段：包括动态分配的内存，从低地址开始向上增长;</li>
+<li>文件映射段：包括动态库、共享内存等;</li>
+<li>栈段：包括局部变量和函数调用的上下文等。栈的大小是固定的，一般是8MB。当然系统也提供了参数，以便我们自定义大小;</li>
+</ul>
+<p>上图中的内存布局可以看到，代码段下面还有一段内存空间的（灰色部分），这一块区域是「保留区」，之所以要有保留区这是因为在大多数的系统里，我们认为比较小数值的地址不是一个合法地址，例如，我们通常在 C 的代码里会将无效的指针赋值为 NULL 。因此，这里会出现一段不可访问的内存保留区，防止程序因为出现 bug ，导致读或写了一些小内存地址的数据，而使得程序跑飞。</p>
+<p>在这 7 个内存段中，堆和文件映射段的内存是动态分配的。比如说，使用 C 标准库的<code>malloc()</code>或者<code>mmap()</code>，就可以分别在堆和文件映射段动态分配内存。</p>
+<h3 id="堆和栈的区别？"><a href="#堆和栈的区别？" class="headerlink" title="堆和栈的区别？"></a>堆和栈的区别？</h3><ul>
+<li><strong>分配方式</strong>：堆是动态分配内存，由程序员手动申请和释放内存，通常用于存储动态数据结构和对象。栈是静态分配内存，由编译器自动分配和释放内存，用于存储函数的局部变量和函数调用信息。</li>
+<li><strong>内存管理</strong>：堆需要程序员手动管理内存的分配和释放，如果管理不当可能会导致内存泄漏或内存溢出。栈由编译器自动管理内存，遵循后进先出的原则，变量的生命周期由其作用域决定，函数调用时分配内存，函数返回时释放内存。</li>
+<li><strong>大小和速度</strong>：堆通常比栈大，内存空间较大，动态分配和释放内存需要时间开销。栈大小有限，通常比较小，内存分配和释放速度较快，因为是编译器自动管理。</li>
+</ul>
+<h2 id="内存分段"><a href="#内存分段" class="headerlink" title="内存分段"></a>内存分段</h2><p>程序是由若干个逻辑分段组成的，如可由代码分段、数据分段、栈段、堆段组成。<strong>分段将逻辑地址空间划分为若干个不同长度的段，每个段代表程序中的一个逻辑单元。</strong></p>
+<p>分段机制下的虚拟地址由两部分组成，<strong>段选择因子</strong>和<strong>段内偏移量</strong>。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/a9ed979e2ed8414f9828767592aadc21.png" alt="分段内存"></p>
+<p>段选择因子和段内偏移量：</p>
+<ul>
+<li><strong>段选择因子</strong>就保存在段寄存器里面。段选择因子里面最重要的是<strong>段号</strong>，用作段表的索引。<strong>段表</strong>里面保存的是这个<strong>段的基地址、段的界限和特权等级</strong>等。</li>
+<li>虚拟地址中的<strong>段内偏移量</strong>应该位于 0 和段界限之间，如果段内偏移量是合法的，就将段基地址加上段内偏移量得到物理内存地址。</li>
+</ul>
+<h3 id="内存映射"><a href="#内存映射" class="headerlink" title="内存映射"></a>内存映射</h3><p>在上面，知道了虚拟地址是通过<strong>段表</strong>与物理地址进行映射的，分段机制会把程序的虚拟地址分成 4 个段，每个段在段表中有一个项，在这一项找到段的基地址，再加上偏移量，于是就能找到物理内存中的地址，如下图：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/20240806150034.png" alt="分段寻址"></p>
+<p>如果要访问段 3 中偏移量 500 的虚拟地址，我们可以计算出物理地址为，段 3 基地址 7000 + 偏移量 500 &#x3D; 7500。</p>
+<p>分段的办法很好，解决了程序本身不需要关心具体的物理内存地址的问题，但它也有一些不足之处：</p>
+<ul>
+<li>第一个就是<strong>内存碎片</strong>的问题。</li>
+<li>第二个就是<strong>内存交换的效率低</strong>的问题。</li>
+</ul>
+<h3 id="内存碎片"><a href="#内存碎片" class="headerlink" title="内存碎片"></a>内存碎片</h3><p>内存碎片主要分为，<strong>内部内存碎片</strong>和<strong>外部内存碎片</strong>。</p>
+<p>内存分段管理可以做到段根据实际需求分配内存，所以有多少需求就分配多大的段，所以<strong>不会出现内部内存碎片</strong>。</p>
+<p>但是由于每个段的长度不固定，所以多个段未必能恰好使用所有的内存空间，会产生了多个不连续的小物理内存，导致新的程序无法被装载，所以<strong>会出现外部内存碎片</strong>的问题。</p>
+<p>我们来看看这样一个例子。假设有 1G 的物理内存，用户执行了多个程序，其中：</p>
+<ul>
+<li>游戏占用了 512MB 内存</li>
+<li>浏览器占用了 128MB 内存</li>
+<li>音乐占用了 256 MB 内存。</li>
+</ul>
+<p>这个时候，如果我们关闭了浏览器，则空闲内存还有 1024 - 512 - 256 &#x3D; 256MB。</p>
+<p>如果这个 256MB 不是连续的，被分成了两段 128 MB 内存，这就会导致没有空间再打开一个 200MB 的程序。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/bd4b4a66ef171477c27ee937c4b2c54309ed0ce90c814abeefa2e418c53ca0a8/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f36313432626333633931376534613632393862646236323933366530643333322e706e67" alt="外部内存碎片"></p>
+<p>解决「外部内存碎片」的问题就是<strong>内存交换</strong>。</p>
+<p>可以把音乐程序占用的那 256MB 内存写到硬盘上，然后再从硬盘上读回来到内存里。不过再读回的时候，我们不能装载回原来的位置，而是紧紧跟着那已经被占用了的 512MB 内存后面。这样就能空缺出连续的 256MB 空间，于是新的 200MB 程序就可以装载进来。</p>
+<p>这个内存交换空间，在 Linux 系统里，也就是我们常看到的 Swap 空间，这块空间是从硬盘划分出来的，用于内存与硬盘的空间交换。</p>
+<h3 id="内存交换"><a href="#内存交换" class="headerlink" title="内存交换"></a>内存交换</h3><p>对于多进程的系统来说，用分段的方式，外部内存碎片是很容易产生的，产生了外部内存碎片，那不得不重新 <code>Swap</code> 内存区域，这个过程会产生性能瓶颈。</p>
+<p>因为硬盘的访问速度要比内存慢太多了，每一次内存交换，我们都需要把一大段连续的内存数据写到硬盘上。</p>
+<p>所以，<strong>如果内存交换的时候，交换的是一个占内存空间很大的程序，这样整个机器都会显得卡顿。</strong></p>
+<p>为了解决内存分段的「外部内存碎片和内存交换效率低」的问题，就出现了内存分页。</p>
+<h2 id="内存分页"><a href="#内存分页" class="headerlink" title="内存分页"></a>内存分页</h2><p><strong>分页将逻辑地址空间和物理内存空间划分为固定大小的页（<em>pages</em>）</strong>，通常为连续的 2 的幂大小，如 4 KB 或 4 MB。</p>
+<p>虚拟地址与物理地址之间通过<strong>页表</strong>来映射，如下图：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/7e5453c7f2d555c9634c00e38f4bce5c3061b99efeb921803124c0acda17c214/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f30386138653331356665646334613835383036306462356362346136353461662e706e67" alt="分页"></p>
+<p>页表是存储在内存里的，<strong>内存管理单元</strong> （<em>MMU</em>）就做将虚拟内存地址转换成物理地址的工作。</p>
+<p>而当进程访问的虚拟地址在页表中查不到时，系统会产生一个<strong>缺页异常</strong>，进入系统内核空间分配物理内存、更新进程页表，最后再返回用户空间，恢复进程的运行。</p>
+<p>内存分页由于内存空间都是预先划分好的，也就<strong>不会</strong>像内存分段一样，在段与段之间会产生间隙非常小的内存。</p>
+<p>但是，因为内存分页机制分配内存的最小单位是一页，即使程序不足一页大小，我们最少只能分配一个页，所以页内会出现内存浪费，所以针对<strong>内存分页机制会有内部内存碎片</strong>的现象。</p>
+<p>如果内存空间不够，操作系统会把其他正在运行的进程中的「最近没被使用（LRU）」的内存页面给释放掉，也就是暂时写在硬盘上，称为<strong>换出</strong>（<em>Swap Out</em>）。一旦需要的时候，再加载进来，称为<strong>换入</strong>（<em>Swap In</em>）。所以，一次性写入磁盘的也只有少数的一个页或者几个页，不会花太多时间，<strong>内存交换的效率就相对比较高。</strong></p>
+<p>更进一步地，分页的方式使得我们在加载程序的时候，不再需要一次性都把程序加载到物理内存中。我们完全可以在进行虚拟内存和物理内存的页之间的映射之后，并不真的把页加载到物理内存里，而是<strong>只有在程序运行中，需要用到对应虚拟内存页里面的指令和数据时，再加载到物理内存里面去。</strong></p>
+<h3 id="内存映射-1"><a href="#内存映射-1" class="headerlink" title="内存映射"></a>内存映射</h3><p>在分页机制下，虚拟地址分为两部分，<strong>页号</strong>和<strong>页内偏移</strong>。页号作为页表的索引，<strong>页表</strong>包含物理页每页所在<strong>物理内存的基地址</strong>，这个基地址与页内偏移的组合就形成了物理内存地址，见下图。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/ae971854ba9993f34798409de8e291af052546e8c4c90af5f682ce7ea22db77f/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f37383834663464386462343934396637613562623462626430663435323630392e706e67" alt="img"></p>
+<p>这看起来似乎没什么毛病，但是放到实际中操作系统，这种简单的分页是肯定是会有问题的。</p>
+<p>因为操作系统是可以同时运行非常多的进程的，那这不就意味着页表会非常的庞大。</p>
+<p>在 32 位的环境下，虚拟地址空间共有 4GB，假设一个页的大小是 4KB（2^12），那么就需要大约 100 万（2^20）个页，每个「页表项」需要 4 个字节大小来存储，那么整个 4GB 空间的映射就需要有 <code>4MB</code> 的内存来存储页表。</p>
+<p>这 4MB 大小的页表，看起来也不是很大。但是要知道每个进程都是有自己的虚拟地址空间的，也就说都有自己的页表。</p>
+<p>那么，<code>100</code> 个进程的话，就需要 <code>400MB</code> 的内存来存储页表，这是非常大的内存了，更别说 64 位的环境了。</p>
+<p>要解决上面的问题，就需要采用一种叫作<strong>多级页表</strong>（<em>Multi-Level Page Table</em>）的解决方案。</p>
+<h3 id="多级页表"><a href="#多级页表" class="headerlink" title="多级页表"></a>多级页表</h3><p>我们把这个 100 多万个「页表项」的单级页表再分页，将页表（一级页表）分为 <code>1024</code> 个页表（二级页表），每个表（二级页表）中包含 <code>1024</code> 个「页表项」，形成<strong>二级分页</strong>。如下图所示：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/7de1acad7d283959f0de6acfc0e80f65318089772ca3da3d53b1d07ec81714cf/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f31393239366532343962323234306332396639633532626537306636313164352e706e67" alt="img"></p>
+<p>如果 4GB 的虚拟地址全部都映射到了物理内存上的话，二级分页占用空间确实是更大了，但是，我们往往不会为一个进程分配那么多内存。</p>
+<p>每个进程都有 4GB 的虚拟地址空间，而显然对于大多数程序来说，其使用到的空间远未达到 4GB，因为会存在部分对应的页表项都是空的，根本没有分配，对于已分配的页表项，如果存在最近一定时间未访问的页表，在物理内存紧张的情况下，操作系统会将页面换出到硬盘，也就是说不会占用物理内存。</p>
+<p>如果使用了二级分页，一级页表就可以覆盖整个 4GB 虚拟地址空间，但<strong>如果某个一级页表的页表项没有被用到，也就不需要创建这个页表项对应的二级页表了，即可以在需要时才创建二级页表</strong>。做个简单的计算，假设只有 20% 的一级页表项被用到了，那么页表占用的内存空间就只有 4KB（一级页表） + 20% * 4MB（二级页表）&#x3D; <code>0.804MB</code>，这对比单级页表的 <code>4MB</code> 是不是一个巨大的节约？</p>
+<p>我们把二级分页再推广到多级页表，就会发现页表占用的内存空间更少了，这一切都要归功于对局部性原理的充分应用。</p>
+<h3 id="TLB（快表）"><a href="#TLB（快表）" class="headerlink" title="TLB（快表）"></a>TLB（快表）</h3><p>多级页表虽然解决了空间上的问题，但是虚拟地址到物理地址的转换就多了几道转换的工序，这显然就降低了这俩地址转换的速度，也就是带来了时间上的开销。</p>
+<p>程序是有局部性的，即在一段时间内，整个程序的执行仅限于程序中的某一部分。相应地，执行所访问的存储空间也局限于某个内存区域。我们就可以利用这一特性，把最常访问的几个页表项存储到访问速度更快的硬件，于是计算机科学家们，就在 CPU 芯片中，加入了一个专门存放程序最常访问的页表项的 Cache，这个 Cache 就是 TLB（<em>Translation Lookaside Buffer</em>） ，通常称为页表缓存、转址旁路缓存、快表等。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/c44bdc551441564ca063b8bad5f3628df997464b7148344b39a367f9818abfee/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f61336364663237363436623234363134613634636663356437636366666133352e706e67" alt="img"></p>
+<p>在 CPU 芯片里面，封装了内存管理单元（<em>Memory Management Unit</em>）芯片，它用来完成地址转换和 TLB 的访问与交互。</p>
+<p>有了 TLB 后，那么 CPU 在寻址时，会先查 TLB，如果没找到，才会继续查常规的页表。</p>
+<p>TLB 的命中率其实是很高的，因为程序最常访问的页就那么几个。</p>
+<h3 id="fork-会复制哪些东西？"><a href="#fork-会复制哪些东西？" class="headerlink" title="fork()会复制哪些东西？"></a>fork()会复制哪些东西？</h3><ul>
+<li>fork 阶段会复制父进程的页表（虚拟内存）</li>
+<li>fork 之后，如果发生了写时复制，就会复制物理内存</li>
+</ul>
+<h3 id="什么是copy-on-write-写时复制-？"><a href="#什么是copy-on-write-写时复制-？" class="headerlink" title="什么是copy on write(写时复制)？"></a>什么是copy on write(写时复制)？</h3><p>主进程在执行fork的时候，操作系统会把主进程的「<strong>页表</strong>」复制一份给子进程，这个页表记录着虚拟地址和物理地址映射关系，而不会复制物理内存，也就是说，两者的虚拟空间不同，但其对应的物理空间是同一个。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//picgo/1711953642784-59f9d165-53fa-47db-8f88-dec5b084a96b.png" alt="img"></p>
+<p>这样一来，子进程就共享了父进程的物理内存数据了，这样能够<strong>节约物理内存资源</strong>，页表对应的页表项的属性会标记该物理内存的权限为<strong>只读</strong>。</p>
+<p>不过，当父进程或者子进程在向这个内存发起写操作时，CPU就会触发<strong>写保护中断</strong>，这个写保护中断是由于违反权限导致的，然后操作系统会在「写保护中断处理函数」里进行<strong>物理内存的复制</strong>，并重新设置其内存映射关系，将父子进程的内存读写权限设置为<strong>可读写</strong>，最后才会对内存进行写操作，这个过程被称为「**写时复制(Copy On Write)**」。</p>
+<p>写时复制顾名思义，<strong>在发生写操作的时候，操作系统才会去复制物理内存</strong>，这样是为了防止fork创建子进程时，由于物理内存数据的复制时间过长而导致父进程长时间阻塞的问题。</p>
+<h3 id="页面置换有哪些算法？"><a href="#页面置换有哪些算法？" class="headerlink" title="页面置换有哪些算法？"></a>页面置换有哪些算法？</h3><p>页面置换算法的功能是，当<strong>出现缺页异常，需调入新页面而内存已满时，选择被置换的物理页面</strong>，也就是说选择一个物理页面换出到磁盘，然后把需要访问的页面换入到物理页。</p>
+<p>那其算法目标则是，尽可能减少页面的换入换出的次数，常见的页面置换算法有如下几种：</p>
+<ul>
+<li>最佳页面置换算法 (OPT)</li>
+<li>先进先出置换算法 (FIFO)</li>
+<li>最近最久未使用的置换算法 (LRU)</li>
+<li>时钟页面置换算法 (Lock)</li>
+<li>最不常用置换算法 (LFU)</li>
+</ul>
+<div class="note  flat info"><p>最佳页面置换算法</p>
+</div>
+
+<p>基本思路：<strong>置换在「未来」最长时间不访问的页面</strong>。</p>
+<p>所以，该算法实现需要计算内存中每个逻辑页面的「下一次」访问时间，然后比较，选择未来最长时间不访问的页面。</p>
+<p>这很理想，但是实际系统中无法实现，因为程序访问页面时是动态的，我们是无法预知每个页面在「下一次」访问前的等待时间。</p>
+<div class="note  flat info"><p>LRU置换算法</p>
+</div>
+
+<p>虽然LRU 在理论上是可以实现的，但代价很高。为了完全实现LRU，需要在内存中维护一个所有页面的链表，最近最多使用的页面在表头，最近最少使用的页面在表尾。</p>
+<p>困难的是，在每次访问内存时都必须要更新「整个链表」。在链表中找到一个页面，删除它，然后把它移动到表头是一个非常费时的操作。</p>
+<p>所以，LRU虽然看上去不错，但是由于开销比较大，实际应用中比较少使用。</p>
+<div class="note  flat info"><p>时钟页面置换算法</p>
+</div>
+
+<p>时钟页面置换算法就可以两者兼得，它跟 LRU 近似，又是对 FIFO 的一种改进。</p>
+<p>该算法的思路是，把所有的页面都保存在一个类似钟面的「环形链表」中，一个表针指向最老的页面。</p>
+<p>当发生缺页中断时，算法首先检查表针指向的页面：</p>
+<ul>
+<li>如果它的访问位是 0 就淘汰该页面，并把新的页面插入这个位置，然后把表针前移一个位置；</li>
+<li>如果访问位是 1 就清除访问位，并把表针前移一个位置，重复这个过程直到找到了一个访问位为 0 的页面为止；</li>
+</ul>
+<p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95/%E6%97%B6%E9%92%9F%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95.png" alt="时钟页面置换算法"></p>
+<div class="note  flat info"><p>LFU置换算法</p>
+</div>
+
+<p>它的实现方式是，对每个页面设置一个「访问计数器」，每当一个页面被访问时，该页面的访问计数器就累加 1 。在发生缺页中断时，淘汰计数器值最小的那个页面。</p>
+<p>看起来很简单，每个页面加一个计数器就可以实现了，但是在操作系统中实现的时候，我们需要考虑效率和硬件成本的。<br>要增加一个计数器来实现，这个硬件成本是比较高的，另外如果要对这个计数器查找哪个页面访问次数最小，查找链表本身，如果链表长度很大，是非常耗时的，效率不高。</p>
+<p>但还有个问题，LFU算法只考虑了频率问题，没考虑时间的问题，比如有些页面在过去时间里访问的频率很高，但是现在已经没有访问了，而当前频繁访问的页面由于没有这些页面访问的次数高，在发生缺页中断时，就会可能会误伤当前刚开始频繁访问，但访问次数还不高的页面。</p>
+<p>那这个问题的解决的办法还是有的，可以定期减少访问的次数，比如当发生时间中断时，把过去时间访问的页面的访问次数除以2，也就说，随着时间的流失，以前的高访问次数的页面会慢慢减少，相当于加大了被置换的概率。</p>
+<h2 id="段页式内存管理"><a href="#段页式内存管理" class="headerlink" title="段页式内存管理"></a>段页式内存管理</h2><p>段页式内存管理实现的方式：</p>
+<ul>
+<li>先将程序划分为多个有逻辑意义的段，也就是前面提到的分段机制；</li>
+<li>接着再把每个段划分为多个页，也就是对分段划分出来的连续空间，再划分固定大小的页；</li>
+</ul>
+<p>这样，地址结构就由<strong>段号、段内页号和页内位移</strong>三部分组成。</p>
+<p>用于段页式地址变换的数据结构是每一个程序一张段表，每个段又建立一张页表，段表中的地址是页表的起始地址，而页表中的地址则为某页的物理页号，如图所示：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/ad918113ad7283f07d5fd5278c787b92afa4a4a9d6d328659918de8a0e55fafe/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f38393034666238396165306334396334623066326637623561306137623039392e706e67" alt="img"></p>
+<p>段页式地址变换中要得到物理地址须经过三次内存访问：</p>
+<ul>
+<li>第一次访问段表，得到页表起始地址；</li>
+<li>第二次访问页表，得到物理页号；</li>
+<li>第三次将物理页号与页内位移组合，得到物理地址。</li>
+</ul>
+<p>可用软、硬件相结合的方法实现段页式地址变换，这样虽然增加了硬件成本和系统开销，但提高了内存的利用率。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><div class="note  flat"><p>虚拟内存有什么作用？</p>
+</div>
+
+<ul>
+<li>第一，虚拟内存可以使得进程的<strong>运行内存超过物理内存</strong>大小，因为程序运行符合局部性原理，CPU 访问内存会有很明显的重复访问的倾向性，对于那些没有被经常使用到的内存，我们可以把它换出到物理内存之外，比如硬盘上的 swap 区域。</li>
+<li>第二，由于每个进程都有自己的页表，所以每个进程的虚拟内存空间就是相互独立的。进程也没有办法访问其他进程的页表，所以这些页表是私有的，这就<strong>解决了多进程之间地址冲突</strong>的问题。</li>
+<li>第三，页表里的页表项中除了物理地址之外，还有一些标记属性的比特，比如控制一个页的读写权限，标记该页是否存在等。在内存访问方面，操作系统提供了更好的<strong>安全</strong>性。</li>
+</ul>
+<br>
+
+<h1 id="内存满了，会发生什么？"><a href="#内存满了，会发生什么？" class="headerlink" title="内存满了，会发生什么？"></a>内存满了，会发生什么？</h1><p><img src= "/img/spin.svg" data-lazy-src="https://cdn.xiaolincoding.com//mysql/other/e069da38c4b54ee98a585a176e2c342f.png" alt="提纲"></p>
+<h2 id="内存分配过程"><a href="#内存分配过程" class="headerlink" title="内存分配过程"></a>内存分配过程</h2><p>应用程序通过 malloc 函数申请内存的时候，实际上申请的是虚拟内存，此时并不会分配物理内存。</p>
+<p>当应用程序读写了这块虚拟内存，CPU 就会去访问这个虚拟内存，这时会发现这个虚拟内存没有映射到物理内存，CPU 就会产生<strong>缺页中断</strong>，进程会从用户态切换到内核态，并将缺页中断交给内核的 Page Fault Handler（缺页中断函数）处理。</p>
+<div class="note  simple info"><p>用户态和内核态是操作系统中的两种运行模式，它们描述了不同的权限级别和访问方式。</p>
+<ul>
+<li><p>用户态（User Mode）</p>
+<ol>
+<li>在用户态下，程序只能访问有限的资源和功能，如内存、CPU寄存器等。</li>
+<li>用户态下的程序不能直接操作系统的核心部分，例如对硬件的直接访问。</li>
+<li>大多数应用程序在用户态下运行，包括常见的软件如浏览器、文字处理器等。</li>
+</ol>
+</li>
+<li><p>内核态（Kernel Mode）</p>
+<ol>
+<li>在内核态下，操作系统拥有对系统所有资源和硬件的完全控制权。</li>
+<li>内核态下的代码可以执行特权指令，访问所有内存区域，并处理中断和异常。</li>
+<li>操作系统的核心部分，如调度程序、内存管理器等，在内核态下运行。</li>
+</ol>
+</li>
+</ul>
+<p>用户态和内核态之间的切换由操作系统控制，通常发生在系统调用、中断或异常处理等情况下。当一个程序需要访问操作系统提供的服务或请求更高权限时，会触发从用户态到内核态的切换。这种切换的开销相对较高，因为涉及到保存和恢复进程的状态。</p>
+</div>
+
+<p>缺页中断处理函数会看是否有空闲的物理内存，如果有，就直接分配物理内存，并建立虚拟内存与物理内存之间的映射关系。如果没有空闲的物理内存，那么内核就会开始进行<strong>回收内存</strong>的工作，回收的方式主要是两种：直接内存回收和后台内存回收。</p>
+<ul>
+<li><strong>后台内存回收</strong>（kswapd）：在物理内存紧张的时候，会唤醒 kswapd 内核线程来回收内存，这个回收内存的过程<strong>异步</strong>的，不会阻塞进程的执行。</li>
+<li><strong>直接内存回收</strong>（direct reclaim）：如果后台异步回收跟不上进程内存申请的速度，就会开始直接回收，这个回收内存的过程是<strong>同步</strong>的，会阻塞进程的执行。</li>
+</ul>
+<p>如果直接内存回收后，空闲的物理内存仍然无法满足此次物理内存的申请，那么内核就会放最后的大招了 ——<strong>触发 OOM（Out of Memory）机制</strong>。</p>
+<p>OOM Killer 机制会根据算法选择一个占用物理内存较高的进程，然后将其杀死，以便释放内存资源，如果物理内存依然不足，OOM Killer 会继续杀死占用物理内存较高的进程，直到释放足够的内存位置。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/a37a5605e231bb465726d27dcb84c6a603e6603900860704728592c687ef7896/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f32663631623038323262336334613335396639393737303233313938316230372e706e67" alt="img"></p>
+<h2 id="哪些内存可以回收？"><a href="#哪些内存可以回收？" class="headerlink" title="哪些内存可以回收？"></a>哪些内存可以回收？</h2><p>主要有两类内存可以被回收，而且它们的回收方式也不同。</p>
+<ul>
+<li><strong>文件页</strong>（File-backed Page）：内核缓存的磁盘数据（Buffer）和内核缓存的文件数据（Cache）都叫作文件页。大部分文件页，都可以直接释放内存，以后有需要时，再从磁盘重新读取就可以了。而那些被应用程序修改过，并且暂时还没写入磁盘的数据（也就是脏页），就得先写入磁盘，然后才能进行内存释放。所以，<strong>回收干净页的方式是直接释放内存，回收脏页的方式是先写回磁盘后再释放内存</strong>。</li>
+<li><strong>匿名页</strong>（Anonymous Page）：这部分内存没有实际载体，不像文件缓存有硬盘文件这样一个载体，比如堆、栈数据等。这部分内存很可能还要再次被访问，所以不能直接释放内存，它们<strong>回收的方式是通过 Linux 的 Swap 机制</strong>，Swap 会把不常访问的内存先写到磁盘中，然后释放这些内存，给其他更需要的进程使用。再次访问这些内存时，重新从磁盘读入内存就可以了。</li>
+</ul>
+<p>文件页和匿名页的回收都是基于 LRU 算法，也就是优先回收不常访问的内存。LRU 回收算法，实际上维护着 active 和 inactive 两个双向链表，其中：</p>
+<ul>
+<li><strong>active_list</strong> 活跃内存页链表，这里存放的是最近被访问过（活跃）的内存页；</li>
+<li><strong>inactive_list</strong> 不活跃内存页链表，这里存放的是很少被访问（非活跃）的内存页；</li>
+</ul>
+<p>越接近链表尾部，就表示内存页越不常访问。这样，在回收内存时，系统就可以根据活跃程度，优先回收不活跃的内存。</p>
+<h1 id="在-4GB-物理内存的机器上，申请-8G-内存会怎么样？"><a href="#在-4GB-物理内存的机器上，申请-8G-内存会怎么样？" class="headerlink" title="在 4GB 物理内存的机器上，申请 8G 内存会怎么样？"></a>在 4GB 物理内存的机器上，申请 8G 内存会怎么样？</h1><p>这个问题在没有前置条件下，就说出答案就是耍流氓。这个问题要考虑三个前置条件：</p>
+<ul>
+<li>操作系统是 32 位的，还是 64 位的？</li>
+<li>申请完 8G 内存后会不会被使用？</li>
+<li>操作系统有没有使用 Swap 机制？</li>
+</ul>
+<p>所以，我们要分场景讨论。</p>
+<h2 id="操作系统虚拟内存大小"><a href="#操作系统虚拟内存大小" class="headerlink" title="操作系统虚拟内存大小"></a>操作系统虚拟内存大小</h2><p>32 位操作系统和 64 位操作系统的虚拟地址空间大小是不同的，在 Linux 操作系统中，虚拟地址空间的内部又被分为<strong>内核空间和用户空间</strong>两部分，如下所示：</p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/c94f935422acd1848e43bfa2c3043f7757e3bbd4caa2853f23bb6aa2c6709e39/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f33613663623465336632373234316433623039623437363662623062313132342e706e67"><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/c94f935422acd1848e43bfa2c3043f7757e3bbd4caa2853f23bb6aa2c6709e39/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f33613663623465336632373234316433623039623437363662623062313132342e706e67" alt="img"></a></p>
+<p>通过这里可以看出：</p>
+<ul>
+<li><code>32</code> 位系统的内核空间占用 <code>1G</code>，位于最高处，剩下的 <code>3G</code> 是用户空间；</li>
+<li><code>64</code> 位系统的内核空间和用户空间都是 <code>128T</code>，分别占据整个内存空间的最高和最低处，剩下的中间部分是未定义的。</li>
+</ul>
+<h3 id="32-位系统的场景"><a href="#32-位系统的场景" class="headerlink" title="32 位系统的场景"></a>32 位系统的场景</h3><p>因为 32 位操作系统，进程最多只能申请 3 GB 大小的虚拟内存空间，所以进程申请 8GB 内存的话，在申请虚拟内存阶段就会失败（我手上没有 32 位操作系统测试，我估计失败的错误是 cannot allocate memory，也就是无法申请内存失败）。</p>
+<h3 id="64-位系统的场景"><a href="#64-位系统的场景" class="headerlink" title="64 位系统的场景"></a>64 位系统的场景</h3><p>64 位操作系统，进程可以使用 128 TB 大小的虚拟内存空间，所以进程申请 8GB 内存是没问题的，因为进程申请内存是申请虚拟内存，只要不读写这个虚拟内存，操作系统就不会分配物理内存。</p>
+<p>我们可以简单做个测试，我的服务器是 64 位操作系统，但是物理内存只有 2 GB：</p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/f638e83dadd1fab26aaa8c40d9c075981beabdff05a6c5efd936c2f205bdce88/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545352538362538352545352541442539382545372541452541312545372539302538362f3267622e706e67"><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/f638e83dadd1fab26aaa8c40d9c075981beabdff05a6c5efd936c2f205bdce88/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545352538362538352545352541442539382545372541452541312545372539302538362f3267622e706e67" alt="img"></a></p>
+<p>现在，我在机器上，连续申请 4 次 1 GB 内存，也就是一共申请了 4 GB 内存，注意下面代码只是单纯分配了虚拟内存，并没有使用该虚拟内存：</p>
+<p>可以看到，我的物理内存虽然只有 2GB，但是程序正常分配了 4GB 大小的虚拟内存：</p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/78b508f661cadf00108d4b17f7df833431cad370b7cbf7d6cfbf53d27fc684bd/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545352538362538352545352541442539382545372541452541312545372539302538362f25453825393925394125453625384225394625453525383625383525453525414425393834672e706e67"><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/78b508f661cadf00108d4b17f7df833431cad370b7cbf7d6cfbf53d27fc684bd/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545352538362538352545352541442539382545372541452541312545372539302538362f25453825393925394125453625384225394625453525383625383525453525414425393834672e706e67" alt="img"></a></p>
+<p>我们可以通过下面这条命令查看进程（test）的虚拟内存大小：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">ps aux | grep <span class="built_in">test</span></span></span><br><span class="line">USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND</span><br><span class="line">root      7797  0.0  0.0 4198540  352 pts/1    S+   16:58   0:00 ./test</span><br></pre></td></tr></table></figure>
+
+
+
+<p>其中，VSZ 就代表进程使用的虚拟内存大小，RSS 代表进程使用的物理内存大小。可以看到，VSZ 大小为 4198540，也就是 4GB 的虚拟内存。</p>
+<p>读者的服务器物理内存是 2 GB，实验后发现，进程还没有申请到 128T 虚拟内存的时候就被杀死了。</p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/6c046e33dfd615b8aee168ee061affcb7c4a793bec495ea059f8ea9bc9d3a7f8/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545352538362538352545352541442539382545372541452541312545372539302538362f3033332545382541462542422545382538302538352d332e706e67"><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/6c046e33dfd615b8aee168ee061affcb7c4a793bec495ea059f8ea9bc9d3a7f8/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545352538362538352545352541442539382545372541452541312545372539302538362f3033332545382541462542422545382538302538352d332e706e67" alt="img"></a></p>
+<p>注意，这次是 killed，而不是 Cannot Allocate Memory，说明并不是内存申请有问题，而是触发 OOM 了。</p>
+<p>但是为什么会触发 OOM 呢？</p>
+<p>那得看你的主机的「物理内存」够不够大了，即使 malloc 申请的是虚拟内存，只要不去访问就不会映射到物理内存，但是申请虚拟内存的过程中，还是使用到了物理内存（比如内核保存虚拟内存的数据结构，也是占用物理内存的），如果你的主机是只有 2GB 的物理内存的话，大概率会触发 OOM。</p>
+<p>可以使用 top 命令，点击两下 m，通过进度条观察物理内存使用情况。</p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/c38a110fcac674cf48a5c65f9804995bd824740f459f1883ab1a16bb17937209/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545352538362538352545352541442539382545372541452541312545372539302538362f3033332545382541462542422545382538302538352d342e706e67"><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/c38a110fcac674cf48a5c65f9804995bd824740f459f1883ab1a16bb17937209/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545352538362538352545352541442539382545372541452541312545372539302538362f3033332545382541462542422545382538302538352d342e706e67" alt="img"></a></p>
+<p>可以看到申请虚拟内存的过程中<strong>物理内存使用量一直在增长</strong>。</p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/61726a8ae5f195c4881880a6befe489477cf391ab2f4f53a035836d0b7be2a81/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545352538362538352545352541442539382545372541452541312545372539302538362f3033332545382541462542422545382538302538352d352e706e67"><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/61726a8ae5f195c4881880a6befe489477cf391ab2f4f53a035836d0b7be2a81/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545352538362538352545352541442539382545372541452541312545372539302538362f3033332545382541462542422545382538302538352d352e706e67" alt="img"></a></p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/d0413874f73308be96564189519e0f1025afa8c1d9e1bd51c439a89ff8ac346d/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545352538362538352545352541442539382545372541452541312545372539302538362f3033332545382541462542422545382538302538352d362e706e67"><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/d0413874f73308be96564189519e0f1025afa8c1d9e1bd51c439a89ff8ac346d/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545352538362538352545352541442539382545372541452541312545372539302538362f3033332545382541462542422545382538302538352d362e706e67" alt="img"></a></p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/e8723a0850da31cbffd4076e5358803ab9f51ee08ffa90e07676ca115d700d0f/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545352538362538352545352541442539382545372541452541312545372539302538362f3033332545382541462542422545382538302538352d372e706e67"><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/e8723a0850da31cbffd4076e5358803ab9f51ee08ffa90e07676ca115d700d0f/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545352538362538352545352541442539382545372541452541312545372539302538362f3033332545382541462542422545382538302538352d372e706e67" alt="img"></a></p>
+<p>直到直接内存回收之后，也无法回收出一块空间供这个进程使用，这个时候就会触发 OOM，给所有能杀死的进程打分，分数越高的进程越容易被杀死。</p>
+<p>在这里当然是这个进程得分最高，那么操作系统就会将这个进程杀死，所以最后会出现 killed，而不是 Cannot allocate memory。</p>
+<div class="note  flat info"><p>那么 2GB 的物理内存的 64 位操作系统，就不能申请 128T 的虚拟内存了吗？</p>
+</div>
+
+<p>其实可以，上面的情况是还没开启 swap 的情况。</p>
+<p>使用 swapfile 的方式开启了 1GB 的 swap 空间之后再做实验：</p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/3df75ca2d1ba49eda1c8842ae9b95ebcbefe3c81ef2de7bf3ffececa8ac1d8cc/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545352538362538352545352541442539382545372541452541312545372539302538362f3033332545382541462542422545382538302538352d382e706e67"><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/3df75ca2d1ba49eda1c8842ae9b95ebcbefe3c81ef2de7bf3ffececa8ac1d8cc/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545352538362538352545352541442539382545372541452541312545372539302538362f3033332545382541462542422545382538302538352d382e706e67" alt="img"></a></p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/41ef5679e39a1a14219fedc206b0321970fa0bc8e8a5775e70ee0478c9c3e205/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545352538362538352545352541442539382545372541452541312545372539302538362f3033332545382541462542422545382538302538352d392e706e67"><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/41ef5679e39a1a14219fedc206b0321970fa0bc8e8a5775e70ee0478c9c3e205/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545352538362538352545352541442539382545372541452541312545372539302538362f3033332545382541462542422545382538302538352d392e706e67" alt="img"></a></p>
+<p>发现出现了 Cannot allocate memory，但是其实到这里已经成功了，</p>
+<p>打开计算器计算一下，发现已经申请了 127.998T 虚拟内存了。</p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/ec0b99c93dd73d5d421f60c171336a899ce15915e85bce9a1f2f8006ef230fd0/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545352538362538352545352541442539382545372541452541312545372539302538362f3033332545382541462542422545382538302538352d31302e706e67"><img src= "/img/spin.svg" data-lazy-src="https://camo.githubusercontent.com/ec0b99c93dd73d5d421f60c171336a899ce15915e85bce9a1f2f8006ef230fd0/68747470733a2f2f63646e2e7869616f6c696e636f64696e672e636f6d2f67682f7869616f6c696e636f6465722f496d616765486f73742f2545362539332538442545342542442539432545372542332542422545372542422539462f2545352538362538352545352541442539382545372541452541312545372539302538362f3033332545382541462542422545382538302538352d31302e706e67" alt="img"></a></p>
+<p>实际上我们是不可能申请完整个 128T 的用户空间的，因为程序运行本身也需要申请虚拟空间。</p>
+<h2 id="Swap-机制的作用"><a href="#Swap-机制的作用" class="headerlink" title="Swap 机制的作用"></a>Swap 机制的作用</h2><p>当系统的物理内存不够用的时候，就需要将物理内存中的一部分空间释放出来，以供当前运行的程序使用。那些被释放的空间可能来自一些很长时间没有什么操作的程序，这些被释放的空间会被临时保存到磁盘，等到那些程序要运行时，再从磁盘中恢复保存的数据到内存中。</p>
+<p>另外，当内存使用存在压力的时候，会开始触发内存回收行为，会把这些不常访问的内存先写到磁盘中，然后释放这些内存，给其他更需要的进程使用。再次访问这些内存时，重新从磁盘读入内存就可以了。</p>
+<p>这种，将内存数据换出磁盘，又从磁盘中恢复数据到内存的过程，就是 Swap 机制负责的。</p>
+<p>Swap 就是把一块磁盘空间或者本地文件，当成内存来使用，它包含换出和换入两个过程：</p>
+<ul>
+<li><strong>换出（Swap Out）</strong> ，是把进程暂时不用的内存数据存储到磁盘中，并释放这些数据占用的内存；</li>
+<li><strong>换入（Swap In）</strong>，是在进程再次访问这些内存的时候，把它们从磁盘读到内存中来；</li>
+</ul>
+<p>使用 Swap 机制优点是，应用程序实际可以使用的内存空间将远远超过系统的物理内存。由于硬盘空间的价格远比内存要低，因此这种方式无疑是经济实惠的。当然，频繁地读写硬盘，会显著降低操作系统的运行速率，这也是 Swap 的弊端。</p>
+<p>Linux 中的 Swap 机制会在内存不足和内存闲置的场景下触发：</p>
+<ul>
+<li><strong>内存不足</strong>：当系统需要的内存超过了可用的物理内存时，内核会将内存中不常使用的内存页交换到磁盘上为当前进程让出内存，保证正在执行的进程的可用性，这个内存回收的过程是强制的直接内存回收（Direct Page Reclaim）。直接内存回收是同步的过程，会阻塞当前申请内存的进程。</li>
+<li><strong>内存闲置</strong>：应用程序在启动阶段使用的大量内存在启动后往往都不会使用，通过后台运行的守护进程（kSwapd），我们可以将这部分只使用一次的内存交换到磁盘上为其他内存的申请预留空间。kSwapd 是 Linux 负责页面置换（Page replacement）的守护进程，它也是负责交换闲置内存的主要进程，它会在<a target="_blank" rel="noopener" href="https://xiaolincoding.com/os/3_memory/mem_reclaim.html#%E5%B0%BD%E6%97%A9%E8%A7%A6%E5%8F%91-kSwapd-%E5%86%85%E6%A0%B8%E7%BA%BF%E7%A8%8B%E5%BC%82%E6%AD%A5%E5%9B%9E%E6%94%B6%E5%86%85%E5%AD%98">空闲内存低于一定水位</a>时，回收内存页中的空闲内存保证系统中的其他进程可以尽快获得申请的内存。kSwapd 是后台进程，所以回收内存的过程是异步的，不会阻塞当前申请内存的进程。</li>
+</ul>
+<p>Linux 提供了两种不同的方法启用 Swap，分别是 Swap 分区（Swap Partition）和 Swap 文件（Swapfile），开启方法可以看<a target="_blank" rel="noopener" href="https://support.huaweicloud.com/trouble-ecs/ecs_trouble_0322.html">这个资料</a>：</p>
+<ul>
+<li>Swap 分区是硬盘上的独立区域，该区域只会用于交换分区，其他的文件不能存储在该区域上，我们可以使用 <code>swapon -s</code> 命令查看当前系统上的交换分区；</li>
+<li>Swap 文件是文件系统中的特殊文件，它与文件系统中的其他文件也没有太多的区别；</li>
+</ul>
+<div class="note  flat"><p>Swap 换入换出的是什么类型的内存？</p>
+</div>
+
+<p>内核缓存的文件数据，因为都有对应的磁盘文件，所以在回收文件数据的时候，直接写回到对应的文件就可以了。</p>
+<p>但是像进程的堆、栈数据等，它们是没有实际载体，这部分内存被称为匿名页。而且这部分内存很可能还要再次被访问，所以不能直接释放内存，于是就需要有一个能保存匿名页的磁盘载体，这个载体就是 Swap 分区。</p>
+<p>匿名页回收的方式是通过 Linux 的 Swap 机制，Swap 会把不常访问的内存先写到磁盘中，然后释放这些内存，给其他更需要的进程使用。再次访问这些内存时，重新从磁盘读入内存就可以了。</p>
+<h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><p><a target="_blank" rel="noopener" href="https://xiaolincoding.com/os/3_memory/vmem.html#%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98">4.1 为什么要有虚拟内存？ | 小林coding (xiaolincoding.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://xiaolincoding.com/os/3_memory/mem_reclaim.html#%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E7%9A%84%E8%BF%87%E7%A8%8B%E6%98%AF%E6%80%8E%E6%A0%B7%E7%9A%84">4.3 内存满了，会发生什么？ | 小林coding (xiaolincoding.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://xiaolincoding.com/os/3_memory/alloc_mem.html#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%A4%A7%E5%B0%8F">4.4 在 4GB 物理内存的机器上，申请 8G 内存会怎么样？ | 小林coding (xiaolincoding.com)</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author_group"><a class="post-copyright__author_img" href="/about/"><img class="post-copyright__author_img_front" src= "/img/spin.svg" data-lazy-src="/img/avatar.jpg"></a><div class="post-copyright__author_name">Rean's Blog</div><div class="post-copyright__author_desc">Enjoy technology and music</div></div><div class="post-tools" id="post-tools"><div class="post-tools-left"><div id="quit-box" onclick="RemoveRewardMask()"></div></div></div><div class="post-copyright__notice"><span class="post-copyright-info">本文是原创文章，采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0</a>协议，完整转载请注明来自<a href="/">Rean's Blog</a></span></div></div><div class="post-tools-right"><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"><span class="tags-punctuation"></span>操作系统<span class="tagsPageCount">4</span></a></div></div></div><nav class="needEndHide pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/p/7beadfaa/"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">线程崩溃了，进程也会崩溃吗？</div></div></a></div><div class="next-post pull-right"><a href="/p/a440b512/"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">SpringBoot + JavaFx 注入为空怎么办？</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="solitude st-star-smile-fill"></i><span>喜欢这篇的人也看了</span><div class="relatedPosts-link"><a onclick="event.preventDefault(); toRandomPost();" href="javascript:void(0);" rel="external nofollow" data-pjax-state="">随便逛逛</a></div></div><div class="relatedPosts-list"><div><a href="/p/2516f5f2/" title="【操作系统】进程管理"><img class="cover" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture5.jpg" alt="cover"><div class="content is-center"><div class="title">【操作系统】进程管理</div></div></a></div><div><a href="/p/7a3264f/" title="【操作系统】网络I&#x2F;O"><img class="cover" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/cover5.JPG" alt="cover"><div class="content is-center"><div class="title">【操作系统】网络I&#x2F;O</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-content"><div class="card-info-avatar is-center"><div class="author-info__top-group"><div class="author-info__sayhi" id="author-info__sayhi" onclick="sco.changeSayHelloText()">sayhello.morning</div></div></div><div class="avatar-img-group"><img class="avatar-img" alt="头像" src= "/img/spin.svg" data-lazy-src="/img/avatar.jpg"><div class="avatar-sticker"><img class="avatar-sticker-img" src= "/img/spin.svg" data-lazy-src="https://7.isyangs.cn/34/65f2e4e0423cc-34.png" alt="心情贴纸"></div></div><div class="author-info__description_group"><div class="author-info__description">分享自己对编程的<b>热爱</b>，对知识海洋<b>探索历程</b>，随机掉落<b>无参配布</b>以及<b>翻调</b>（主要是音综类，在B站因为版权基本过不了审（。</div><div class="author-info__description2">相信你可以在这里找到对你有用的知识和教程。</div></div><div class="author-info__bottom-group"><a class="author-info__bottom-group-left" href="/about/"><div class="author-info__name">Rean</div><div class="author-info__desc">Enjoy technology and music</div></a><div class="card-info-social-icons is-center"><a class="social-icon" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze" title="Github"><i class="solitude  st-github-line"></i></a><a class="social-icon" target="_blank" rel="noopener" href="https://space.bilibili.com/6531436" title="Bilibili"><i class="solitude  st-bilibili-line"></i></a></div></div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="solitude st-menu-line"></i><span>文章目录</span></div><div class="toc-content" id="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E6%9C%89%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%EF%BC%9F"><span class="toc-text">为什么要有虚拟内存？</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98"><span class="toc-text">虚拟内存</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%89%A9%E7%90%86%E5%9C%B0%E5%9D%80"><span class="toc-text">物理地址</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%BB%E8%BE%91%E5%9C%B0%E5%9D%80"><span class="toc-text">逻辑地址</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%BB%E8%BE%91%E5%9C%B0%E5%9D%80%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="toc-text">逻辑地址的作用</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E6%98%AF%E6%80%8E%E4%B9%88%E6%A0%B7%E7%9A%84%EF%BC%9F"><span class="toc-text">程序的内存布局是怎么样的？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A0%86%E5%92%8C%E6%A0%88%E7%9A%84%E5%8C%BA%E5%88%AB%EF%BC%9F"><span class="toc-text">堆和栈的区别？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E5%88%86%E6%AE%B5"><span class="toc-text">内存分段</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84"><span class="toc-text">内存映射</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E7%A2%8E%E7%89%87"><span class="toc-text">内存碎片</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E4%BA%A4%E6%8D%A2"><span class="toc-text">内存交换</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E5%88%86%E9%A1%B5"><span class="toc-text">内存分页</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84-1"><span class="toc-text">内存映射</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E7%BA%A7%E9%A1%B5%E8%A1%A8"><span class="toc-text">多级页表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TLB%EF%BC%88%E5%BF%AB%E8%A1%A8%EF%BC%89"><span class="toc-text">TLB（快表）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#fork-%E4%BC%9A%E5%A4%8D%E5%88%B6%E5%93%AA%E4%BA%9B%E4%B8%9C%E8%A5%BF%EF%BC%9F"><span class="toc-text">fork()会复制哪些东西？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFcopy-on-write-%E5%86%99%E6%97%B6%E5%A4%8D%E5%88%B6-%EF%BC%9F"><span class="toc-text">什么是copy on write(写时复制)？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A1%B5%E9%9D%A2%E7%BD%AE%E6%8D%A2%E6%9C%89%E5%93%AA%E4%BA%9B%E7%AE%97%E6%B3%95%EF%BC%9F"><span class="toc-text">页面置换有哪些算法？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%AE%B5%E9%A1%B5%E5%BC%8F%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="toc-text">段页式内存管理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E6%BB%A1%E4%BA%86%EF%BC%8C%E4%BC%9A%E5%8F%91%E7%94%9F%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">内存满了，会发生什么？</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E8%BF%87%E7%A8%8B"><span class="toc-text">内存分配过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%93%AA%E4%BA%9B%E5%86%85%E5%AD%98%E5%8F%AF%E4%BB%A5%E5%9B%9E%E6%94%B6%EF%BC%9F"><span class="toc-text">哪些内存可以回收？</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9C%A8-4GB-%E7%89%A9%E7%90%86%E5%86%85%E5%AD%98%E7%9A%84%E6%9C%BA%E5%99%A8%E4%B8%8A%EF%BC%8C%E7%94%B3%E8%AF%B7-8G-%E5%86%85%E5%AD%98%E4%BC%9A%E6%80%8E%E4%B9%88%E6%A0%B7%EF%BC%9F"><span class="toc-text">在 4GB 物理内存的机器上，申请 8G 内存会怎么样？</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%A4%A7%E5%B0%8F"><span class="toc-text">操作系统虚拟内存大小</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#32-%E4%BD%8D%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%9C%BA%E6%99%AF"><span class="toc-text">32 位系统的场景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#64-%E4%BD%8D%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%9C%BA%E6%99%AF"><span class="toc-text">64 位系统的场景</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Swap-%E6%9C%BA%E5%88%B6%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="toc-text">Swap 机制的作用</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="toc-text">参考链接</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="solitude st-map-line"></i><span>最近发布</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/p/5871d67/" title="woff 字体反扒方案"><img alt="woff 字体反扒方案" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/221228-15574975489aa1.jpg"></a><div class="content"><a class="title" href="/p/5871d67/" title="woff 字体反扒方案">woff 字体反扒方案</a><a class="article-recent_post_categories" href="/p/5871d67/">研究</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/204d99f1/" title="【MyBatis】生命周期"><img alt="【MyBatis】生命周期" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/235335-1549900415dcc9.jpg"></a><div class="content"><a class="title" href="/p/204d99f1/" title="【MyBatis】生命周期">【MyBatis】生命周期</a><a class="article-recent_post_categories" href="/p/204d99f1/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/b585efd0/" title="敏感词过滤方案总结"><img alt="敏感词过滤方案总结" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture5.jpg"></a><div class="content"><a class="title" href="/p/b585efd0/" title="敏感词过滤方案总结">敏感词过滤方案总结</a><a class="article-recent_post_categories" href="/p/b585efd0/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/122902e7/" title="【并发】高并发下库存扣减如何避免超卖和少卖？"><img alt="【并发】高并发下库存扣减如何避免超卖和少卖？" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/cover8.JPG"></a><div class="content"><a class="title" href="/p/122902e7/" title="【并发】高并发下库存扣减如何避免超卖和少卖？">【并发】高并发下库存扣减如何避免超卖和少卖？</a><a class="article-recent_post_categories" href="/p/122902e7/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/683f7c8e/" title="网易云音乐歌名&amp;歌词获取方案收集"><img alt="网易云音乐歌名&amp;歌词获取方案收集" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture1.jpg"></a><div class="content"><a class="title" href="/p/683f7c8e/" title="网易云音乐歌名&amp;歌词获取方案收集">网易云音乐歌名&amp;歌词获取方案收集</a><a class="article-recent_post_categories" href="/p/683f7c8e/">教程</a></div></div></div></div></div></div></main><footer id="footer"><div id="st-footer-bar"><div class="footer-logo"><span class="solitude">Rean's Blog</span></div><div class="footer-bar-description">来自Rean's Blog - Enjoy technology and music的文章</div><a class="footer-bar-link" href="/">了解更多</a></div><div id="footer_deal"><a class="deal_link" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze" title="Github"><i class="solitude  st-github-line"></i></a><a class="deal_link" target="_blank" rel="noopener" href="https://space.bilibili.com/6531436" title="Bilibili"><i class="solitude  st-bilibili-line"></i></a></div><div id="st-footer"></div><div id="footer-bar"><div class="footer-bar-links"><div class="footer-bar-left"><div class="copyright">© 2024 By&nbsp;<a class="footer-bar-link" href="/">Rean</a></div></div><div class="footer-bar-right"><a class="footer-bar-link" target="_blank" rel="noopener" href="https://github.com/valor-x/hexo-theme-solitude" alt="主题">主题</a><a class="footer-bar-link cc" href="/null" aria-label="copyright"><i class="solitude st-copyright-line"></i><i class="solitude st-creative-commons-by-line"></i><i class="solitude st-creative-commons-nc-line"></i><i class="solitude st-creative-commons-nd-line"></i></a></div></div></div></footer></div><!-- right_menu--><div id="rightMenu"><div class="rightMenu-group rightMenu-small"><div class="rightMenu-item" id="menu-backward"><i class="solitude st-arrow-left-line"></i></div><div class="rightMenu-item" id="menu-forward"><i class="solitude st-arrow-right-line"></i></div><div class="rightMenu-item" id="menu-refresh"><i class="solitude st-restart-line"></i></div><div class="rightMenu-item" id="menu-top"><i class="solitude st-arrow-up-line"></i></div></div><div class="rightMenu-group rightMenu-line rightMenuPlugin"><div class="rightMenu-item" id="menu-copytext"><i class="solitude st-copy-fill"></i><span>复制选中文本</span></div><div class="rightMenu-item" id="menu-pastetext"><i class="solitude st-clipboard-fill"></i><span>粘贴文本</span></div><div class="rightMenu-item" id="menu-newwindow"><i class="solitude st-window-fill"></i><span>新窗口打开</span></div><div class="rightMenu-item" id="menu-copylink"><i class="solitude st-link-line"></i><span>复制链接地址</span></div><div class="rightMenu-item" id="menu-copyimg"><i class="solitude st-copy-fill"></i><span>复制此图片</span></div><div class="rightMenu-item" id="menu-downloadimg"><i class="solitude st-download-cloud-fill"></i><span>下载此图片</span></div><div class="rightMenu-item" id="menu-search"><i class="solitude st-search-line"></i><span>站内搜索</span></div><div class="rightMenu-item" id="menu-music-toggle"><i class="solitude st-play-fill"></i><span>播放音乐</span></div><div class="rightMenu-item" id="menu-music-back"><i class="solitude st-skip-back-fill"></i><span>切换到上一首</span></div><div class="rightMenu-item" id="menu-music-forward"><i class="solitude st-skip-forward-fill"></i><span>切换到下一首</span></div><div class="rightMenu-item" id="menu-music-copyMusicName"><i class="solitude st-copy-fill"></i><span>复制歌名</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><div class="rightMenu-item" id="menu-randomPost" onclick="toRandomPost()||rm.hideRightMenu()"><i class="solitude st-signal-tower-fill"></i><span>随机短文</span></div><div class="rightMenu-item" onclick="pjax.loadUrl('/categories/')||rm.hideRightMenu()"><i class="solitude st-checkbox-multiple-blank-fill"></i><span>全部分类</span></div><div class="rightMenu-item" onclick="pjax.loadUrl('/tags/')||rm.hideRightMenu()"><i class="solitude st-price-tag-fill"></i><span>全部标签</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><div class="rightMenu-item" id="menu-darkmode" onclick="sco.switchDarkMode()"><i class="solitude st-moon-clear-fill"></i><span class="menu-darkmode-text">深色模式</span></div><div class="rightMenu-item" id="menu-translate"><i class="solitude st-panben-line"></i><span>轉為繁體</span></div></div></div><div id="rightmenu-mask"></div><!-- inject body--><div><script src="/js/utils.js?v=1.8.10"></script><script src="/js/main.js?v=1.8.10"></script><script src="/js/third_party/waterfall.min.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/pjax/0.2.8/pjax.min.js"></script><script src="/js/third_party/universe.min.js?v=1.8.10"></script><script>dark()
+</script><script src="/js/tw_cn.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/vanilla-lazyload/19.1.3/lazyload.iife.min.js"></script><script src="https://cdn.staticfile.net/node-snackbar/0.1.16/snackbar.min.js"></script><script src="https://cdn.staticfile.net/fancyapps-ui/5.0.36/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.staticfile.net/Swiper/11.0.5/swiper-bundle.min.js"></script><script>var meting_api = 'https://meting.qjqq.cn/?server=:server&type=:type&id=:id&auth=:auth&r=:r';</script><script src="https://cdn.staticfile.net/aplayer/1.10.1/APlayer.min.js"></script><script src="https://cdn.staticfile.net/meting/2.0.1/Meting.min.js"></script><script>const coverColorConfig = {
+    api: 'https://api.qjqq.cn/api/Imgcolor?img=',
+    time: 43200000
+}</script><script src="/js/covercolor/api.js?v=1.8.10"></script><script src="/js/music.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/pace/1.2.4/pace.min.js"></script><script src="/js/right_menu.js?v=1.8.10"></script><div class="js-pjax"><script defer pjax src="https://cdn.staticfile.net/pearssauce-busuanzi/1.0.0/bsz.pure.min.js"></script></div></div><!-- newest comment--><!-- pjax--><script>const pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: ['title','#body-wrap','#site-config','meta[name="description"]','.js-pjax','meta[property^="og:"]','#config-diff'],
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+})
+
+document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+})
+
+document.addEventListener('pjax:complete', () => {
+    window.refreshFn()
+
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+        const newScript = document.createElement('script')
+        const content = item.text || item.textContent || item.innerHTML || ""
+        Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+        newScript.appendChild(document.createTextNode(content))
+        item.parentNode.replaceChild(newScript, item)
+    })
+
+    GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+})
+
+document.addEventListener('pjax:error', (e) => {
+    if (e.request.status === 404) {
+        pjax.loadUrl('/404.html')
+    }
+})</script><!-- theme--><script>initTheme = () => {
+    let isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const cachedMode = utils.saveToLocal.get('theme');
+    if (cachedMode === undefined) {
+        const nowMode =
+            isDarkMode ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', nowMode);
+    } else {
+        document.documentElement.setAttribute('data-theme', cachedMode);
+    }
+    is_rm && rm.mode(cachedMode === 'dark' && isDarkMode)
+}
+initTheme()</script><!-- google adsense--><!-- search--><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><button class="search-close-button"><i class="solitude st-close-fill"></i></button></nav><div class="search-wrap"><div class="search-box"><input class="search-box-input" id="search-input" type="text" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="输入关键词快速查找"></div><div id="search-results"><div id="search-hits"></div></div><div id="search-pagination"></div><div id="search-tips"></div></div></div><div id="search-mask"></div></div><script src="/js/search/local.js?v=1.8.10"></script><!-- music--><div class="needEndHide" id="nav-music" onclick="sco.musicToggle()"><div id="nav-music-hoverTips">音乐已暂停</div><meting-js id="421801417" server="netease" type="playlist" mutex="true" preload="none" data-lrctype="0" order="random" theme="var(--efu-main)"></meting-js></div></body></html><script>const posts=["p/5871d67/","p/204d99f1/","p/b585efd0/","p/122902e7/","p/683f7c8e/","p/36b252a1/","p/bbd98f0d/","p/1b320550/","p/30cd73ca/","p/332adb42/","p/4f877c1e/","p/677c7789/","p/f7f0a5f3/","p/9b5a538c/","p/37360bc0/","p/bb996d5/","p/364ea8cc/","p/a027699d/","p/21cdaec5/","p/37c37880/","p/a02febe4/","p/d1ec0e4e/","p/25d2b878/","p/8324e4bc/","p/6021f67a/","p/305331f0/","p/66be4b4/","p/de2d10bc/","p/e6628f8e/","p/4131eeff/","p/27705e17/","p/74e1a37c/","p/b5223f80/","p/9b8bc45a/","p/c9cb7159/","p/82c942ab/","p/4c19fcc6/","p/27446c6a/","p/9f38852a/","p/2516f5f2/","p/b27c77b3/","p/7a3264f/","p/7beadfaa/","p/e1d9906f/","p/a440b512/","p/a46aa116/","p/fe8dd3bd/","p/51c99199/","p/91b418a/","p/421add40/","p/9d7a18c7/","p/26345198/","p/fa30e874/","p/dea9a817/","p/59203ba6/","p/e5616c72/","p/971e9859/","p/d7f6ccff/","p/1b2ec1c2/","p/a0d1cef9/","p/a58b6af0/","p/9381aa6d/","p/38b8becb/","p/d0a26095/","p/2b3bdada/","p/ba70636/","p/374630f5/","p/a964a243/","p/a06e9899/","p/ef9a99de/","p/108f7c52/","p/a91c1846/","p/413576cf/","p/9ee60c65/","p/e74db628/","p/888c8bf3/","p/477dbe08/","p/38e8a510/","p/dfb41864/","p/b0e3506b/","p/e17fd725/","p/e1fe458c/","p/636cfdea/","p/7b854cb7/","p/b3a61240/","p/64f43fb4/","p/800f9a11/","p/4a48b34c/","p/b3641215/","p/53bc1fc9/","p/fc02f9ee/","p/25b929f6/","p/dd30b42/","p/3aa261db/","p/fc078742/","p/22c9d1d0/","p/33fc02d2/","p/70335ae0/","p/f32ef110/","p/f756486c/","p/8dd4b91f/","p/a290d941/","p/61a8a4ef/","p/c2d0bb20/","p/9770d71c/","p/41bd2aed/","p/bfebe40b/","p/6b4006e6/","p/b5696360/","p/53ab7115/","p/e6fa9b9/","p/866abf45/","p/b718b92a/","p/d26f4c21/","p/bc5d6bbe/","p/5a18917b/","p/5f2b1e2f/","p/2532a2ee/","p/4337b2c0/","p/e042d029/","p/9b4a91e5/","p/9d8ce868/","p/a69f6a48/","p/f9b9edb2/","p/cbe55d0/","p/156c59d0/","p/d4d6f818/","p/2574cf15/","p/a0efc292/","p/ec2ecf28/","p/85f11265/","p/db95e6f5/","p/a8296e6d/","p/4cc89a71/","p/d0fe2d0f/","p/ffab2f6b/","p/95d9f91e/","p/7f869365/","p/5b246b1b/","p/a9c92fa9/","p/7d49fec0/","p/a9a25fcd/","p/43bb383e/","p/b9aeb4/","p/52eaf228/","p/4be90d2f/","p/ed500d41/","p/dcfbc8e5/","p/240e5e52/","p/18cda1b3/","p/66a6c396/","p/5f33341/","p/f9bef31e/","p/acac46b/","p/a4189438/","p/ae6b0147/","p/4e982f2d/","p/403e0cac/","p/495b9f0f/","p/8e966ab9/","p/f6e1007e/","p/6f562d19/","p/10eac329/","p/cc53cf58/","p/4f2beac6/","p/73e2aa1/","p/c677e75e/","p/3f13b766/","p/cc30f00/","p/807cab5e/","p/5b5991e4/","p/e941ffc/"];function toRandomPost(){ pjax.loadUrl('/'+posts[Math.floor(Math.random()*posts.length)]); }</script>

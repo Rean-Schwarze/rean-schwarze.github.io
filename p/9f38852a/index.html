@@ -1,0 +1,448 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><title>【Java】基础（一） | 数据类型 &amp; 类 &amp; 异常 | Rean's Blog</title><noscript>开启JavaScript才能访问本站哦~</noscript><link rel="icon" href="/img/favicon.png"><!-- index.css--><link rel="stylesheet" href="/css/index.css?v=1.8.10"><!-- inject head--><link rel="stylesheet" href="https://cdn2.codesign.qq.com/icons/7pOrz0WXB5ZWJPX/latest/iconfont.css"><!-- aplayer--><link rel="stylesheet" href="https://cdn.staticfile.net/aplayer/1.10.1/APlayer.min.css"><!-- swiper--><link rel="stylesheet" href="https://cdn.staticfile.net/Swiper/11.0.5/swiper-bundle.min.css"><!-- fancybox ui--><link rel="stylesheet" href="https://cdn.staticfile.net/fancyapps-ui/5.0.36/fancybox/fancybox.min.css"><!-- katex--><!-- Open Graph--><meta name="description" content="Java 中的基本数据类型有哪些？Java 中的数据类型可以分为两大类：基本数据类型和引用数据类型。 基本数据类型是 Java 中的原始数据类型，而引用数据类型则是对象引用。 基本数据类型（Primitive Data Types） 整型：byte（8位有符号整数）、short（16位有符号整数）、"><!-- pwa--><meta name="apple-mobile-web-app-capable" content="Rean's Blog"><meta name="theme-color" content="var(--efu-main)"><meta name="apple-mobile-web-app-status-bar-style" content="var(--efu-main)"><link rel="bookmark" href="/img/favicon.png"><link rel="apple-touch-icon" href="/img/favicon.png" sizes="180x180"><script>console.log(
+    "%c Program: Hexo %c Theme: Solitude %c Version: v1.8.10",
+    "border-radius:5px 0 0 5px;padding: 5px 10px;color:white;background:#ff3842;",
+    "padding: 5px 10px;color:white;background:#3e9f50;",
+    "padding: 5px 10px;color:white;background:#0084ff;",
+)
+</script><script>(()=>{
+        const saveToLocal = {
+            set: function setWithExpiry(key, value, ttl) {
+                if (ttl === 0)
+                    return
+                const now = new Date()
+                const expiryDay = ttl * 86400000
+                const item = {
+                    value: value,
+                    expiry: now.getTime() + expiryDay
+                }
+                localStorage.setItem(key, JSON.stringify(item))
+            },
+            get: function getWithExpiry(key) {
+                const itemStr = localStorage.getItem(key)
+    
+                if (!itemStr) {
+                    return undefined
+                }
+                const item = JSON.parse(itemStr)
+                const now = new Date()
+    
+                if (now.getTime() > item.expiry) {
+                    localStorage.removeItem(key)
+                    return undefined
+                }
+                return item.value
+            }
+        };
+        window.utils = {
+            saveToLocal: saveToLocal,
+            getCSS: (url, id = false) => new Promise((resolve, reject) => {
+              const link = document.createElement('link')
+              link.rel = 'stylesheet'
+              link.href = url
+              if (id) link.id = id
+              link.onerror = reject
+              link.onload = link.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                link.onload = link.onreadystatechange = null
+                resolve()
+              }
+              document.head.appendChild(link)
+            }),
+            getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+              const script = document.createElement('script')
+              script.src = url
+              script.async = true
+              script.onerror = reject
+              script.onload = script.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                script.onload = script.onreadystatechange = null
+                resolve()
+              }
+    
+              Object.keys(attr).forEach(key => {
+                script.setAttribute(key, attr[key])
+              })
+    
+              document.head.appendChild(script)
+            }),
+            addGlobalFn: (key, fn, name = false, parent = window) => {
+                const globalFn = parent.globalFn || {}
+                const keyObj = globalFn[key] || {}
+        
+                if (name && keyObj[name]) return
+        
+                name = name || Object.keys(keyObj).length
+                keyObj[name] = fn
+                globalFn[key] = keyObj
+                parent.globalFn = globalFn
+            },
+        }
+    })()</script><!-- global head--><script>const GLOBAL_CONFIG = {
+    root: '/',
+    algolia: undefined,
+    localsearch: {"preload":false,"path":"/search.xml"},
+    runtime: '2024-01-05 00:00:00',
+    lazyload: {
+        enable: true,
+        error: '/img/error_load.png'
+    },
+    copyright: {"limit":50,"author":"作者: Rean","link":"链接: ","source":"来源: Rean's Blog","info":"著作权归作者所有。 商业转载请联系作者获得授权，非商业转载请注明出处。"},
+    highlight: {
+        enable: true,
+        limit: 200,
+        expand: true,
+        copy: true,
+        syntax: 'highlight.js'
+    },
+    randomlink: false,
+    lang: {"theme":{"dark":"已切换至深色模式","light":"已切换至浅色模式"},"copy":{"success":"复制成功","error":"复制失败"},"backtop":"返回顶部","time":{"day":"天前","hour":"小时前","just":"刚刚","min":"分钟前","month":"个月前"},"f12":"开发者模式已打开，请遵循GPL协议。","totalk":"无需删除空行，直接输入评论即可","search":{"empty":"找不到你查询的内容：${query}","hit":"找到 ${hits} 条结果，用时 ${time} 毫秒","placeholder":"输入关键词快速查找","count":"共 <b>${count}</b> 条结果。"}},
+    aside: {
+        sayhello: {
+            morning: '一日之计在于晨',
+            noon: '吃饱了才有力气干活',
+            afternoon: '集中精力，攻克难关',
+            night: '不要太劳累了，早睡更健康',
+            goodnight: '睡个好觉，保证精力充沛',
+        },
+        sayhello2: ["🤖️ 数码科技爱好者","🔍 分享与热心帮助","🔨 设计开发一条龙","🎮 游戏爱好者"],
+    },
+    covercolor: {
+        enable: true
+    },
+    comment: false,
+    lightbox: 'fancybox',
+    post_ai: false,
+    right_menu: {"mode":{"dark":"深色模式","light":"浅色模式"},"img_error":"此图片无法复制与下载","music":{"start":"播放音乐","stop":"暂停音乐"},"translate":{"translateDelay":0,"defaultEncoding":2}},
+};</script><!-- page-config head--><script id="config-diff">var PAGE_CONFIG = {
+    is_post: true,
+    is_page: false,
+    is_home: false,
+    page: '',
+    toc: true,
+    comment: false,
+    ai_text: false,
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body id="body"><!-- universe--><canvas id="universe"></canvas><!-- loading--><!-- console--><div id="console"><div class="close-btn" onclick="sco.hideConsole()"><i class="solitude st-close-fill"></i></div><div class="button-group"><div class="console-btn-item"><span class="darkmode_switchbutton" onclick="sco.switchDarkMode()" title="昼夜切换"><i class="solitude st-moon-clear-fill"></i></span></div><div class="console-btn-item" id="consoleHideAside"><span class="asideSwitch" onclick="sco.switchHideAside()" title="边栏显示控制"><i class="solitude st-side-bar-fill"></i></span></div><div class="console-btn-item" id="consoleMusic" onclick="sco.musicToggle()"><span class="music-switch" title="音乐开关"><i class="solitude st-disc-fill"></i></span></div></div><div class="console-mask" onclick="sco.hideConsole()"></div></div><!-- sidebar--><div id="sidebar" style="zoom: 1;"><div id="menu-mask" style="display: none;"></div><div id="sidebar-menus"><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">172</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">11</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">155</div></a></div></div></div><span class="sidebar-menu-item-title">功能</span><div class="sidebar-menu-item"><span class="darkmode_switchbutton menu-child" onclick="sco.switchDarkMode()"><i class="solitude st-moon-clear-fill"></i><span>显示模式</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文章</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  st-folder-fill"></i><span>文章列表</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  st-checkbox-multiple-blank-fill"></i><span>分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  st-price-tag-fill"></i><span>标签</span></a></li><li><a class="site-page child" href="/study/"><i class="solitude  st-gift-fill"></i><span>学习</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>我的</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="solitude  st-disc-fill"></i><span>音乐馆</span></a></li><li><a class="site-page child" href="/essay/"><span>即刻短文</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>关于本站</span></a></li></ul></div></div><span class="sidebar-menu-item-title">标签</span><div class="card-widget card-tags card-archives card-webinfo card-allinfo"><div class="card-tag-cloud"><a href="/tags/%E8%85%BE%E8%AE%AF/">腾讯<sup>1</sup></a><a href="/tags/%E5%90%8E%E5%8F%B0%E5%BC%80%E5%8F%91/">后台开发<sup>1</sup></a><a href="/tags/Markdown/">Markdown<sup>1</sup></a><a href="/tags/Butterfly/">Butterfly<sup>2</sup></a><a href="/tags/PyCharm/">PyCharm<sup>1</sup></a><a href="/tags/IDEA/">IDEA<sup>1</sup></a><a href="/tags/Git/">Git<sup>2</sup></a><a href="/tags/Halo/">Halo<sup>1</sup></a><a href="/tags/GitHub/">GitHub<sup>1</sup></a><a href="/tags/JavaFx/">JavaFx<sup>2</sup></a><a href="/tags/SpringBoot/">SpringBoot<sup>7</sup></a><a href="/tags/Java/">Java<sup>18</sup></a><a href="/tags/MyBatis/">MyBatis<sup>4</sup></a><a href="/tags/Hexo/">Hexo<sup>3</sup></a><a href="/tags/SyncTV/">SyncTV<sup>1</sup></a><a href="/tags/AList/">AList<sup>1</sup></a><a href="/tags/%E5%AE%9D%E5%A1%94/">宝塔<sup>3</sup></a><a href="/tags/Vue/">Vue<sup>18</sup></a><a href="/tags/Vite/">Vite<sup>6</sup></a><a href="/tags/JavaScript/">JavaScript<sup>4</sup></a><a href="/tags/TypeScript/">TypeScript<sup>3</sup></a><a href="/tags/Electron/">Electron<sup>4</sup></a><a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习<sup>1</sup></a><a href="/tags/scikit-learn/">scikit-learn<sup>1</sup></a><a href="/tags/vocalremover/">vocalremover<sup>1</sup></a><a href="/tags/BPM/">BPM<sup>1</sup></a><a href="/tags/%E9%BB%91%E7%A5%9E%E8%AF%9D%EF%BC%9A%E6%82%9F%E7%A9%BA/">黑神话：悟空<sup>1</sup></a><a href="/tags/HTTP/">HTTP<sup>5</sup></a><a href="/tags/HTTPS/">HTTPS<sup>2</sup></a><a href="/tags/%E7%9F%AD%E9%93%BE/">短链<sup>1</sup></a><a href="/tags/%E8%A7%86%E9%A2%91/">视频<sup>1</sup></a><a href="/tags/HTTP-1-1/">HTTP/1.1<sup>1</sup></a><a href="/tags/LaTex/">LaTex<sup>1</sup></a><a href="/tags/%E5%8A%A0%E5%AF%86/">加密<sup>1</sup></a><a href="/tags/IP/">IP<sup>2</sup></a><a href="/tags/ICMP/">ICMP<sup>1</sup></a><a href="/tags/I-O/">I/O<sup>2</sup></a><a href="/tags/JVM/">JVM<sup>2</sup></a><a href="/tags/Springboot/">Springboot<sup>1</sup></a><a href="/tags/ThreadLocal/">ThreadLocal<sup>1</sup></a><a href="/tags/UUID/">UUID<sup>1</sup></a><a href="/tags/%E5%B9%B6%E5%8F%91/">并发<sup>4</sup></a><a href="/tags/%E7%BA%A2%E9%BB%91%E6%A0%91/">红黑树<sup>2</sup></a><a href="/tags/%E9%93%BE%E8%A1%A8/">链表<sup>1</sup></a><a href="/tags/%E5%8A%9B%E6%89%A3/">力扣<sup>1</sup></a><a href="/tags/LeetCode/">LeetCode<sup>1</sup></a><a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库<sup>8</sup></a><a href="/tags/NLP/">NLP<sup>6</sup></a><a href="/tags/spaCy/">spaCy<sup>4</sup></a><a href="/tags/Python/">Python<sup>1</sup></a><a href="/tags/Redis/">Redis<sup>10</sup></a><a href="/tags/RDB/">RDB<sup>1</sup></a><a href="/tags/AOF/">AOF<sup>1</sup></a><a href="/tags/%E7%BA%BF%E7%A8%8B/">线程<sup>2</sup></a><a href="/tags/I-O%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">I/O多路复用<sup>2</sup></a><a href="/tags/Spring/">Spring<sup>5</sup></a><a href="/tags/TCP/">TCP<sup>7</sup></a><a href="/tags/UDP/">UDP<sup>1</sup></a><a href="/tags/Socket/">Socket<sup>1</sup></a><a href="/tags/FFMpeg/">FFMpeg<sup>1</sup></a><a href="/tags/%E6%A0%B7%E5%BC%8F/">样式<sup>1</sup></a><a href="/tags/ECMAScript/">ECMAScript<sup>2</sup></a><a href="/tags/Element/">Element<sup>3</sup></a><a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">分布式锁<sup>1</sup></a><a href="/tags/%E5%91%A8%E6%B7%B1/">周深<sup>5</sup></a><a href="/tags/%E5%BE%B5%E7%BE%BD%E6%91%A9%E6%9F%AF/">徵羽摩柯<sup>1</sup></a><a href="/tags/%E9%9F%B3%E4%B9%90%E7%BC%98%E8%AE%A1%E5%88%92/">音乐缘计划<sup>1</sup></a><a href="/tags/%E5%A5%A5%E6%96%AF%E5%8D%A1/">奥斯卡<sup>3</sup></a><a href="/tags/%E5%BC%A0%E6%9D%B0/">张杰<sup>2</sup></a><a href="/tags/%E5%A3%B0%E7%94%9F%E4%B8%8D%E6%81%AF%C2%B7%E5%AE%9D%E5%B2%9B%E5%AD%A3/">声生不息·宝岛季<sup>3</sup></a><a href="/tags/%E5%BE%90%E4%BD%B3%E8%8E%B9/">徐佳莹<sup>1</sup></a><a href="/tags/SynthV/">SynthV<sup>15</sup></a><a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统<sup>4</sup></a><a href="/tags/%E6%B0%B8%E5%A4%9CMinus/">永夜Minus<sup>4</sup></a><a href="/tags/%E9%9F%A6%E7%A4%BC%E5%AE%89/">韦礼安<sup>1</sup></a><a href="/tags/%E8%94%A1%E4%BE%9D%E6%9E%97/">蔡依林<sup>1</sup></a><a href="/tags/%E6%97%A0%E5%8F%82/">无参<sup>45</sup></a><a href="/tags/%E5%8F%A4%E9%A3%8E/">古风<sup>11</sup></a><a href="/tags/%E4%B8%89%E6%97%A0Marblue/">三无Marblue<sup>1</sup></a><a href="/tags/%E7%B4%A2%E5%BC%95/">索引<sup>1</sup></a><a href="/tags/B%E6%A0%91/">B树<sup>1</sup></a><a href="/tags/B-%E6%A0%91/">B+树<sup>1</sup></a><a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构<sup>1</sup></a><a href="/tags/%E6%A0%91/">树<sup>1</sup></a><a href="/tags/%E4%BA%8C%E5%8F%89%E6%A0%91/">二叉树<sup>1</sup></a><a href="/tags/%E8%AE%B8%E9%92%A7/">许钧<sup>1</sup></a><a href="/tags/%E6%AD%8C%E6%89%8B2024/">歌手2024<sup>37</sup></a><a href="/tags/Chante-Moore/">Chanté Moore<sup>2</sup></a><a href="/tags/%E9%BB%84%E5%AE%A3/">黄宣<sup>1</sup></a><a href="/tags/Faouzia/">Faouzia<sup>4</sup></a><a href="/tags/Lenka/">Lenka<sup>1</sup></a><a href="/tags/%E5%BC%A0%E9%92%B0%E7%90%AA/">张钰琪<sup>1</sup></a><a href="/tags/%E9%82%A3%E8%8B%B1/">那英<sup>9</sup></a><a href="/tags/%E5%B0%A4%E9%95%BF%E9%9D%96/">尤长靖<sup>2</sup></a><a href="/tags/%E5%AD%99%E6%A5%A0/">孙楠<sup>5</sup></a><a href="/tags/%E8%B0%AD%E7%BB%B4%E7%BB%B4/">谭维维<sup>3</sup></a><a href="/tags/%E5%B4%A9%E5%9D%8F%EF%BC%9A%E6%98%9F%E7%A9%B9%E9%93%81%E9%81%93/">崩坏：星穹铁道<sup>4</sup></a><a href="/tags/%E8%B5%A4%E7%BE%BD/">赤羽<sup>1</sup></a><a href="/tags/%E6%B1%AA%E8%8B%8F%E6%B3%B7/">汪苏泷<sup>4</sup></a><a href="/tags/%E5%A3%B0%E7%94%9F%E4%B8%8D%E6%81%AF%C2%B7%E5%AE%B6%E5%B9%B4%E5%8D%8E/">声生不息·家年华<sup>2</sup></a><a href="/tags/%E9%99%88%E6%A5%9A%E7%94%9F/">陈楚生<sup>2</sup></a><a href="/tags/%E9%99%88%E4%BA%A6%E6%B4%BA/">陈亦洺<sup>1</sup></a><a href="/tags/%E5%B0%9A%E8%BE%B0/">尚辰<sup>1</sup></a><a href="/tags/%E5%BF%98%E5%B7%9D%E9%A3%8E%E5%8D%8E%E5%BD%95/">忘川风华录<sup>2</sup></a><a href="/tags/%E4%B9%90%E6%AD%A3%E9%BE%99%E7%89%99/">乐正龙牙<sup>1</sup></a><a href="/tags/%E6%98%9F%E5%B0%98Infinity/">星尘Infinity<sup>1</sup></a><a href="/tags/%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F/">明日方舟<sup>2</sup></a><a href="/tags/%E7%A5%96%E5%A8%85%E7%BA%B3%E6%83%9C/">祖娅纳惜<sup>1</sup></a><a href="/tags/%E7%94%B5%E5%AD%90/">电子<sup>1</sup></a><a href="/tags/%E6%98%9F%E5%B0%98/">星尘<sup>3</sup></a><a href="/tags/%E5%BC%A0%E4%BF%A1%E5%93%B2/">张信哲<sup>2</sup></a><a href="/tags/%E9%93%B6%E4%B8%B4/">银临<sup>1</sup></a><a href="/tags/%E6%9D%8E%E5%B8%B8%E8%B6%85/">李常超<sup>1</sup></a><a href="/tags/%E5%B1%B1%E8%89%B2%E6%9C%89%E6%97%A0%E4%B8%AD/">山色有无中<sup>1</sup></a><a href="/tags/%E5%91%A8%E6%9D%B0%E4%BC%A6/">周杰伦<sup>1</sup></a><a href="/tags/%E9%BB%84%E9%9C%84%E9%9B%B2/">黄霄雲<sup>1</sup></a><a href="/tags/%E5%AE%B9%E7%A5%96%E5%84%BF/">容祖儿<sup>1</sup></a><a href="/tags/%E6%88%91%E6%98%AF%E6%AD%8C%E6%89%8B%C2%B7%E7%AC%AC%E5%9B%9B%E5%AD%A3/">我是歌手·第四季<sup>1</sup></a><a href="/tags/%E6%9D%8E%E5%85%8B%E5%8B%A4/">李克勤<sup>1</sup></a><a href="/tags/%E7%B2%A4%E8%AF%AD/">粤语<sup>2</sup></a><a href="/tags/%E9%BB%84%E4%B8%BD%E7%8E%B2/">黄丽玲<sup>1</sup></a><a href="/tags/G-E-M-%E9%82%93%E7%B4%AB%E6%A3%8B/">G.E.M.邓紫棋<sup>6</sup></a><a href="/tags/T-I-M-E/">T.I.M.E.<sup>4</sup></a><a href="/tags/%E6%97%B6%E5%85%89%E9%9F%B3%E4%B9%90%E4%BC%9A%C2%B7%E8%80%81%E5%8F%8B%E8%AE%B0/">时光音乐会·老友记<sup>4</sup></a><a href="/tags/%E5%BC%A0%E5%AD%A6%E5%8F%8B/">张学友<sup>1</sup></a><a href="/tags/%E6%9D%A8%E4%B8%9E%E7%90%B3/">杨丞琳<sup>1</sup></a><a href="/tags/%E6%B1%AA%E5%B3%B0/">汪峰<sup>1</sup></a><a href="/tags/%E6%9C%AA%E5%AE%9A%E4%BA%8B%E4%BB%B6%E7%B0%BF/">未定事件簿<sup>1</sup></a><a href="/tags/%E5%BC%A0%E8%BF%9C/">张远<sup>1</sup></a><a href="/tags/%E5%AD%99%E7%87%95%E5%A7%BF/">孙燕姿<sup>1</sup></a><a href="/tags/%E6%B5%B7%E6%9D%A5%E9%98%BF%E6%9C%A8/">海来阿木<sup>1</sup></a><a href="/tags/%E6%9B%B9%E6%9D%A8/">曹杨<sup>2</sup></a><a href="/tags/%E4%B8%8B%E4%B8%80%E6%88%98%E6%AD%8C%E6%89%8B/">下一战歌手<sup>2</sup></a><a href="/tags/Fine%E4%B9%90%E5%9B%A2/">Fine乐团<sup>1</sup></a><a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络<sup>4</sup></a><a href="/tags/DNS/">DNS<sup>1</sup></a><a href="/tags/MAC/">MAC<sup>1</sup></a><a href="/tags/Adam-Lambert/">Adam Lambert<sup>1</sup></a><a href="/tags/%E4%BA%9A%E5%BD%93%C2%B7%E5%85%B0%E4%BC%AF%E7%89%B9/">亚当·兰伯特<sup>1</sup></a><a href="/tags/Hayden/">Hayden<sup>1</sup></a><a href="/tags/%E6%9A%AE%E5%A4%9C/">暮夜<sup>1</sup></a><a href="/tags/ACE-Studio/">ACE Studio<sup>2</sup></a><a href="/tags/%E5%B0%9A%E9%9B%AF%E5%A9%95/">尚雯婕<sup>1</sup></a><a href="/tags/%E4%B8%9C%E6%96%B9%E6%A0%80%E5%AD%90/">东方栀子<sup>2</sup></a><a href="/tags/%E9%BB%84%E7%BB%AE%E7%8F%8A/">黄绮珊<sup>1</sup></a><a href="/tags/%E5%8D%8E%E6%99%A8%E5%AE%87/">华晨宇<sup>1</sup></a><a href="/tags/JUN/">JUN<sup>1</sup></a><a href="/tags/%E6%9E%97%E5%BF%86%E8%8E%B2/">林忆莲<sup>1</sup></a><a href="/tags/UTAU/">UTAU<sup>1</sup></a><a href="/tags/Sheena/">Sheena<sup>1</sup></a><a href="/tags/%E5%89%A7%E5%A5%BD%E5%90%AC%E7%9A%84%E6%AD%8C/">剧好听的歌<sup>1</sup></a><a href="/tags/Syncthing/">Syncthing<sup>1</sup></a><a href="/tags/%E5%90%8C%E6%AD%A5/">同步<sup>1</sup></a><a href="/tags/%E6%94%AF%E4%BB%98%E5%AE%9D/">支付宝<sup>1</sup></a><a href="/tags/Apifox/">Apifox<sup>2</sup></a></div></div></div></div><!-- keyboard--><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav class="show" id="nav"><div id="nav-group"><div id="blog_name"><a id="site-name" href="/" title="返回博客主页"><span class="title">Rean's Blog</span></a></div><div id="page-name-mask"><div id="page-name"><a id="page-name-text" onclick="sco.toTop()">【Java】基础（一） | 数据类型 &amp; 类 &amp; 异常</a></div></div><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文章</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  st-folder-fill"></i><span>文章列表</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  st-checkbox-multiple-blank-fill"></i><span>分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  st-price-tag-fill"></i><span>标签</span></a></li><li><a class="site-page child" href="/study/"><i class="solitude  st-gift-fill"></i><span>学习</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>我的</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="solitude  st-disc-fill"></i><span>音乐馆</span></a></li><li><a class="site-page child" href="/essay/"><span>即刻短文</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>关于本站</span></a></li></ul></div></div></div><div id="nav-left"></div><div id="nav-right"><div class="nav-button" id="randomPost_button"><a class="site-page" onclick="toRandomPost()" title="随机一篇文章" href="javascript:void(0);"><i class="solitude st-signal-tower-fill"></i></a></div><div class="nav-button" id="search-button"><a class="site-page social-icon search" href="javascript:void(0);" title="搜索"><i class="solitude st-search-line"></i></a></div><div class="nav-button" id="nav-console"><a class="console_switchbutton" onclick="sco.showConsole()" title="中控台" href="javascript:void(0);"><i class="solitude st-dashboard-fill"></i></a></div><div class="nav-button" id="nav-totop" onclick="sco.toTop()"><a class="totopbtn"><i class="solitude st-arrow-up-line"></i><span id="percent">0</span></a></div><div id="toggle-menu"><a class="site-page"><i class="solitude st-menu-line"></i></a></div></div></div></nav><div class="coverdiv" id="coverdiv"><img class="nolazyload" id="post-cover" src="https://npm.elemecdn.com/justlovesmile-photo/cover1.JPG" alt="【Java】基础（一） | 数据类型 &amp; 类 &amp; 异常"></div><div id="post-info"><div id="post-firstinfo"><div class="meta-firstline"><a class="post-meta-original" title="该文章为原创文章，注意版权协议">原创</a><span class="post-meta-categories"><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a></span><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Java/"><span class="tags-name tags-punctuation">Java</span></a></div></div></div></div><h1 class="post-title">【Java】基础（一） | 数据类型 &amp; 类 &amp; 异常</h1><div id="post-meta"><div class="meta-secondline"><span class="post-meta-date" title="发布于 2024-08-12 16:46:30"><i class="post-meta-icon solitude st-calendar-todo-fill"></i><time datetime="2024-08-12T08:46:30.000Z">2024-08-12T08:46:30.000Z</time></span><span class="post-meta-date" title="最后更新于 2024-11-16 17:36:03"><i class="post-meta-icon solitude st-refresh-line"></i><time datetime="2024-11-16T09:36:03.257Z">2024-11-16T09:36:03.257Z</time></span><span class="post-meta-wordcount"><i class="post-meta-icon solitude st-word-fill" title="文章字数"></i><span class="word-count">6.3k</span><span class="post-meta-separator"></span><i class="post-meta-icon solitude st-clock-fill" title="阅读耗时"></i><span>23 min</span></span><a class="post-meta-pv" href="/p/9f38852a/" title="文章热度"><i class="post-meta-icon solitude st-fire-fill"></i><span id="busuanzi_page_pv"><i class="solitude st-loading-line"></i></span></a></div></div></div><section class="main-hero-waves-area waves-area"><svg class="waves-svg" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto"><defs><path id="gentle-wave" d="M -160 44 c 30 0 58 -18 88 -18 s 58 18 88 18 s 58 -18 88 -18 s 58 18 88 18 v 44 h -352 Z"></path></defs><g class="parallax"><use href="#gentle-wave" x="48" y="0"></use><use href="#gentle-wave" x="48" y="3"></use><use href="#gentle-wave" x="48" y="5"></use><use href="#gentle-wave" x="48" y="7"></use></g></svg></section></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="Java-中的基本数据类型有哪些？"><a href="#Java-中的基本数据类型有哪些？" class="headerlink" title="Java 中的基本数据类型有哪些？"></a>Java 中的基本数据类型有哪些？</h2><p>Java 中的数据类型可以分为两大类：基本数据类型和引用数据类型。</p>
+<p>基本数据类型是 Java 中的原始数据类型，而引用数据类型则是对象引用。</p>
+<h3 id="基本数据类型（Primitive-Data-Types）"><a href="#基本数据类型（Primitive-Data-Types）" class="headerlink" title="基本数据类型（Primitive Data Types）"></a>基本数据类型（Primitive Data Types）</h3><ul>
+<li>整型：byte（8位有符号整数）、short（16位有符号整数）、int（32位有符号整数）、long（64位有符号整数，后缀 L 或 l）。</li>
+<li>浮点型：float（32位浮点数，后缀 F 或 f）、double（64位浮点数，后缀 D 或 d）。</li>
+<li>字符型：char（16位 Unicode 字符）。</li>
+<li>布尔型：boolean（只有两个可能的值：true 或 false）。</li>
+</ul>
+<h3 id="引用数据类型（Reference-Data-Types）"><a href="#引用数据类型（Reference-Data-Types）" class="headerlink" title="引用数据类型（Reference Data Types）"></a>引用数据类型（Reference Data Types）</h3><ul>
+<li>类（Class）：用户自定义的类或 Java 内置的类。</li>
+<li>接口（Interface）：定义了类必须实现的方法的契约。</li>
+<li>数组（Array）：一种容器对象，可以包含固定数量的单一类型值。</li>
+<li>枚举（Enumeration）：用于表示一组预定义的常量，使代码更加简洁、可读。</li>
+<li>注解（Annotation）：修饰方法或者类或者属性。</li>
+</ul>
+<h2 id="Java-中的参数传递是按值还是按引用？"><a href="#Java-中的参数传递是按值还是按引用？" class="headerlink" title="Java 中的参数传递是按值还是按引用？"></a>Java 中的参数传递是按值还是按引用？</h2><p><strong>Java 只有按值传递，不论是基本类型还是引用类型。</strong></p>
+<p>JVM 内存有划分为栈和堆，局部变量和方法参数是在<strong>栈</strong>上分配的 ，引用类型占 4 个字节，基本类型看具体类型，例如 long 和 double 占 8 个字节。</p>
+<p>而对象所占的空间是在<strong>堆</strong>中开辟的，引用类型变量存储的是对象<strong>在堆中的地址</strong>，并以此来访问对象，所以传递的时候可以理解为把变量存储的地址给传递过去，因此引用类型也是值传递。</p>
+<h2 id="Java-中的深拷贝和浅拷贝有什么区别？"><a href="#Java-中的深拷贝和浅拷贝有什么区别？" class="headerlink" title="Java 中的深拷贝和浅拷贝有什么区别？"></a>Java 中的深拷贝和浅拷贝有什么区别？</h2><p>深拷贝：完全拷贝一个对象，包括基本类型和引用类型，堆内的引用对象也会复制一份。</p>
+<p>浅拷贝：仅拷贝基本类型和引用，堆内的引用对象和被拷贝的对象共享。</p>
+<p>所以假如拷贝的对象成员间有一个 list，深拷贝之后堆内有 2 个 list，之间不会影响，而浅拷贝的话堆内还是只有一个 list。</p>
+<p>比如现在有个 teacher 对象，然后成员里面有一个 student 列表。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/image-20210303201307397_mianshiya.png" alt="image-20210303201307397.png"></p>
+<p>因此深拷贝是安全的，浅拷贝的话如果有引用对象则原先和拷贝对象修改引用对象的值会相互影响。</p>
+<h2 id="Java-的类加载过程是怎样的？"><a href="#Java-的类加载过程是怎样的？" class="headerlink" title="Java 的类加载过程是怎样的？"></a>Java 的类加载过程是怎样的？</h2><p>类加载顾名思义就是把类加载到 JVM 中，而输入一段二进制流到内存，之后经过一番解析、处理转化成可用的 class 类，这就是类加载要做的事情。</p>
+<p>二进制流可以来源于 class 文件，或者通过字节码工具生成的字节码或者来自于网络都行，只要符合格式的二进制流，JVM 来者不拒。</p>
+<p>类加载流程分为<strong>加载、连接、初始化</strong>三个阶段，连接还能拆分为：验证、准备、解析三个阶段。</p>
+<p>所以总的来看可以分为 5 个阶段：</p>
+<ul>
+<li>加载：将二进制流搞到内存中来，生成一个 Class 类。</li>
+<li>验证：主要是验证加载进来的二进制流是否符合一定格式，是否规范，是否符合当前 JVM 版本等等之类的验证。</li>
+<li>准备：为<strong>静态变量</strong>(类变量)赋初始值，也即为它们在方法区划分内存空间。这里注意是静态变量，并且是初始值，比如 int 的初始值是 0。</li>
+<li>解析：将常量池的符号引用转化成直接引用。符号引用可以理解为只是个替代的标签，比如你此时要做一个计划，暂时还没有人选，你设定了个 A 去做这个事。然后等计划真的要落地的时候肯定要找到确定的人选，到时候就是小明去做一件事。解析就是把 A(符号引用) 替换成小明(直接引用)。符号引用就是一个字面量，没有什么实质性的意义，只是一个代表。直接引用指的是一个真实引用，在内存中可以通过这个引用查找到目标。</li>
+<li>初始化：这时候就执行一些静态代码块，为静态变量赋值，这里的赋值才是<strong>代码里面的赋值</strong>，准备阶段只是设置初始值占个坑。</li>
+</ul>
+<h2 id="什么是-Java-中的不可变类？如何实现一个不可变类？"><a href="#什么是-Java-中的不可变类？如何实现一个不可变类？" class="headerlink" title="什么是 Java 中的不可变类？如何实现一个不可变类？"></a>什么是 Java 中的不可变类？如何实现一个不可变类？</h2><p>不可变类指的是无法修改对象的值，比如 String 就是典型的不可变类，当你创建一个 String 对象之后，这个对象就无法被修改。所以不要在字符串拼接频繁的场景使用 + 来拼接，因为这样会频繁的创建对象。</p>
+<p>至于如何实现，就参考 String 的设计就行。</p>
+<p>String 类用 final 修饰，表示无法被继承。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/7a891c1016266126c1428a76ae5f15c8.png"></p>
+<p>String 本质是一个 char 数组，然后用 final 修饰，不过 final 限制不了数组内部的数据，所以这还不够。</p>
+<p>所以 value 是用 private 修饰的，并且没有暴露出 set 方法，这样外部其实就接触不到 value 所以无法修改。</p>
+<p>当然还是有修改的需求，比如 replace 方法，所以这时候就需要返回一个新对象来作为结果。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/2d578e400ef8b32f6846988d6707db01.png"></p>
+<p>总结一下就是私有化变量，然后不要暴露 set 方法，即使有修改的需求也是返回一个新对象。</p>
+<h2 id="Java-中-String、StringBuffer-和-StringBuilder-的区别是什么？"><a href="#Java-中-String、StringBuffer-和-StringBuilder-的区别是什么？" class="headerlink" title="Java 中 String、StringBuffer 和 StringBuilder 的区别是什么？"></a>Java 中 String、StringBuffer 和 StringBuilder 的区别是什么？</h2><p><code>String</code> 是 Java 中基础且重要的类，是可不变的。</p>
+<p><strong><code>StringBuffer</code> 就是为了解决大量拼接字符串时产生很多中间对象问题而提供的一个类</strong>，它的本质是一个线程安全的可修改的字符序列，把所有修改数据的方法都加上了 <code>synchronized</code>。但是保证了线程安全是需要性能的代价的。</p>
+<p>在很多情况下我们的字符串拼接操作不需要线程安全，这时候 <strong>StringBuilder</strong> 登场了，<code>StringBuilder</code>是<code>JDK1.5</code>发布的，它和 <code>StringBuffer</code> 本质上没什么区别，就是<strong>去掉了保证线程安全的那部分，减少了开销</strong>。</p>
+<h3 id="选择建议"><a href="#选择建议" class="headerlink" title="选择建议"></a>选择建议</h3><ul>
+<li>String：适用于少量字符串操作或需要字符串常量池优化的场景。</li>
+<li>StringBuffer：适用于多线程环境下频繁的字符串操作。</li>
+<li>StringBuilder：适用于单线程环境下频繁的字符串操作。</li>
+</ul>
+<h2 id="使用-new-String-语句在-Java-中会创建多少个对象？"><a href="#使用-new-String-语句在-Java-中会创建多少个对象？" class="headerlink" title="使用 new String() 语句在 Java 中会创建多少个对象？"></a>使用 new String() 语句在 Java 中会创建多少个对象？</h2><p>会创建 1 或 2 个字符串对象。</p>
+<p>主要有两种情况：</p>
+<p>1、如果字符串常量池中不存在字符串对象的引用，那么它会在堆上创建<strong>两个</strong>字符串对象，其中一个字符串对象的引用会被保存在字符串常量池中。</p>
+<p>2、如果字符串常量池中已存在字符串对象“yupi”的引用，则只会在堆中创建 1 个字符串对象“yupi”。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 字符串常量池中已存在字符串对象的引用</span></span><br><span class="line"><span class="type">String</span> <span class="variable">s1</span> <span class="operator">=</span> <span class="string">&quot;test&quot;</span>;</span><br><span class="line"><span class="comment">// 下面这段代码只会在堆中创建 1 个字符串对象</span></span><br><span class="line"><span class="type">String</span> <span class="variable">s2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">String</span>(<span class="string">&quot;test&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="为什么-JDK-9-中将-String-的-char-数组改为-byte-数组？"><a href="#为什么-JDK-9-中将-String-的-char-数组改为-byte-数组？" class="headerlink" title="为什么 JDK 9 中将 String 的 char 数组改为 byte 数组？"></a>为什么 JDK 9 中将 String 的 char 数组改为 byte 数组？</h2><p>这个操作主要是为了<strong>节省内存空间，提高内存利用率</strong>。</p>
+<p>在 JDK 9 之前，String 类是基于 <code>char[]</code> 实现的，内部采用 UTF-16 编码，每个字符占用<strong>两个字节</strong>。</p>
+<p>但是，如果当前的字符仅需一个字节的空间，这就造成了浪费。例如一些 <code>Latin-1</code> 字符用一个字节即可表示。</p>
+<p>因此 JDK 9 做了优化采用 <code>byte</code> 数组来实现。</p>
+<p>并引入了 coder 变量来标识编码方式（Latin-1 或 UTF-16）。对于大多数只包含 Latin-1 字符（即每个字符可以用一个字节表示）的字符串，内存使用量减半。</p>
+<h3 id="Latin1-是什么？"><a href="#Latin1-是什么？" class="headerlink" title="Latin1 是什么？"></a>Latin1 是什么？</h3><p>Latin1 是国际标准编码 ISO-8859-1 的别名。Latin1 也是单字节编码，在 ASCII 编码的基础上，利用了 ASCII 未利用的最高位，扩充了 128 个字符，因此 Latin1 可以表示 256 个字符，并向下兼容 ASCII。</p>
+<p>Latin1收录的字符除 ASCII 收录的字符外，还包括西欧语言、希腊语、泰语、阿拉伯语、希伯来语对应的文字符号。欧元符号出现的比较晚，没有被收录在 ISO-8859-1 当中，在后来的修订版 ISO-8859-15 加入了欧元符号。</p>
+<p>Latin1的编码范围是 0x00-0xFF，ASCII的编码范围是 0x00-0x7F。</p>
+<p>Latin1 相对 ASCII 而言，较少被提及，其实 Latin1 的使用还是比较广泛的，比如 MySQL（8.0之前）的数据表存储默认编码就是 Latin1。</p>
+<h2 id="Java-的-BigDecimal-是什么？"><a href="#Java-的-BigDecimal-是什么？" class="headerlink" title="Java 的 BigDecimal 是什么？"></a>Java 的 BigDecimal 是什么？</h2><p><code>BigDecimal</code> 是 Java 中提供的一个用于高精度计算的类，属于 java.math 包。它提供对浮点数和定点数的精确控制，特别适用于金融和科学计算等需要高精度的领域。</p>
+<p>主要特点：</p>
+<ul>
+<li>高精度：BigDecimal 可以处理<strong>任意精度</strong>的数值，而不像 float 和 double 存在精度限制。</li>
+<li>不可变性：BigDecimal 是<strong>不可变</strong>类，所有的算术运算都会返回新的 BigDecimal 对象，而不会修改原有对象（所以要注意性能问题）。</li>
+<li>丰富的功能：提供了加、减、乘、除、取余、舍入、比较等多种方法，并支持各种舍入模式。</li>
+</ul>
+<p>通常情况下，大部分需要浮点数精确运算结果的业务场景（比如涉及到钱的场景）都是通过 BigDecimal 来做的。</p>
+<h2 id="Java-中包装类型和基本类型的区别是什么？"><a href="#Java-中包装类型和基本类型的区别是什么？" class="headerlink" title="Java 中包装类型和基本类型的区别是什么？"></a>Java 中包装类型和基本类型的区别是什么？</h2><p>Java 中有 8 种基本数据类型，这些基本类型又有对应的包装类。</p>
+<table>
+<thead>
+<tr>
+<th>基本数据类型（默认值）</th>
+<th>包装类（默认值）</th>
+<th>长度</th>
+<th>取值范围</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>byte (0)</td>
+<td>Byte (null)</td>
+<td>1字节</td>
+<td>-128～127</td>
+</tr>
+<tr>
+<td>short (0)</td>
+<td>Short (null)</td>
+<td>2字节</td>
+<td>-32768～32767</td>
+</tr>
+<tr>
+<td>int (0)</td>
+<td>Integer (null)</td>
+<td>4字节</td>
+<td>-231 ～ 2(31-1)</td>
+</tr>
+<tr>
+<td>long (0)</td>
+<td>Long (null)</td>
+<td>8字节</td>
+<td>-263 ~ 2(63-1)</td>
+</tr>
+<tr>
+<td>float (0.0)</td>
+<td>Float (null)</td>
+<td>4字节</td>
+<td>1.4E-45~3.4028235E38</td>
+</tr>
+<tr>
+<td>double (0.0)</td>
+<td>Double (null)</td>
+<td>8字节</td>
+<td>4.9E-324~1.7976931348623157E308</td>
+</tr>
+<tr>
+<td>boolean (false)</td>
+<td>Boolean (null)</td>
+<td>&#x2F;</td>
+<td>true | false</td>
+</tr>
+<tr>
+<td>char (为空)</td>
+<td>Character (null)</td>
+<td>2字节</td>
+<td>0～65535</td>
+</tr>
+</tbody></table>
+<p><strong>因为 Java 是一种面向对象语言，很多地方都需要使用对象而不是基本数据类型</strong>。比如，在集合类中，我们是无法将int 、double等类型放进去的。因为集合的容器要求元素是 Object类型。</p>
+<p>为了让基本类型也具有对象的特征，就出现了包装类型，它相当于将基本类型“包装起来”，使得它具有了对象的性质，并且为其添加了属性和方法，丰富了基本类型的操作。</p>
+<h3 id="基本类型与包装类型的区别"><a href="#基本类型与包装类型的区别" class="headerlink" title="基本类型与包装类型的区别"></a>基本类型与包装类型的区别</h3><ol>
+<li><strong>默认值不同</strong>：基本类型的默认值是 0，false 等，包装类默认为 null（包装类型可以为null，而基本类型不可以）</li>
+<li><strong>初始化的方式不同</strong>：一个需要采用 new 的方式创建，一个则不需要</li>
+<li><strong>存储方式有所差异</strong>：基本类型主要保存在<strong>栈</strong>上面，包装类对象保存在<strong>堆</strong>上（成员变量的话，在不考虑JIT优化的栈上分配时，都是随着对象一起保存在堆上的）</li>
+<li>包装类型可用于<strong>泛型</strong>，而基本类型不可以</li>
+<li>两个包装类型的值可以相同，但却不相等（&#x3D;&#x3D;）</li>
+</ol>
+<h2 id="什么是-Java-中的自动装箱和拆箱？"><a href="#什么是-Java-中的自动装箱和拆箱？" class="headerlink" title="什么是 Java 中的自动装箱和拆箱？"></a>什么是 Java 中的自动装箱和拆箱？</h2><p>自动装箱（Autoboxing）和拆箱（Unboxing）是 Java 语言中的一种特性，它们允许自动地在基本数据类型和相应的包装类之间进行转换。极大地简化了代码，使得基本类型和包装类之间的转换更加透明和自然。</p>
+<h3 id="需要注意的事项："><a href="#需要注意的事项：" class="headerlink" title="需要注意的事项："></a>需要注意的事项：</h3><ol>
+<li>性能影响：虽然自动装箱和拆箱提供了方便，但它们会产生额外的对象创建和拆箱操作，可能会影响性能，<strong>尤其是在循环或频繁使用的场景中</strong>。</li>
+<li>NullPointerException：在进行拆箱操作时，如果包装类对象为 null，会抛出 NullPointerException。</li>
+</ol>
+<h2 id="什么是-Java-的-Integer-缓存池？"><a href="#什么是-Java-的-Integer-缓存池？" class="headerlink" title="什么是 Java 的 Integer 缓存池？"></a>什么是 Java 的 Integer 缓存池？</h2><p>因为根据实践发现大部分的数据操作都集中在值比较小的范围，因此 Integer 搞了个缓存池，默认范围是 -128 到 127，可以根据通过设置 <code>JVM-XX:AutoBoxCacheMax=&lt;size&gt;</code> 来修改缓存的最大值，最小值改不了。</p>
+<p>实现的原理是 <code>int</code> 在自动装箱的时候会调用Integer.valueOf，进而用到了 IntegerCache。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/image-20210228112742081_mianshiya.png" alt="image-20210228112742081.png"></p>
+<p>IntegerCache 在静态块中会初始化好缓存值。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/image-20210228112757226_mianshiya.png" alt="image-20210228112757226.png"></p>
+<p>所以这里还有个面试题，就是啥 Integer 127 之内的相等，而超过 127 的就不等了，因为 127 之内的就是同一个对象，所以当然相等。</p>
+<p>不仅 Integer 有，Long 也是有的，不过范围是写死的 -128 到 127。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/image-20210228112817173.png" alt="image-20210228112817173.png"></p>
+<p>对了 Float 和 Double 是没有滴，毕竟是小数，能存的数太多了。</p>
+<h2 id="Java-中-hashCode-和-equals-方法是什么？它们与-操作符有什么区别？"><a href="#Java-中-hashCode-和-equals-方法是什么？它们与-操作符有什么区别？" class="headerlink" title="Java 中 hashCode 和 equals 方法是什么？它们与 &#x3D;&#x3D; 操作符有什么区别？"></a>Java 中 hashCode 和 equals 方法是什么？它们与 &#x3D;&#x3D; 操作符有什么区别？</h2><p>这些都是 <code>Java</code> 中用于比较对象的三种方式。</p>
+<h3 id="hashCode"><a href="#hashCode" class="headerlink" title="hashCode"></a>hashCode</h3><p><code>hashCode</code>返回对象的哈希码（整数），主要用于支持基于哈希表的集合，用来确定对象的存储位置，如 <code>HashMap、HashSet</code> 等。</p>
+<p><code>Object</code> 类中的默认实现会根据对象的内存地址生成哈希码（<code>native</code> 方法）。</p>
+<p>在 <code>Java</code> 中，<code>hashCode</code> 方法和 <code>equals</code> 方法之间有一个 <strong>“合约”</strong>：</p>
+<ul>
+<li>如果两个对象根据 <code>equals</code> 方法被认为是相等的，那么它们必须具有<strong>相同的哈希码</strong>。</li>
+<li>如果两个对象具有相同的哈希码，它们<strong>并不一定相等</strong>，但会被放在同一个哈希桶中。</li>
+</ul>
+<h3 id="equals"><a href="#equals" class="headerlink" title="equals"></a>equals</h3><p>用于比较两个对象的<strong>内容是否相等</strong>。<code>Object</code> 类中的默认实现会使用 &#x3D;&#x3D; 操作符来比较对象的内存地址。</p>
+<p>通常我们需要在自定义类中重写 <code>equals</code> 方法，以基于对象的属性进行内容比较。比如你可以自定义两个对象的名字一样就是相等的、年龄一样就是相等，可以灵活按照需求定制。</p>
+<p>对于 <code>equals</code> 定义的比较，实际上还有以下五个要求：</p>
+<ul>
+<li>自反性：对于任何非空引用值 <code>x</code>，<code>x.equals(x)</code> 必须返回 <code>true</code>。</li>
+<li>对称性：对于任何非空引用值 <code>x</code> 和 <code>y</code>，如果 <code>x.equals(y)</code> 返回 <code>true</code>，则 <code>y.equals(x)</code> 也必须返回 <code>true</code>。</li>
+<li>传递性：对于任何非空引用值 <code>x</code>、<code>y</code> 和 <code>z</code>，如果 <code>x.equals(y)</code> 返回 <code>true</code> 且 <code>y.equals(z)</code> 返回 <code>true</code>，则 <code>x.equals(z)</code> 也必须返回 <code>true</code>。</li>
+<li>一致性：对于任何非空引用值 <code>x</code> 和 <code>y</code>，只要对象在比较中没有被修改，多次调用 <code>x.equals(y)</code> 应返回相同的结果。</li>
+<li>对于任何非空引用值 <code>x</code>，<code>x.equals(null)</code> 必须返回 <code>false</code>。</li>
+</ul>
+<h3 id=""><a href="#" class="headerlink" title="&#x3D;&#x3D;"></a>&#x3D;&#x3D;</h3><p><code>==</code> 操作符用于比较两个引用是否指向同一个对象（即比较内存地址），如果是基本数据类型，<code>==</code> 直接比较它们的值。</p>
+<h3 id="区别总结"><a href="#区别总结" class="headerlink" title="区别总结"></a>区别总结</h3><p><code>hashCode</code> 用于散列存储结构中确定对象的存储位置。可用于快速比较两个对象是否不同，因为如果它们的哈希码不同，那么它们肯定不相等。</p>
+<p><code>equals</code> 用于比较两个对象的内容是否相等，通常需要重写自定义比较逻辑。</p>
+<p><code>==</code> 用于比较两个引用是否指向同一个对象（即内存地址）。对于基本数据类型，比较它们的值。</p>
+<h3 id="散列表的相关类"><a href="#散列表的相关类" class="headerlink" title="散列表的相关类"></a>散列表的相关类</h3><p>比如 HashSet，我们常用来得到一个不重复的集合。</p>
+<p>现在有个 Yes 类的 HashSet 集合，我只重写了 Yes 类的 equals 方法，表明如果 name 相同就返回 true。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">equals</span><span class="params">(Object obj)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">this</span> == obj) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (obj <span class="keyword">instanceof</span> Yes) &#123;</span><br><span class="line">        <span class="type">Yes</span> <span class="variable">other</span> <span class="operator">=</span> (Yes) obj;</span><br><span class="line">        <span class="keyword">return</span> name.equals(other.name);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>就重写一个 equals 的话，HashSet 中会出现相同 name 的 Yes 对象。</p>
+<p>原因就是 hashCode 没有重写，那为什么会这样呢？因为 HashSet 是复用 HashMap 的能力存储对象，而塞入 key 的时候要计算 hash 值，可以看到这里实际会调用对象的 hashCode 方法来计算 hash 值。</p>
+<p>然后在具体执行 putVal 方法的时候，相关的判断条件会先判断 hash 值是否相等，如果 hash 值都不同，那就认为这两个对象不相等，这与我们之前设定的 name 一样的对象就是相等的条件就冲突了</p>
+<p>因此规定，重写 equals 方法的时候，也要重写 hashCode 方法，这样才能保持条件判断的同步。我建议不管会不会用到散列表，只要你重写 equals 就一起重写 hashCode ，这样肯定不会出错。</p>
+<h2 id="Java-的-Optional-类是什么？它有什么用？"><a href="#Java-的-Optional-类是什么？它有什么用？" class="headerlink" title="Java 的 Optional 类是什么？它有什么用？"></a>Java 的 Optional 类是什么？它有什么用？</h2><p>Optional 是 Java 8 引入的一个用来解决空指针异常的问题的容器类，它用来<strong>表示一个值可能存在或不存在</strong>。通过Optional类，我们可以避免在获取对象值时出现空指针异常。常见的使用方式如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Optional&lt;User&gt; userOption = Optional.ofNullable(userService.getUser(...));</span><br><span class="line"><span class="keyword">if</span> (!userOption.isPresent()) &#123;....&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Optional 其实就是一个壳，里面放着原先的值，至于这个值是不是 null 另说，反正拿到的这个壳肯定不是 null。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/UmdCliuo_c7362dfe-26af-4ae0-be83-57ebefcdcbfc.png"></p>
+<p>我认为 Optional 的好处在于可以简化平日里一系列判断 null 的操作，使得用起来的时候看着不需要判断 null，纵享丝滑，表现出来好像用 Optional 就不需要关心空指针的情况。</p>
+<p>而事实上是 Optional 在替我们负重前行，该有的判断它替我们完成了，而且用了 Optional 最后拿结果的时候还是小心的，盲目 get 一样会抛错。</p>
+<p>Optional类主要有三个常用方法，分别是of()、ofNullable()和orElse()。</p>
+<ul>
+<li>of()方法用来创建一个非空的Optional实例</li>
+<li>ofNullable()方法可以创建一个可能为空的Optional实例</li>
+<li>orElse()方法可以在Optional为空时提供一个默认值。</li>
+</ul>
+<p>我们来看一下代码就很清楚 Optional 的好处在哪儿了。比如现在有个 yesSerivce 能 get 一个 Yes，此时需要输出 Yes 所在的省，此时的代码是这样的：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="type">Yes</span> <span class="variable">yes</span> <span class="operator">=</span> getYes();</span><br><span class="line"><span class="keyword">if</span> (yes != <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="type">Address</span> <span class="variable">yesAddress</span> <span class="operator">=</span> yes.getAddress();</span><br><span class="line">    <span class="keyword">if</span> (yesAddress != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="type">Province</span> <span class="variable">province</span> <span class="operator">=</span> yesAddress.getProvince();</span><br><span class="line">        System.out.println(province.getName());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NoSuchElementException</span>(); <span class="comment">//如果没找到就抛错</span></span><br></pre></td></tr></table></figure>
+
+<p>如果用 Optional 的话，那就变成下面这样：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Optional.ofNullable(getYes())</span><br><span class="line">        .map(a -&gt; a.getAddress())</span><br><span class="line">        .map(p -&gt; p.getProvince())</span><br><span class="line">        .map(n -&gt; n.getName())</span><br><span class="line">        .orElseThrow(NoSuchElementException::<span class="keyword">new</span>);</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，如果用了 Optional，代码里不需要判空的操作，即使 address 、province 为空的话，也不会产生空指针错误，这就是 Optional 带来的好处！</p>
+<h2 id="什么是-Java-中的迭代器（Iterator）？"><a href="#什么是-Java-中的迭代器（Iterator）？" class="headerlink" title="什么是 Java 中的迭代器（Iterator）？"></a>什么是 Java 中的迭代器（Iterator）？</h2><p>迭代器（Iterator）其实是一种<strong>设计模式</strong>，用于遍历集合（例如 List、Set、Map 等）中的元素，而不需要暴露集合的内部实现，即不需要了解集合的底层结构。</p>
+<p>在 Java 中 Iterator 是一个接口，在 java.util 包中的，常用的方法是：</p>
+<ul>
+<li>hasNext()：如果迭代器还有更多的元素可以迭代，则返回 true，否则返回 false。</li>
+<li>next()：返回迭代器的下一个元素。如果没有更多元素，调用该方法将抛出 NoSuchElementException。</li>
+<li>remove()：从底层集合中移除 next() 方法返回的上一个元素。这个方法是可选的，不是所有的实现都支持该操作。如果不支持，调用时会抛出 UnsupportedOperationException。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 获取集合的迭代器</span></span><br><span class="line">      Iterator&lt;String&gt; iterator = list.iterator();</span><br></pre></td></tr></table></figure>
+
+<p>迭代器模式带来了很多好处：</p>
+<ul>
+<li><strong>封装性</strong>：它将集合遍历行为和具体的实现分离，使得使用者不需要了解集合具体的内部实现。</li>
+<li><strong>一致性</strong>：所有的集合都实现了 Iterator 接口，因此对于不同集合的遍历代码都是一致的。</li>
+<li><strong>灵活性</strong>：因为遍历接口一致，使得可以很灵活的替换底层实现的集合而不需要改变上层的遍历代码。</li>
+</ul>
+<p>Iterator 提供了单向遍历方法，如果需要支持双向遍历，可以使用 ListIterator 接口。</p>
+<h2 id="请解释一下-Java-8-Stream-API-和-Lambda-表达式的作用，以及在项目中如何应用它们来简化集合处理？"><a href="#请解释一下-Java-8-Stream-API-和-Lambda-表达式的作用，以及在项目中如何应用它们来简化集合处理？" class="headerlink" title="请解释一下 Java 8 Stream API 和 Lambda 表达式的作用，以及在项目中如何应用它们来简化集合处理？"></a>请解释一下 Java 8 Stream API 和 Lambda 表达式的作用，以及在项目中如何应用它们来简化集合处理？</h2><p>Stream API 和 Lambda 表达式是 Java 8 提供的语法糖，它们的作用是使集合处理更加简洁、易读和高效。</p>
+<h3 id="Lambda-表达式"><a href="#Lambda-表达式" class="headerlink" title="Lambda 表达式"></a>Lambda 表达式</h3><p>Lambda 表达式是一种匿名函数，允许你以更紧凑的方式传递代码块，简化代码的编写，比如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 使用 Lambda 表达式过滤以 &quot;A&quot; 开头的名字</span></span><br><span class="line">List&lt;String&gt; filteredNames = names.stream()</span><br><span class="line">    .filter(name -&gt; name.startsWith(<span class="string">&quot;A&quot;</span>))</span><br><span class="line">    .collect(Collectors.toList());</span><br></pre></td></tr></table></figure>
+
+<h3 id="Stream-流"><a href="#Stream-流" class="headerlink" title="Stream 流"></a>Stream 流</h3><p>Stream API 是一种流式操作集合的方法，提供了丰富的集合处理操作，比如过滤、映射、排序等，还支持延迟加载和并行处理，简化代码、并提高编码效率。</p>
+<p>上述代码示例同样也是 Stream API 的应用。</p>
+<p>在本项目中，匹配相似用户时，将存储用户和匹配度的 List 转化为 Stream 流，用 sorted 方法进行编辑距离由小到大排序，用 limit 方法取流的前 N 项，用 collect 终结操作将处理好的流转化为集合 List。还有使用 Stream API 的 map 方法对用户列表中的每个用户信息进行脱敏、使用ParallelStream 实现并发流等。</p>
+<h2 id="Java-异常有哪些种类？"><a href="#Java-异常有哪些种类？" class="headerlink" title="Java 异常有哪些种类？"></a>Java 异常有哪些种类？</h2><p><strong>Java 异常类层次结构图概览</strong>：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/types-of-exceptions-in-java.png" alt="Java 异常类层次结构图"></p>
+<h3 id="Exception-和-Error-有什么区别？"><a href="#Exception-和-Error-有什么区别？" class="headerlink" title="Exception 和 Error 有什么区别？"></a>Exception 和 Error 有什么区别？</h3><p>在 Java 中，所有的异常都有一个共同的祖先 <code>java.lang</code> 包中的 <code>Throwable</code> 类。<code>Throwable</code> 类有两个重要的子类:</p>
+<ul>
+<li><strong><code>Exception</code></strong> :程序本身可以处理的异常，可以通过 <code>catch</code> 来进行捕获。<code>Exception</code> 又可以分为 Checked Exception (受检查异常，必须处理) 和 Unchecked Exception (不受检查异常，可以不处理)。</li>
+<li>**<code>Error</code>**：<code>Error</code> 属于程序无法处理的错误 ，不建议通过<code>catch</code>捕获 。例如 Java 虚拟机运行错误（<code>Virtual MachineError</code>）、虚拟机内存不够错误(<code>OutOfMemoryError</code>)、类定义错误（<code>NoClassDefFoundError</code>）等 。这些异常发生时，Java 虚拟机（JVM）一般会选择线程终止。</li>
+</ul>
+<h3 id="Checked-Exception-和-Unchecked-Exception-有什么区别？"><a href="#Checked-Exception-和-Unchecked-Exception-有什么区别？" class="headerlink" title="Checked Exception 和 Unchecked Exception 有什么区别？"></a>Checked Exception 和 Unchecked Exception 有什么区别？</h3><p><strong>Checked Exception</strong> 即 受检查异常 ，Java 代码在编译过程中，如果受检查异常没有被 <code>catch</code>或者<code>throws</code> 关键字处理的话，就没办法通过编译。</p>
+<p>比如下面这段 IO 操作的代码：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/checked-exception.png"></p>
+<p>除了<code>RuntimeException</code>及其子类以外，其他的<code>Exception</code>类及其子类都属于受检查异常 。常见的受检查异常有：IO 相关的异常、<code>ClassNotFoundException</code>、<code>SQLException</code>…。</p>
+<p><strong>Unchecked Exception</strong> 即 <strong>不受检查异常</strong> ，Java 代码在编译过程中 ，我们即使不处理不受检查异常也可以正常通过编译。</p>
+<p><code>RuntimeException</code> 及其子类都统称为非受检查异常，常见的有（建议记下来，日常开发中会经常用到）：</p>
+<ul>
+<li><code>NullPointerException</code>(空指针错误)</li>
+<li><code>IllegalArgumentException</code>(参数错误比如方法入参类型错误)</li>
+<li><code>NumberFormatException</code>（字符串转换为数字格式错误，<code>IllegalArgumentException</code>的子类）</li>
+<li><code>ArrayIndexOutOfBoundsException</code>（数组越界错误）</li>
+<li><code>ClassCastException</code>（类型转换错误）</li>
+<li><code>ArithmeticException</code>（算术错误）</li>
+<li><code>SecurityException</code> （安全错误比如权限不够）</li>
+<li><code>UnsupportedOperationException</code>(不支持的操作错误比如重复创建同一用户)</li>
+<li>……</li>
+</ul>
+<h2 id="try-catch-finally-如何使用？"><a href="#try-catch-finally-如何使用？" class="headerlink" title="try-catch-finally 如何使用？"></a>try-catch-finally 如何使用？</h2><p><code>try</code>块：用于捕获异常。其后可接零个或多个 <code>catch</code> 块，如果没有 <code>catch</code> 块，则必须跟一个 <code>finally</code> 块。</p>
+<p><code>catch</code>块：用于处理 try 捕获到的异常。</p>
+<p><code>finally</code> 块：无论是否捕获或处理异常，<code>finally</code> 块里的语句都会被执行。当在 <code>try</code> 块或 <code>catch</code> 块中遇到 <code>return</code> 语句时，<code>finally</code> 语句块将在方法返回之前被执行。</p>
+<p><strong>注意：不要在 finally 语句块中使用 return!</strong> 当 try 语句和 finally 语句中都有 return 语句时，try 语句块中的 return 语句会被忽略。这是因为 try 语句中的 return 返回值会先被暂存在一个本地变量中，当执行到 finally 语句中的 return 之后，这个本地变量的值就变为了 finally 语句中的 return 返回值。</p>
+<h3 id="finally-中的代码一定会执行吗？"><a href="#finally-中的代码一定会执行吗？" class="headerlink" title="finally 中的代码一定会执行吗？"></a>finally 中的代码一定会执行吗？</h3><p>不一定的！在某些情况下，finally 中的代码不会被执行。</p>
+<p>就比如说 finally 之前虚拟机被终止运行的话，finally 中的代码就不会被执行。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;Try to do something&quot;</span>);</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(<span class="string">&quot;RuntimeException&quot;</span>);</span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;Catch Exception -&gt; &quot;</span> + e.getMessage());</span><br><span class="line">    <span class="comment">// 终止当前正在运行的Java虚拟机</span></span><br><span class="line">    System.exit(<span class="number">1</span>);</span><br><span class="line">&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;Finally&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Try to do something</span><br><span class="line">Catch Exception -&gt; RuntimeException</span><br></pre></td></tr></table></figure>
+
+<p>另外，在以下 2 种特殊情况下，<code>finally</code> 块的代码也不会被执行：</p>
+<ol>
+<li>程序所在的线程死亡。</li>
+<li>关闭 CPU。</li>
+</ol>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="noopener" href="https://javaguide.cn/java/basis/java-basic-questions-03.html#%E5%BC%82%E5%B8%B8">Java基础常见面试题总结(下) | JavaGuide</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author_group"><a class="post-copyright__author_img" href="/about/"><img class="post-copyright__author_img_front" src= "/img/spin.svg" data-lazy-src="/img/avatar.jpg"></a><div class="post-copyright__author_name">Rean's Blog</div><div class="post-copyright__author_desc">Enjoy technology and music</div></div><div class="post-tools" id="post-tools"><div class="post-tools-left"><div id="quit-box" onclick="RemoveRewardMask()"></div></div></div><div class="post-copyright__notice"><span class="post-copyright-info">本文是原创文章，采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0</a>协议，完整转载请注明来自<a href="/">Rean's Blog</a></span></div></div><div class="post-tools-right"><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Java/"><span class="tags-punctuation"></span>Java<span class="tagsPageCount">18</span></a></div></div></div><nav class="needEndHide pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/p/27446c6a/"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">【星尘2024诞生日】五维一姐歌选亚乐 高效演绎新单恨如冰《ICE》（Cover: Faouzia）【歌手2024】</div></div></a></div><div class="next-post pull-right"><a href="/p/2516f5f2/"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">【操作系统】进程管理</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="solitude st-star-smile-fill"></i><span>喜欢这篇的人也看了</span><div class="relatedPosts-link"><a onclick="event.preventDefault(); toRandomPost();" href="javascript:void(0);" rel="external nofollow" data-pjax-state="">随便逛逛</a></div></div><div class="relatedPosts-list"><div><a href="/p/4f877c1e/" title="【Java】集合（三） | 集合类源码"><img class="cover" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/cover8.JPG" alt="cover"><div class="content is-center"><div class="title">【Java】集合（三） | 集合类源码</div></div></a></div><div><a href="/p/66be4b4/" title="【Java】JVM（二） | GC"><img class="cover" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/235335-1549900415dcc9.jpg" alt="cover"><div class="content is-center"><div class="title">【Java】JVM（二） | GC</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-content"><div class="card-info-avatar is-center"><div class="author-info__top-group"><div class="author-info__sayhi" id="author-info__sayhi" onclick="sco.changeSayHelloText()">sayhello.morning</div></div></div><div class="avatar-img-group"><img class="avatar-img" alt="头像" src= "/img/spin.svg" data-lazy-src="/img/avatar.jpg"><div class="avatar-sticker"><img class="avatar-sticker-img" src= "/img/spin.svg" data-lazy-src="https://7.isyangs.cn/34/65f2e4e0423cc-34.png" alt="心情贴纸"></div></div><div class="author-info__description_group"><div class="author-info__description">分享自己对编程的<b>热爱</b>，对知识海洋<b>探索历程</b>，随机掉落<b>无参配布</b>以及<b>翻调</b>（主要是音综类，在B站因为版权基本过不了审（。</div><div class="author-info__description2">相信你可以在这里找到对你有用的知识和教程。</div></div><div class="author-info__bottom-group"><a class="author-info__bottom-group-left" href="/about/"><div class="author-info__name">Rean</div><div class="author-info__desc">Enjoy technology and music</div></a><div class="card-info-social-icons is-center"><a class="social-icon" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze" title="Github"><i class="solitude  st-github-line"></i></a><a class="social-icon" target="_blank" rel="noopener" href="https://space.bilibili.com/6531436" title="Bilibili"><i class="solitude  st-bilibili-line"></i></a></div></div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="solitude st-menu-line"></i><span>文章目录</span></div><div class="toc-content" id="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Java-%E4%B8%AD%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E6%9C%89%E5%93%AA%E4%BA%9B%EF%BC%9F"><span class="toc-text">Java 中的基本数据类型有哪些？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%EF%BC%88Primitive-Data-Types%EF%BC%89"><span class="toc-text">基本数据类型（Primitive Data Types）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%95%E7%94%A8%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%EF%BC%88Reference-Data-Types%EF%BC%89"><span class="toc-text">引用数据类型（Reference Data Types）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java-%E4%B8%AD%E7%9A%84%E5%8F%82%E6%95%B0%E4%BC%A0%E9%80%92%E6%98%AF%E6%8C%89%E5%80%BC%E8%BF%98%E6%98%AF%E6%8C%89%E5%BC%95%E7%94%A8%EF%BC%9F"><span class="toc-text">Java 中的参数传递是按值还是按引用？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java-%E4%B8%AD%E7%9A%84%E6%B7%B1%E6%8B%B7%E8%B4%9D%E5%92%8C%E6%B5%85%E6%8B%B7%E8%B4%9D%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%EF%BC%9F"><span class="toc-text">Java 中的深拷贝和浅拷贝有什么区别？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java-%E7%9A%84%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B%E6%98%AF%E6%80%8E%E6%A0%B7%E7%9A%84%EF%BC%9F"><span class="toc-text">Java 的类加载过程是怎样的？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-Java-%E4%B8%AD%E7%9A%84%E4%B8%8D%E5%8F%AF%E5%8F%98%E7%B1%BB%EF%BC%9F%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E4%B8%8D%E5%8F%AF%E5%8F%98%E7%B1%BB%EF%BC%9F"><span class="toc-text">什么是 Java 中的不可变类？如何实现一个不可变类？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java-%E4%B8%AD-String%E3%80%81StringBuffer-%E5%92%8C-StringBuilder-%E7%9A%84%E5%8C%BA%E5%88%AB%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">Java 中 String、StringBuffer 和 StringBuilder 的区别是什么？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%89%E6%8B%A9%E5%BB%BA%E8%AE%AE"><span class="toc-text">选择建议</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8-new-String-%E8%AF%AD%E5%8F%A5%E5%9C%A8-Java-%E4%B8%AD%E4%BC%9A%E5%88%9B%E5%BB%BA%E5%A4%9A%E5%B0%91%E4%B8%AA%E5%AF%B9%E8%B1%A1%EF%BC%9F"><span class="toc-text">使用 new String() 语句在 Java 中会创建多少个对象？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88-JDK-9-%E4%B8%AD%E5%B0%86-String-%E7%9A%84-char-%E6%95%B0%E7%BB%84%E6%94%B9%E4%B8%BA-byte-%E6%95%B0%E7%BB%84%EF%BC%9F"><span class="toc-text">为什么 JDK 9 中将 String 的 char 数组改为 byte 数组？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Latin1-%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">Latin1 是什么？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java-%E7%9A%84-BigDecimal-%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">Java 的 BigDecimal 是什么？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java-%E4%B8%AD%E5%8C%85%E8%A3%85%E7%B1%BB%E5%9E%8B%E5%92%8C%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E7%9A%84%E5%8C%BA%E5%88%AB%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-text">Java 中包装类型和基本类型的区别是什么？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%8C%85%E8%A3%85%E7%B1%BB%E5%9E%8B%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text">基本类型与包装类型的区别</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-Java-%E4%B8%AD%E7%9A%84%E8%87%AA%E5%8A%A8%E8%A3%85%E7%AE%B1%E5%92%8C%E6%8B%86%E7%AE%B1%EF%BC%9F"><span class="toc-text">什么是 Java 中的自动装箱和拆箱？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E4%BA%8B%E9%A1%B9%EF%BC%9A"><span class="toc-text">需要注意的事项：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-Java-%E7%9A%84-Integer-%E7%BC%93%E5%AD%98%E6%B1%A0%EF%BC%9F"><span class="toc-text">什么是 Java 的 Integer 缓存池？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java-%E4%B8%AD-hashCode-%E5%92%8C-equals-%E6%96%B9%E6%B3%95%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F%E5%AE%83%E4%BB%AC%E4%B8%8E-%E6%93%8D%E4%BD%9C%E7%AC%A6%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%EF%BC%9F"><span class="toc-text">Java 中 hashCode 和 equals 方法是什么？它们与 &#x3D;&#x3D; 操作符有什么区别？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#hashCode"><span class="toc-text">hashCode</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#equals"><span class="toc-text">equals</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-text">&#x3D;&#x3D;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8C%BA%E5%88%AB%E6%80%BB%E7%BB%93"><span class="toc-text">区别总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%A3%E5%88%97%E8%A1%A8%E7%9A%84%E7%9B%B8%E5%85%B3%E7%B1%BB"><span class="toc-text">散列表的相关类</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java-%E7%9A%84-Optional-%E7%B1%BB%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F%E5%AE%83%E6%9C%89%E4%BB%80%E4%B9%88%E7%94%A8%EF%BC%9F"><span class="toc-text">Java 的 Optional 类是什么？它有什么用？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-Java-%E4%B8%AD%E7%9A%84%E8%BF%AD%E4%BB%A3%E5%99%A8%EF%BC%88Iterator%EF%BC%89%EF%BC%9F"><span class="toc-text">什么是 Java 中的迭代器（Iterator）？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%B7%E8%A7%A3%E9%87%8A%E4%B8%80%E4%B8%8B-Java-8-Stream-API-%E5%92%8C-Lambda-%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%9A%84%E4%BD%9C%E7%94%A8%EF%BC%8C%E4%BB%A5%E5%8F%8A%E5%9C%A8%E9%A1%B9%E7%9B%AE%E4%B8%AD%E5%A6%82%E4%BD%95%E5%BA%94%E7%94%A8%E5%AE%83%E4%BB%AC%E6%9D%A5%E7%AE%80%E5%8C%96%E9%9B%86%E5%90%88%E5%A4%84%E7%90%86%EF%BC%9F"><span class="toc-text">请解释一下 Java 8 Stream API 和 Lambda 表达式的作用，以及在项目中如何应用它们来简化集合处理？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Lambda-%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="toc-text">Lambda 表达式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Stream-%E6%B5%81"><span class="toc-text">Stream 流</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java-%E5%BC%82%E5%B8%B8%E6%9C%89%E5%93%AA%E4%BA%9B%E7%A7%8D%E7%B1%BB%EF%BC%9F"><span class="toc-text">Java 异常有哪些种类？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Exception-%E5%92%8C-Error-%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%EF%BC%9F"><span class="toc-text">Exception 和 Error 有什么区别？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Checked-Exception-%E5%92%8C-Unchecked-Exception-%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%EF%BC%9F"><span class="toc-text">Checked Exception 和 Unchecked Exception 有什么区别？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#try-catch-finally-%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8%EF%BC%9F"><span class="toc-text">try-catch-finally 如何使用？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#finally-%E4%B8%AD%E7%9A%84%E4%BB%A3%E7%A0%81%E4%B8%80%E5%AE%9A%E4%BC%9A%E6%89%A7%E8%A1%8C%E5%90%97%EF%BC%9F"><span class="toc-text">finally 中的代码一定会执行吗？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="toc-text">参考链接</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="solitude st-map-line"></i><span>最近发布</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/p/5871d67/" title="woff 字体反扒方案"><img alt="woff 字体反扒方案" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/221228-15574975489aa1.jpg"></a><div class="content"><a class="title" href="/p/5871d67/" title="woff 字体反扒方案">woff 字体反扒方案</a><a class="article-recent_post_categories" href="/p/5871d67/">研究</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/204d99f1/" title="【MyBatis】生命周期"><img alt="【MyBatis】生命周期" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/235335-1549900415dcc9.jpg"></a><div class="content"><a class="title" href="/p/204d99f1/" title="【MyBatis】生命周期">【MyBatis】生命周期</a><a class="article-recent_post_categories" href="/p/204d99f1/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/b585efd0/" title="敏感词过滤方案总结"><img alt="敏感词过滤方案总结" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture5.jpg"></a><div class="content"><a class="title" href="/p/b585efd0/" title="敏感词过滤方案总结">敏感词过滤方案总结</a><a class="article-recent_post_categories" href="/p/b585efd0/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/122902e7/" title="【并发】高并发下库存扣减如何避免超卖和少卖？"><img alt="【并发】高并发下库存扣减如何避免超卖和少卖？" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/cover8.JPG"></a><div class="content"><a class="title" href="/p/122902e7/" title="【并发】高并发下库存扣减如何避免超卖和少卖？">【并发】高并发下库存扣减如何避免超卖和少卖？</a><a class="article-recent_post_categories" href="/p/122902e7/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/683f7c8e/" title="网易云音乐歌名&amp;歌词获取方案收集"><img alt="网易云音乐歌名&amp;歌词获取方案收集" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture1.jpg"></a><div class="content"><a class="title" href="/p/683f7c8e/" title="网易云音乐歌名&amp;歌词获取方案收集">网易云音乐歌名&amp;歌词获取方案收集</a><a class="article-recent_post_categories" href="/p/683f7c8e/">教程</a></div></div></div></div></div></div></main><footer id="footer"><div id="st-footer-bar"><div class="footer-logo"><span class="solitude">Rean's Blog</span></div><div class="footer-bar-description">来自Rean's Blog - Enjoy technology and music的文章</div><a class="footer-bar-link" href="/">了解更多</a></div><div id="footer_deal"><a class="deal_link" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze" title="Github"><i class="solitude  st-github-line"></i></a><a class="deal_link" target="_blank" rel="noopener" href="https://space.bilibili.com/6531436" title="Bilibili"><i class="solitude  st-bilibili-line"></i></a></div><div id="st-footer"></div><div id="footer-bar"><div class="footer-bar-links"><div class="footer-bar-left"><div class="copyright">© 2024 By&nbsp;<a class="footer-bar-link" href="/">Rean</a></div></div><div class="footer-bar-right"><a class="footer-bar-link" target="_blank" rel="noopener" href="https://github.com/valor-x/hexo-theme-solitude" alt="主题">主题</a><a class="footer-bar-link cc" href="/null" aria-label="copyright"><i class="solitude st-copyright-line"></i><i class="solitude st-creative-commons-by-line"></i><i class="solitude st-creative-commons-nc-line"></i><i class="solitude st-creative-commons-nd-line"></i></a></div></div></div></footer></div><!-- right_menu--><div id="rightMenu"><div class="rightMenu-group rightMenu-small"><div class="rightMenu-item" id="menu-backward"><i class="solitude st-arrow-left-line"></i></div><div class="rightMenu-item" id="menu-forward"><i class="solitude st-arrow-right-line"></i></div><div class="rightMenu-item" id="menu-refresh"><i class="solitude st-restart-line"></i></div><div class="rightMenu-item" id="menu-top"><i class="solitude st-arrow-up-line"></i></div></div><div class="rightMenu-group rightMenu-line rightMenuPlugin"><div class="rightMenu-item" id="menu-copytext"><i class="solitude st-copy-fill"></i><span>复制选中文本</span></div><div class="rightMenu-item" id="menu-pastetext"><i class="solitude st-clipboard-fill"></i><span>粘贴文本</span></div><div class="rightMenu-item" id="menu-newwindow"><i class="solitude st-window-fill"></i><span>新窗口打开</span></div><div class="rightMenu-item" id="menu-copylink"><i class="solitude st-link-line"></i><span>复制链接地址</span></div><div class="rightMenu-item" id="menu-copyimg"><i class="solitude st-copy-fill"></i><span>复制此图片</span></div><div class="rightMenu-item" id="menu-downloadimg"><i class="solitude st-download-cloud-fill"></i><span>下载此图片</span></div><div class="rightMenu-item" id="menu-search"><i class="solitude st-search-line"></i><span>站内搜索</span></div><div class="rightMenu-item" id="menu-music-toggle"><i class="solitude st-play-fill"></i><span>播放音乐</span></div><div class="rightMenu-item" id="menu-music-back"><i class="solitude st-skip-back-fill"></i><span>切换到上一首</span></div><div class="rightMenu-item" id="menu-music-forward"><i class="solitude st-skip-forward-fill"></i><span>切换到下一首</span></div><div class="rightMenu-item" id="menu-music-copyMusicName"><i class="solitude st-copy-fill"></i><span>复制歌名</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><div class="rightMenu-item" id="menu-randomPost" onclick="toRandomPost()||rm.hideRightMenu()"><i class="solitude st-signal-tower-fill"></i><span>随机短文</span></div><div class="rightMenu-item" onclick="pjax.loadUrl('/categories/')||rm.hideRightMenu()"><i class="solitude st-checkbox-multiple-blank-fill"></i><span>全部分类</span></div><div class="rightMenu-item" onclick="pjax.loadUrl('/tags/')||rm.hideRightMenu()"><i class="solitude st-price-tag-fill"></i><span>全部标签</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><div class="rightMenu-item" id="menu-darkmode" onclick="sco.switchDarkMode()"><i class="solitude st-moon-clear-fill"></i><span class="menu-darkmode-text">深色模式</span></div><div class="rightMenu-item" id="menu-translate"><i class="solitude st-panben-line"></i><span>轉為繁體</span></div></div></div><div id="rightmenu-mask"></div><!-- inject body--><div><script src="/js/utils.js?v=1.8.10"></script><script src="/js/main.js?v=1.8.10"></script><script src="/js/third_party/waterfall.min.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/pjax/0.2.8/pjax.min.js"></script><script src="/js/third_party/universe.min.js?v=1.8.10"></script><script>dark()
+</script><script src="/js/tw_cn.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/vanilla-lazyload/19.1.3/lazyload.iife.min.js"></script><script src="https://cdn.staticfile.net/node-snackbar/0.1.16/snackbar.min.js"></script><script src="https://cdn.staticfile.net/fancyapps-ui/5.0.36/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.staticfile.net/Swiper/11.0.5/swiper-bundle.min.js"></script><script>var meting_api = 'https://meting.qjqq.cn/?server=:server&type=:type&id=:id&auth=:auth&r=:r';</script><script src="https://cdn.staticfile.net/aplayer/1.10.1/APlayer.min.js"></script><script src="https://cdn.staticfile.net/meting/2.0.1/Meting.min.js"></script><script>const coverColorConfig = {
+    api: 'https://api.qjqq.cn/api/Imgcolor?img=',
+    time: 43200000
+}</script><script src="/js/covercolor/api.js?v=1.8.10"></script><script src="/js/music.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/pace/1.2.4/pace.min.js"></script><script src="/js/right_menu.js?v=1.8.10"></script><div class="js-pjax"><script defer pjax src="https://cdn.staticfile.net/pearssauce-busuanzi/1.0.0/bsz.pure.min.js"></script></div></div><!-- newest comment--><!-- pjax--><script>const pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: ['title','#body-wrap','#site-config','meta[name="description"]','.js-pjax','meta[property^="og:"]','#config-diff'],
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+})
+
+document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+})
+
+document.addEventListener('pjax:complete', () => {
+    window.refreshFn()
+
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+        const newScript = document.createElement('script')
+        const content = item.text || item.textContent || item.innerHTML || ""
+        Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+        newScript.appendChild(document.createTextNode(content))
+        item.parentNode.replaceChild(newScript, item)
+    })
+
+    GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+})
+
+document.addEventListener('pjax:error', (e) => {
+    if (e.request.status === 404) {
+        pjax.loadUrl('/404.html')
+    }
+})</script><!-- theme--><script>initTheme = () => {
+    let isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const cachedMode = utils.saveToLocal.get('theme');
+    if (cachedMode === undefined) {
+        const nowMode =
+            isDarkMode ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', nowMode);
+    } else {
+        document.documentElement.setAttribute('data-theme', cachedMode);
+    }
+    is_rm && rm.mode(cachedMode === 'dark' && isDarkMode)
+}
+initTheme()</script><!-- google adsense--><!-- search--><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><button class="search-close-button"><i class="solitude st-close-fill"></i></button></nav><div class="search-wrap"><div class="search-box"><input class="search-box-input" id="search-input" type="text" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="输入关键词快速查找"></div><div id="search-results"><div id="search-hits"></div></div><div id="search-pagination"></div><div id="search-tips"></div></div></div><div id="search-mask"></div></div><script src="/js/search/local.js?v=1.8.10"></script><!-- music--><div class="needEndHide" id="nav-music" onclick="sco.musicToggle()"><div id="nav-music-hoverTips">音乐已暂停</div><meting-js id="421801417" server="netease" type="playlist" mutex="true" preload="none" data-lrctype="0" order="random" theme="var(--efu-main)"></meting-js></div></body></html><script>const posts=["p/5871d67/","p/204d99f1/","p/b585efd0/","p/122902e7/","p/683f7c8e/","p/36b252a1/","p/bbd98f0d/","p/1b320550/","p/30cd73ca/","p/332adb42/","p/4f877c1e/","p/677c7789/","p/f7f0a5f3/","p/9b5a538c/","p/37360bc0/","p/bb996d5/","p/364ea8cc/","p/a027699d/","p/21cdaec5/","p/37c37880/","p/a02febe4/","p/d1ec0e4e/","p/25d2b878/","p/8324e4bc/","p/6021f67a/","p/305331f0/","p/66be4b4/","p/de2d10bc/","p/e6628f8e/","p/4131eeff/","p/27705e17/","p/74e1a37c/","p/b5223f80/","p/9b8bc45a/","p/c9cb7159/","p/82c942ab/","p/4c19fcc6/","p/27446c6a/","p/9f38852a/","p/2516f5f2/","p/b27c77b3/","p/7a3264f/","p/7beadfaa/","p/e1d9906f/","p/a440b512/","p/a46aa116/","p/fe8dd3bd/","p/51c99199/","p/91b418a/","p/421add40/","p/9d7a18c7/","p/26345198/","p/fa30e874/","p/dea9a817/","p/59203ba6/","p/e5616c72/","p/971e9859/","p/d7f6ccff/","p/1b2ec1c2/","p/a0d1cef9/","p/a58b6af0/","p/9381aa6d/","p/38b8becb/","p/d0a26095/","p/2b3bdada/","p/ba70636/","p/374630f5/","p/a964a243/","p/a06e9899/","p/ef9a99de/","p/108f7c52/","p/a91c1846/","p/413576cf/","p/9ee60c65/","p/e74db628/","p/888c8bf3/","p/477dbe08/","p/38e8a510/","p/dfb41864/","p/b0e3506b/","p/e17fd725/","p/e1fe458c/","p/636cfdea/","p/7b854cb7/","p/b3a61240/","p/64f43fb4/","p/800f9a11/","p/4a48b34c/","p/b3641215/","p/53bc1fc9/","p/fc02f9ee/","p/25b929f6/","p/dd30b42/","p/3aa261db/","p/fc078742/","p/22c9d1d0/","p/33fc02d2/","p/70335ae0/","p/f32ef110/","p/f756486c/","p/8dd4b91f/","p/a290d941/","p/61a8a4ef/","p/c2d0bb20/","p/9770d71c/","p/41bd2aed/","p/bfebe40b/","p/6b4006e6/","p/b5696360/","p/53ab7115/","p/e6fa9b9/","p/866abf45/","p/b718b92a/","p/d26f4c21/","p/bc5d6bbe/","p/5a18917b/","p/5f2b1e2f/","p/2532a2ee/","p/4337b2c0/","p/e042d029/","p/9b4a91e5/","p/9d8ce868/","p/a69f6a48/","p/f9b9edb2/","p/cbe55d0/","p/156c59d0/","p/d4d6f818/","p/2574cf15/","p/a0efc292/","p/ec2ecf28/","p/85f11265/","p/db95e6f5/","p/a8296e6d/","p/4cc89a71/","p/d0fe2d0f/","p/ffab2f6b/","p/95d9f91e/","p/7f869365/","p/5b246b1b/","p/a9c92fa9/","p/7d49fec0/","p/a9a25fcd/","p/43bb383e/","p/b9aeb4/","p/52eaf228/","p/4be90d2f/","p/ed500d41/","p/dcfbc8e5/","p/240e5e52/","p/18cda1b3/","p/66a6c396/","p/5f33341/","p/f9bef31e/","p/acac46b/","p/a4189438/","p/ae6b0147/","p/4e982f2d/","p/403e0cac/","p/495b9f0f/","p/8e966ab9/","p/f6e1007e/","p/6f562d19/","p/10eac329/","p/cc53cf58/","p/4f2beac6/","p/73e2aa1/","p/c677e75e/","p/3f13b766/","p/cc30f00/","p/807cab5e/","p/5b5991e4/","p/e941ffc/"];function toRandomPost(){ pjax.loadUrl('/'+posts[Math.floor(Math.random()*posts.length)]); }</script>

@@ -1,0 +1,741 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><title>【NLP】NLP Techniques(POS/NER) | Rean's Blog</title><noscript>开启JavaScript才能访问本站哦~</noscript><link rel="icon" href="/img/favicon.png"><!-- index.css--><link rel="stylesheet" href="/css/index.css?v=1.8.10"><!-- inject head--><link rel="stylesheet" href="https://cdn2.codesign.qq.com/icons/7pOrz0WXB5ZWJPX/latest/iconfont.css"><!-- aplayer--><link rel="stylesheet" href="https://cdn.staticfile.net/aplayer/1.10.1/APlayer.min.css"><!-- swiper--><link rel="stylesheet" href="https://cdn.staticfile.net/Swiper/11.0.5/swiper-bundle.min.css"><!-- fancybox ui--><link rel="stylesheet" href="https://cdn.staticfile.net/fancyapps-ui/5.0.36/fancybox/fancybox.min.css"><!-- katex--><!-- Open Graph--><meta name="description" content="A revision of NLP Course&amp;#39;s module 4.(POS&amp;#x2F;NER&amp;#x2F;Sentence Segmentation)"><!-- pwa--><meta name="apple-mobile-web-app-capable" content="Rean's Blog"><meta name="theme-color" content="var(--efu-main)"><meta name="apple-mobile-web-app-status-bar-style" content="var(--efu-main)"><link rel="bookmark" href="/img/favicon.png"><link rel="apple-touch-icon" href="/img/favicon.png" sizes="180x180"><script>console.log(
+    "%c Program: Hexo %c Theme: Solitude %c Version: v1.8.10",
+    "border-radius:5px 0 0 5px;padding: 5px 10px;color:white;background:#ff3842;",
+    "padding: 5px 10px;color:white;background:#3e9f50;",
+    "padding: 5px 10px;color:white;background:#0084ff;",
+)
+</script><script>(()=>{
+        const saveToLocal = {
+            set: function setWithExpiry(key, value, ttl) {
+                if (ttl === 0)
+                    return
+                const now = new Date()
+                const expiryDay = ttl * 86400000
+                const item = {
+                    value: value,
+                    expiry: now.getTime() + expiryDay
+                }
+                localStorage.setItem(key, JSON.stringify(item))
+            },
+            get: function getWithExpiry(key) {
+                const itemStr = localStorage.getItem(key)
+    
+                if (!itemStr) {
+                    return undefined
+                }
+                const item = JSON.parse(itemStr)
+                const now = new Date()
+    
+                if (now.getTime() > item.expiry) {
+                    localStorage.removeItem(key)
+                    return undefined
+                }
+                return item.value
+            }
+        };
+        window.utils = {
+            saveToLocal: saveToLocal,
+            getCSS: (url, id = false) => new Promise((resolve, reject) => {
+              const link = document.createElement('link')
+              link.rel = 'stylesheet'
+              link.href = url
+              if (id) link.id = id
+              link.onerror = reject
+              link.onload = link.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                link.onload = link.onreadystatechange = null
+                resolve()
+              }
+              document.head.appendChild(link)
+            }),
+            getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+              const script = document.createElement('script')
+              script.src = url
+              script.async = true
+              script.onerror = reject
+              script.onload = script.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                script.onload = script.onreadystatechange = null
+                resolve()
+              }
+    
+              Object.keys(attr).forEach(key => {
+                script.setAttribute(key, attr[key])
+              })
+    
+              document.head.appendChild(script)
+            }),
+            addGlobalFn: (key, fn, name = false, parent = window) => {
+                const globalFn = parent.globalFn || {}
+                const keyObj = globalFn[key] || {}
+        
+                if (name && keyObj[name]) return
+        
+                name = name || Object.keys(keyObj).length
+                keyObj[name] = fn
+                globalFn[key] = keyObj
+                parent.globalFn = globalFn
+            },
+        }
+    })()</script><!-- global head--><script>const GLOBAL_CONFIG = {
+    root: '/',
+    algolia: undefined,
+    localsearch: {"preload":false,"path":"/search.xml"},
+    runtime: '2024-01-05 00:00:00',
+    lazyload: {
+        enable: true,
+        error: '/img/error_load.png'
+    },
+    copyright: {"limit":50,"author":"作者: Rean","link":"链接: ","source":"来源: Rean's Blog","info":"著作权归作者所有。 商业转载请联系作者获得授权，非商业转载请注明出处。"},
+    highlight: {
+        enable: true,
+        limit: 200,
+        expand: true,
+        copy: true,
+        syntax: 'highlight.js'
+    },
+    randomlink: false,
+    lang: {"theme":{"dark":"已切换至深色模式","light":"已切换至浅色模式"},"copy":{"success":"复制成功","error":"复制失败"},"backtop":"返回顶部","time":{"day":"天前","hour":"小时前","just":"刚刚","min":"分钟前","month":"个月前"},"f12":"开发者模式已打开，请遵循GPL协议。","totalk":"无需删除空行，直接输入评论即可","search":{"empty":"找不到你查询的内容：${query}","hit":"找到 ${hits} 条结果，用时 ${time} 毫秒","placeholder":"输入关键词快速查找","count":"共 <b>${count}</b> 条结果。"}},
+    aside: {
+        sayhello: {
+            morning: '一日之计在于晨',
+            noon: '吃饱了才有力气干活',
+            afternoon: '集中精力，攻克难关',
+            night: '不要太劳累了，早睡更健康',
+            goodnight: '睡个好觉，保证精力充沛',
+        },
+        sayhello2: ["🤖️ 数码科技爱好者","🔍 分享与热心帮助","🔨 设计开发一条龙","🎮 游戏爱好者"],
+    },
+    covercolor: {
+        enable: true
+    },
+    comment: false,
+    lightbox: 'fancybox',
+    post_ai: false,
+    right_menu: {"mode":{"dark":"深色模式","light":"浅色模式"},"img_error":"此图片无法复制与下载","music":{"start":"播放音乐","stop":"暂停音乐"},"translate":{"translateDelay":0,"defaultEncoding":2}},
+};</script><!-- page-config head--><script id="config-diff">var PAGE_CONFIG = {
+    is_post: true,
+    is_page: false,
+    is_home: false,
+    page: '',
+    toc: true,
+    comment: false,
+    ai_text: false,
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body id="body"><!-- universe--><canvas id="universe"></canvas><!-- loading--><!-- console--><div id="console"><div class="close-btn" onclick="sco.hideConsole()"><i class="solitude st-close-fill"></i></div><div class="button-group"><div class="console-btn-item"><span class="darkmode_switchbutton" onclick="sco.switchDarkMode()" title="昼夜切换"><i class="solitude st-moon-clear-fill"></i></span></div><div class="console-btn-item" id="consoleHideAside"><span class="asideSwitch" onclick="sco.switchHideAside()" title="边栏显示控制"><i class="solitude st-side-bar-fill"></i></span></div><div class="console-btn-item" id="consoleMusic" onclick="sco.musicToggle()"><span class="music-switch" title="音乐开关"><i class="solitude st-disc-fill"></i></span></div></div><div class="console-mask" onclick="sco.hideConsole()"></div></div><!-- sidebar--><div id="sidebar" style="zoom: 1;"><div id="menu-mask" style="display: none;"></div><div id="sidebar-menus"><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">172</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">11</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">155</div></a></div></div></div><span class="sidebar-menu-item-title">功能</span><div class="sidebar-menu-item"><span class="darkmode_switchbutton menu-child" onclick="sco.switchDarkMode()"><i class="solitude st-moon-clear-fill"></i><span>显示模式</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文章</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  st-folder-fill"></i><span>文章列表</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  st-checkbox-multiple-blank-fill"></i><span>分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  st-price-tag-fill"></i><span>标签</span></a></li><li><a class="site-page child" href="/study/"><i class="solitude  st-gift-fill"></i><span>学习</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>我的</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="solitude  st-disc-fill"></i><span>音乐馆</span></a></li><li><a class="site-page child" href="/essay/"><span>即刻短文</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>关于本站</span></a></li></ul></div></div><span class="sidebar-menu-item-title">标签</span><div class="card-widget card-tags card-archives card-webinfo card-allinfo"><div class="card-tag-cloud"><a href="/tags/%E8%85%BE%E8%AE%AF/">腾讯<sup>1</sup></a><a href="/tags/%E5%90%8E%E5%8F%B0%E5%BC%80%E5%8F%91/">后台开发<sup>1</sup></a><a href="/tags/Markdown/">Markdown<sup>1</sup></a><a href="/tags/Butterfly/">Butterfly<sup>2</sup></a><a href="/tags/PyCharm/">PyCharm<sup>1</sup></a><a href="/tags/IDEA/">IDEA<sup>1</sup></a><a href="/tags/Git/">Git<sup>2</sup></a><a href="/tags/Halo/">Halo<sup>1</sup></a><a href="/tags/GitHub/">GitHub<sup>1</sup></a><a href="/tags/JavaFx/">JavaFx<sup>2</sup></a><a href="/tags/SpringBoot/">SpringBoot<sup>7</sup></a><a href="/tags/Java/">Java<sup>18</sup></a><a href="/tags/MyBatis/">MyBatis<sup>4</sup></a><a href="/tags/Hexo/">Hexo<sup>3</sup></a><a href="/tags/SyncTV/">SyncTV<sup>1</sup></a><a href="/tags/AList/">AList<sup>1</sup></a><a href="/tags/%E5%AE%9D%E5%A1%94/">宝塔<sup>3</sup></a><a href="/tags/Vue/">Vue<sup>18</sup></a><a href="/tags/Vite/">Vite<sup>6</sup></a><a href="/tags/JavaScript/">JavaScript<sup>4</sup></a><a href="/tags/TypeScript/">TypeScript<sup>3</sup></a><a href="/tags/Electron/">Electron<sup>4</sup></a><a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习<sup>1</sup></a><a href="/tags/scikit-learn/">scikit-learn<sup>1</sup></a><a href="/tags/vocalremover/">vocalremover<sup>1</sup></a><a href="/tags/BPM/">BPM<sup>1</sup></a><a href="/tags/%E9%BB%91%E7%A5%9E%E8%AF%9D%EF%BC%9A%E6%82%9F%E7%A9%BA/">黑神话：悟空<sup>1</sup></a><a href="/tags/HTTP/">HTTP<sup>5</sup></a><a href="/tags/HTTPS/">HTTPS<sup>2</sup></a><a href="/tags/%E7%9F%AD%E9%93%BE/">短链<sup>1</sup></a><a href="/tags/%E8%A7%86%E9%A2%91/">视频<sup>1</sup></a><a href="/tags/HTTP-1-1/">HTTP/1.1<sup>1</sup></a><a href="/tags/LaTex/">LaTex<sup>1</sup></a><a href="/tags/%E5%8A%A0%E5%AF%86/">加密<sup>1</sup></a><a href="/tags/IP/">IP<sup>2</sup></a><a href="/tags/ICMP/">ICMP<sup>1</sup></a><a href="/tags/I-O/">I/O<sup>2</sup></a><a href="/tags/JVM/">JVM<sup>2</sup></a><a href="/tags/Springboot/">Springboot<sup>1</sup></a><a href="/tags/ThreadLocal/">ThreadLocal<sup>1</sup></a><a href="/tags/UUID/">UUID<sup>1</sup></a><a href="/tags/%E5%B9%B6%E5%8F%91/">并发<sup>4</sup></a><a href="/tags/%E7%BA%A2%E9%BB%91%E6%A0%91/">红黑树<sup>2</sup></a><a href="/tags/%E9%93%BE%E8%A1%A8/">链表<sup>1</sup></a><a href="/tags/%E5%8A%9B%E6%89%A3/">力扣<sup>1</sup></a><a href="/tags/LeetCode/">LeetCode<sup>1</sup></a><a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库<sup>8</sup></a><a href="/tags/NLP/">NLP<sup>6</sup></a><a href="/tags/spaCy/">spaCy<sup>4</sup></a><a href="/tags/Python/">Python<sup>1</sup></a><a href="/tags/Redis/">Redis<sup>10</sup></a><a href="/tags/RDB/">RDB<sup>1</sup></a><a href="/tags/AOF/">AOF<sup>1</sup></a><a href="/tags/%E7%BA%BF%E7%A8%8B/">线程<sup>2</sup></a><a href="/tags/I-O%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">I/O多路复用<sup>2</sup></a><a href="/tags/Spring/">Spring<sup>5</sup></a><a href="/tags/TCP/">TCP<sup>7</sup></a><a href="/tags/UDP/">UDP<sup>1</sup></a><a href="/tags/Socket/">Socket<sup>1</sup></a><a href="/tags/FFMpeg/">FFMpeg<sup>1</sup></a><a href="/tags/%E6%A0%B7%E5%BC%8F/">样式<sup>1</sup></a><a href="/tags/ECMAScript/">ECMAScript<sup>2</sup></a><a href="/tags/Element/">Element<sup>3</sup></a><a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">分布式锁<sup>1</sup></a><a href="/tags/%E5%91%A8%E6%B7%B1/">周深<sup>5</sup></a><a href="/tags/%E5%BE%B5%E7%BE%BD%E6%91%A9%E6%9F%AF/">徵羽摩柯<sup>1</sup></a><a href="/tags/%E9%9F%B3%E4%B9%90%E7%BC%98%E8%AE%A1%E5%88%92/">音乐缘计划<sup>1</sup></a><a href="/tags/%E5%A5%A5%E6%96%AF%E5%8D%A1/">奥斯卡<sup>3</sup></a><a href="/tags/%E5%BC%A0%E6%9D%B0/">张杰<sup>2</sup></a><a href="/tags/%E5%A3%B0%E7%94%9F%E4%B8%8D%E6%81%AF%C2%B7%E5%AE%9D%E5%B2%9B%E5%AD%A3/">声生不息·宝岛季<sup>3</sup></a><a href="/tags/%E5%BE%90%E4%BD%B3%E8%8E%B9/">徐佳莹<sup>1</sup></a><a href="/tags/SynthV/">SynthV<sup>15</sup></a><a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统<sup>4</sup></a><a href="/tags/%E6%B0%B8%E5%A4%9CMinus/">永夜Minus<sup>4</sup></a><a href="/tags/%E9%9F%A6%E7%A4%BC%E5%AE%89/">韦礼安<sup>1</sup></a><a href="/tags/%E8%94%A1%E4%BE%9D%E6%9E%97/">蔡依林<sup>1</sup></a><a href="/tags/%E6%97%A0%E5%8F%82/">无参<sup>45</sup></a><a href="/tags/%E5%8F%A4%E9%A3%8E/">古风<sup>11</sup></a><a href="/tags/%E4%B8%89%E6%97%A0Marblue/">三无Marblue<sup>1</sup></a><a href="/tags/%E7%B4%A2%E5%BC%95/">索引<sup>1</sup></a><a href="/tags/B%E6%A0%91/">B树<sup>1</sup></a><a href="/tags/B-%E6%A0%91/">B+树<sup>1</sup></a><a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构<sup>1</sup></a><a href="/tags/%E6%A0%91/">树<sup>1</sup></a><a href="/tags/%E4%BA%8C%E5%8F%89%E6%A0%91/">二叉树<sup>1</sup></a><a href="/tags/%E8%AE%B8%E9%92%A7/">许钧<sup>1</sup></a><a href="/tags/%E6%AD%8C%E6%89%8B2024/">歌手2024<sup>37</sup></a><a href="/tags/Chante-Moore/">Chanté Moore<sup>2</sup></a><a href="/tags/%E9%BB%84%E5%AE%A3/">黄宣<sup>1</sup></a><a href="/tags/Faouzia/">Faouzia<sup>4</sup></a><a href="/tags/Lenka/">Lenka<sup>1</sup></a><a href="/tags/%E5%BC%A0%E9%92%B0%E7%90%AA/">张钰琪<sup>1</sup></a><a href="/tags/%E9%82%A3%E8%8B%B1/">那英<sup>9</sup></a><a href="/tags/%E5%B0%A4%E9%95%BF%E9%9D%96/">尤长靖<sup>2</sup></a><a href="/tags/%E5%AD%99%E6%A5%A0/">孙楠<sup>5</sup></a><a href="/tags/%E8%B0%AD%E7%BB%B4%E7%BB%B4/">谭维维<sup>3</sup></a><a href="/tags/%E5%B4%A9%E5%9D%8F%EF%BC%9A%E6%98%9F%E7%A9%B9%E9%93%81%E9%81%93/">崩坏：星穹铁道<sup>4</sup></a><a href="/tags/%E8%B5%A4%E7%BE%BD/">赤羽<sup>1</sup></a><a href="/tags/%E6%B1%AA%E8%8B%8F%E6%B3%B7/">汪苏泷<sup>4</sup></a><a href="/tags/%E5%A3%B0%E7%94%9F%E4%B8%8D%E6%81%AF%C2%B7%E5%AE%B6%E5%B9%B4%E5%8D%8E/">声生不息·家年华<sup>2</sup></a><a href="/tags/%E9%99%88%E6%A5%9A%E7%94%9F/">陈楚生<sup>2</sup></a><a href="/tags/%E9%99%88%E4%BA%A6%E6%B4%BA/">陈亦洺<sup>1</sup></a><a href="/tags/%E5%B0%9A%E8%BE%B0/">尚辰<sup>1</sup></a><a href="/tags/%E5%BF%98%E5%B7%9D%E9%A3%8E%E5%8D%8E%E5%BD%95/">忘川风华录<sup>2</sup></a><a href="/tags/%E4%B9%90%E6%AD%A3%E9%BE%99%E7%89%99/">乐正龙牙<sup>1</sup></a><a href="/tags/%E6%98%9F%E5%B0%98Infinity/">星尘Infinity<sup>1</sup></a><a href="/tags/%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F/">明日方舟<sup>2</sup></a><a href="/tags/%E7%A5%96%E5%A8%85%E7%BA%B3%E6%83%9C/">祖娅纳惜<sup>1</sup></a><a href="/tags/%E7%94%B5%E5%AD%90/">电子<sup>1</sup></a><a href="/tags/%E6%98%9F%E5%B0%98/">星尘<sup>3</sup></a><a href="/tags/%E5%BC%A0%E4%BF%A1%E5%93%B2/">张信哲<sup>2</sup></a><a href="/tags/%E9%93%B6%E4%B8%B4/">银临<sup>1</sup></a><a href="/tags/%E6%9D%8E%E5%B8%B8%E8%B6%85/">李常超<sup>1</sup></a><a href="/tags/%E5%B1%B1%E8%89%B2%E6%9C%89%E6%97%A0%E4%B8%AD/">山色有无中<sup>1</sup></a><a href="/tags/%E5%91%A8%E6%9D%B0%E4%BC%A6/">周杰伦<sup>1</sup></a><a href="/tags/%E9%BB%84%E9%9C%84%E9%9B%B2/">黄霄雲<sup>1</sup></a><a href="/tags/%E5%AE%B9%E7%A5%96%E5%84%BF/">容祖儿<sup>1</sup></a><a href="/tags/%E6%88%91%E6%98%AF%E6%AD%8C%E6%89%8B%C2%B7%E7%AC%AC%E5%9B%9B%E5%AD%A3/">我是歌手·第四季<sup>1</sup></a><a href="/tags/%E6%9D%8E%E5%85%8B%E5%8B%A4/">李克勤<sup>1</sup></a><a href="/tags/%E7%B2%A4%E8%AF%AD/">粤语<sup>2</sup></a><a href="/tags/%E9%BB%84%E4%B8%BD%E7%8E%B2/">黄丽玲<sup>1</sup></a><a href="/tags/G-E-M-%E9%82%93%E7%B4%AB%E6%A3%8B/">G.E.M.邓紫棋<sup>6</sup></a><a href="/tags/T-I-M-E/">T.I.M.E.<sup>4</sup></a><a href="/tags/%E6%97%B6%E5%85%89%E9%9F%B3%E4%B9%90%E4%BC%9A%C2%B7%E8%80%81%E5%8F%8B%E8%AE%B0/">时光音乐会·老友记<sup>4</sup></a><a href="/tags/%E5%BC%A0%E5%AD%A6%E5%8F%8B/">张学友<sup>1</sup></a><a href="/tags/%E6%9D%A8%E4%B8%9E%E7%90%B3/">杨丞琳<sup>1</sup></a><a href="/tags/%E6%B1%AA%E5%B3%B0/">汪峰<sup>1</sup></a><a href="/tags/%E6%9C%AA%E5%AE%9A%E4%BA%8B%E4%BB%B6%E7%B0%BF/">未定事件簿<sup>1</sup></a><a href="/tags/%E5%BC%A0%E8%BF%9C/">张远<sup>1</sup></a><a href="/tags/%E5%AD%99%E7%87%95%E5%A7%BF/">孙燕姿<sup>1</sup></a><a href="/tags/%E6%B5%B7%E6%9D%A5%E9%98%BF%E6%9C%A8/">海来阿木<sup>1</sup></a><a href="/tags/%E6%9B%B9%E6%9D%A8/">曹杨<sup>2</sup></a><a href="/tags/%E4%B8%8B%E4%B8%80%E6%88%98%E6%AD%8C%E6%89%8B/">下一战歌手<sup>2</sup></a><a href="/tags/Fine%E4%B9%90%E5%9B%A2/">Fine乐团<sup>1</sup></a><a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络<sup>4</sup></a><a href="/tags/DNS/">DNS<sup>1</sup></a><a href="/tags/MAC/">MAC<sup>1</sup></a><a href="/tags/Adam-Lambert/">Adam Lambert<sup>1</sup></a><a href="/tags/%E4%BA%9A%E5%BD%93%C2%B7%E5%85%B0%E4%BC%AF%E7%89%B9/">亚当·兰伯特<sup>1</sup></a><a href="/tags/Hayden/">Hayden<sup>1</sup></a><a href="/tags/%E6%9A%AE%E5%A4%9C/">暮夜<sup>1</sup></a><a href="/tags/ACE-Studio/">ACE Studio<sup>2</sup></a><a href="/tags/%E5%B0%9A%E9%9B%AF%E5%A9%95/">尚雯婕<sup>1</sup></a><a href="/tags/%E4%B8%9C%E6%96%B9%E6%A0%80%E5%AD%90/">东方栀子<sup>2</sup></a><a href="/tags/%E9%BB%84%E7%BB%AE%E7%8F%8A/">黄绮珊<sup>1</sup></a><a href="/tags/%E5%8D%8E%E6%99%A8%E5%AE%87/">华晨宇<sup>1</sup></a><a href="/tags/JUN/">JUN<sup>1</sup></a><a href="/tags/%E6%9E%97%E5%BF%86%E8%8E%B2/">林忆莲<sup>1</sup></a><a href="/tags/UTAU/">UTAU<sup>1</sup></a><a href="/tags/Sheena/">Sheena<sup>1</sup></a><a href="/tags/%E5%89%A7%E5%A5%BD%E5%90%AC%E7%9A%84%E6%AD%8C/">剧好听的歌<sup>1</sup></a><a href="/tags/Syncthing/">Syncthing<sup>1</sup></a><a href="/tags/%E5%90%8C%E6%AD%A5/">同步<sup>1</sup></a><a href="/tags/%E6%94%AF%E4%BB%98%E5%AE%9D/">支付宝<sup>1</sup></a><a href="/tags/Apifox/">Apifox<sup>2</sup></a></div></div></div></div><!-- keyboard--><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav class="show" id="nav"><div id="nav-group"><div id="blog_name"><a id="site-name" href="/" title="返回博客主页"><span class="title">Rean's Blog</span></a></div><div id="page-name-mask"><div id="page-name"><a id="page-name-text" onclick="sco.toTop()">【NLP】NLP Techniques(POS/NER)</a></div></div><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文章</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  st-folder-fill"></i><span>文章列表</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  st-checkbox-multiple-blank-fill"></i><span>分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  st-price-tag-fill"></i><span>标签</span></a></li><li><a class="site-page child" href="/study/"><i class="solitude  st-gift-fill"></i><span>学习</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>我的</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="solitude  st-disc-fill"></i><span>音乐馆</span></a></li><li><a class="site-page child" href="/essay/"><span>即刻短文</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>关于本站</span></a></li></ul></div></div></div><div id="nav-left"></div><div id="nav-right"><div class="nav-button" id="randomPost_button"><a class="site-page" onclick="toRandomPost()" title="随机一篇文章" href="javascript:void(0);"><i class="solitude st-signal-tower-fill"></i></a></div><div class="nav-button" id="search-button"><a class="site-page social-icon search" href="javascript:void(0);" title="搜索"><i class="solitude st-search-line"></i></a></div><div class="nav-button" id="nav-console"><a class="console_switchbutton" onclick="sco.showConsole()" title="中控台" href="javascript:void(0);"><i class="solitude st-dashboard-fill"></i></a></div><div class="nav-button" id="nav-totop" onclick="sco.toTop()"><a class="totopbtn"><i class="solitude st-arrow-up-line"></i><span id="percent">0</span></a></div><div id="toggle-menu"><a class="site-page"><i class="solitude st-menu-line"></i></a></div></div></div></nav><div class="coverdiv" id="coverdiv"><img class="nolazyload" id="post-cover" src="https://npm.elemecdn.com/justlovesmile-photo/235139-15499002994bfe.jpg" alt="【NLP】NLP Techniques(POS/NER)"></div><div id="post-info"><div id="post-firstinfo"><div class="meta-firstline"><a class="post-meta-original" title="该文章为原创文章，注意版权协议">原创</a><span class="post-meta-categories"><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a></span><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/NLP/"><span class="tags-name tags-punctuation">NLP</span></a><a class="post-meta__tags" href="/tags/spaCy/"><span class="tags-name tags-punctuation">spaCy</span></a></div></div></div></div><h1 class="post-title">【NLP】NLP Techniques(POS/NER)</h1><div id="post-meta"><div class="meta-secondline"><span class="post-meta-date" title="发布于 2024-01-25 12:19:11"><i class="post-meta-icon solitude st-calendar-todo-fill"></i><time datetime="2024-01-25T04:19:11.000Z">2024-01-25T04:19:11.000Z</time></span><span class="post-meta-date" title="最后更新于 2024-12-11 20:22:23"><i class="post-meta-icon solitude st-refresh-line"></i><time datetime="2024-12-11T12:22:23.717Z">2024-12-11T12:22:23.717Z</time></span><span class="post-meta-wordcount"><i class="post-meta-icon solitude st-word-fill" title="文章字数"></i><span class="word-count">3.7k</span><span class="post-meta-separator"></span><i class="post-meta-icon solitude st-clock-fill" title="阅读耗时"></i><span>22 min</span></span><a class="post-meta-pv" href="/p/acac46b/" title="文章热度"><i class="post-meta-icon solitude st-fire-fill"></i><span id="busuanzi_page_pv"><i class="solitude st-loading-line"></i></span></a></div></div></div><section class="main-hero-waves-area waves-area"><svg class="waves-svg" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto"><defs><path id="gentle-wave" d="M -160 44 c 30 0 58 -18 88 -18 s 58 18 88 18 s 58 -18 88 -18 s 58 18 88 18 v 44 h -352 Z"></path></defs><g class="parallax"><use href="#gentle-wave" x="48" y="0"></use><use href="#gentle-wave" x="48" y="3"></use><use href="#gentle-wave" x="48" y="5"></use><use href="#gentle-wave" x="48" y="7"></use></g></svg></section></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="Part-of-Speech-Tagging"><a href="#Part-of-Speech-Tagging" class="headerlink" title="Part of Speech Tagging"></a>Part of Speech Tagging</h1><h2 id="View-token-tags"><a href="#View-token-tags" class="headerlink" title="View token tags"></a>View token tags</h2><ul>
+<li>To view the coarse POS tag use <code>token.pos_</code></li>
+<li>To view the fine-grained tag use <code>token.tag_</code></li>
+<li>To view the syntactic dependency use <code>token.dep_</code></li>
+<li>To view the description of either type of tag use <code>spacy.explain(tag_)</code></li>
+</ul>
+<div class="note  flat info"><p><code>token.pos</code> and <code>token.tag</code> return integer hash values !</p>
+</div>
+
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Perform standard imports</span></span><br><span class="line"><span class="keyword">import</span> spacy</span><br><span class="line">nlp = spacy.load(<span class="string">&#x27;en_core_web_sm&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Create a simple Doc object</span></span><br><span class="line">doc = nlp(<span class="string">u&quot;Apple is looking at buying U.K. startup for $1 Billion.&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> token <span class="keyword">in</span> doc:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&#x27;<span class="subst">&#123;token.text:&#123;<span class="number">10</span>&#125;</span>&#125; <span class="subst">&#123;token.pos_:&#123;<span class="number">8</span>&#125;</span>&#125; <span class="subst">&#123;token.tag_:&#123;<span class="number">6</span>&#125;</span>&#125; <span class="subst">&#123;spacy.explain(token.tag_)&#125;</span>&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Apple      PROPN    NNP    noun, proper singular</span><br><span class="line">is         VERB     VBZ    verb, 3rd person singular present</span><br><span class="line">looking    VERB     VBG    verb, gerund or present participle</span><br><span class="line">at         ADP      IN     conjunction, subordinating or preposition</span><br><span class="line">buying     VERB     VBG    verb, gerund or present participle</span><br><span class="line">U.K.       PROPN    NNP    noun, proper singular</span><br><span class="line">startup    NOUN     NN     noun, singular or mass</span><br><span class="line">for        ADP      IN     conjunction, subordinating or preposition</span><br><span class="line">$          SYM      $      symbol, currency</span><br><span class="line">1          NUM      CD     cardinal number</span><br><span class="line">Billion    NUM      CD     cardinal number</span><br><span class="line">.          PUNCT    .      punctuation mark, sentence closer</span><br></pre></td></tr></table></figure>
+
+<h2 id="Coarse-grained-Part-of-speech-Tags"><a href="#Coarse-grained-Part-of-speech-Tags" class="headerlink" title="Coarse-grained Part-of-speech Tags"></a>Coarse-grained Part-of-speech Tags</h2><p>Every token is assigned a POS Tag from the following list:</p>
+<table>
+<thead>
+<tr>
+<th align="right">POS</th>
+<th align="right">DESCRIPTION</th>
+<th align="right">EXAMPLES</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">ADJ</td>
+<td align="right">adjective</td>
+<td align="right"><em>big, old, green, incomprehensible, first</em></td>
+</tr>
+<tr>
+<td align="right">ADP</td>
+<td align="right">adposition</td>
+<td align="right"><em>in, to, during</em></td>
+</tr>
+<tr>
+<td align="right">ADV</td>
+<td align="right">adverb</td>
+<td align="right"><em>very, tomorrow, down, where, there</em></td>
+</tr>
+<tr>
+<td align="right">AUX</td>
+<td align="right">auxiliary</td>
+<td align="right"><em>is, has (done), will (do), should (do)</em></td>
+</tr>
+<tr>
+<td align="right">CONJ</td>
+<td align="right">conjunction</td>
+<td align="right"><em>and, or, but</em></td>
+</tr>
+<tr>
+<td align="right">CCONJ</td>
+<td align="right">coordinating conjunction</td>
+<td align="right"><em>and, or, but</em></td>
+</tr>
+<tr>
+<td align="right">DET</td>
+<td align="right">determiner</td>
+<td align="right"><em>a, an, the</em></td>
+</tr>
+<tr>
+<td align="right">INTJ</td>
+<td align="right">interjection</td>
+<td align="right"><em>psst, ouch, bravo, hello</em></td>
+</tr>
+<tr>
+<td align="right">NOUN</td>
+<td align="right">noun</td>
+<td align="right"><em>girl, cat, tree, air, beauty</em></td>
+</tr>
+<tr>
+<td align="right">NUM</td>
+<td align="right">numeral</td>
+<td align="right"><em>1, 2017, one, seventy-seven, IV, MMXIV</em></td>
+</tr>
+<tr>
+<td align="right">PART</td>
+<td align="right">particle</td>
+<td align="right"><em>‘s, not,</em></td>
+</tr>
+<tr>
+<td align="right">PRON</td>
+<td align="right">pronoun</td>
+<td align="right"><em>I, you, he, she, myself, themselves, somebody</em></td>
+</tr>
+<tr>
+<td align="right">PROPN</td>
+<td align="right">proper noun</td>
+<td align="right"><em>Mary, John, London, NATO, HBO</em></td>
+</tr>
+<tr>
+<td align="right">PUNCT</td>
+<td align="right">punctuation</td>
+<td align="right"><em>., (, ), ?</em></td>
+</tr>
+<tr>
+<td align="right">SCONJ</td>
+<td align="right">subordinating conjunction</td>
+<td align="right"><em>if, while, that</em></td>
+</tr>
+<tr>
+<td align="right">SYM</td>
+<td align="right">symbol</td>
+<td align="right"><em>$, %, §, ©, +, −, ×, ÷, &#x3D;, :), 😝</em></td>
+</tr>
+<tr>
+<td align="right">VERB</td>
+<td align="right">verb</td>
+<td align="right"><em>run, runs, running, eat, ate, eating</em></td>
+</tr>
+<tr>
+<td align="right">X</td>
+<td align="right">other</td>
+<td align="right"><em>sfpksdpsxmsa</em></td>
+</tr>
+<tr>
+<td align="right">SPACE</td>
+<td align="right">space</td>
+<td align="right"></td>
+</tr>
+</tbody></table>
+<h2 id="Fine-grained-Part-of-speech-Tags"><a href="#Fine-grained-Part-of-speech-Tags" class="headerlink" title="Fine-grained Part-of-speech Tags"></a>Fine-grained Part-of-speech Tags</h2><p>For a current list of tags for all languages visit <a target="_blank" rel="noopener" href="https://spacy.io/api/annotation#pos-tagging">https://spacy.io/api/annotation#pos-tagging</a></p>
+<h2 id="Working-with-POS-Tags"><a href="#Working-with-POS-Tags" class="headerlink" title="Working with POS Tags"></a>Working with POS Tags</h2><p>In the English language, the same string of characters can have different meanings, even within the same sentence. For this reason, morphology is important. <strong>spaCy</strong> uses machine learning algorithms to best predict the use of a token in a sentence. Is <em>“I read books on NLP”</em> present or past tense? Is <em>wind</em> a verb or a noun?</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">doc = nlp(<span class="string">u&#x27;I read books on NLP.&#x27;</span>)</span><br><span class="line">r = doc[<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;<span class="subst">&#123;r.text:&#123;<span class="number">10</span>&#125;</span>&#125; <span class="subst">&#123;r.pos_:&#123;<span class="number">8</span>&#125;</span>&#125; <span class="subst">&#123;r.tag_:&#123;<span class="number">6</span>&#125;</span>&#125; <span class="subst">&#123;spacy.explain(r.tag_)&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="comment">#read       VERB     VBP    verb, non-3rd person singular present</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">doc = nlp(<span class="string">u&#x27;I read a book on NLP.&#x27;</span>)</span><br><span class="line">r = doc[<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&#x27;<span class="subst">&#123;r.text:&#123;<span class="number">10</span>&#125;</span>&#125; <span class="subst">&#123;r.pos_:&#123;<span class="number">8</span>&#125;</span>&#125; <span class="subst">&#123;r.tag_:&#123;<span class="number">6</span>&#125;</span>&#125; <span class="subst">&#123;spacy.explain(r.tag_)&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="comment">#read       VERB     VBD    verb, past tense</span></span><br></pre></td></tr></table></figure>
+
+<p>In the first example, with no other cues to work from, spaCy assumed that <em><strong>read</strong></em> was present tense.</p>
+<p>In the second example the present tense form would be <em><strong>I am reading a book</strong></em>, so spaCy assigned the past tense.</p>
+<h2 id="Counting-POS-Tags"><a href="#Counting-POS-Tags" class="headerlink" title="Counting POS Tags"></a>Counting POS Tags</h2><p>The <code>Doc.count_by()</code> method accepts a specific token attribute as its argument, and returns a frequency count of the given attribute as a dictionary object. Keys in the dictionary are the integer values of the given attribute ID, and values are the frequency. Counts of zero are not included.</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">doc = nlp(<span class="string">u&quot;Apple is looking at buying U.K. startup for $1 Billion.&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Count the frequencies of different coarse-grained POS tags:</span></span><br><span class="line">POS_counts = doc.count_by(spacy.attrs.POS)</span><br><span class="line">POS_counts</span><br><span class="line"><span class="comment">#&#123;96: 1, 98: 1, 99: 3, 84: 2, 91: 1, 92: 2, 95: 2&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>This isn’t very helpful until you decode the attribute ID:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">doc.vocab[<span class="number">96</span>].text</span><br><span class="line"><span class="comment"># &#x27;PUNCT&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Count the different fine-grained tags:</span></span><br><span class="line">TAG_counts = doc.count_by(spacy.attrs.TAG)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> k,v <span class="keyword">in</span> <span class="built_in">sorted</span>(TAG_counts.items()):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&#x27;<span class="subst">&#123;k:&lt;&#123;<span class="number">23</span>&#125;</span>&#125; <span class="subst">&#123;doc.vocab[k].text:&#123;<span class="number">4</span>&#125;</span>&#125;: <span class="subst">&#123;v:&lt;&#123;<span class="number">5</span>&#125;</span>&#125; <span class="subst">&#123;spacy.explain(doc.vocab[k].text)&#125;</span>&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">1292078113972184607     IN  : 2     conjunction, subordinating or preposition</span><br><span class="line">1534113631682161808     VBG : 2     verb, gerund or present participle</span><br><span class="line">8427216679587749980     CD  : 2     cardinal number</span><br><span class="line">11283501755624150392    $   : 1     symbol, currency</span><br><span class="line">12646065887601541794    .   : 1     punctuation mark, sentence closer</span><br><span class="line">13927759927860985106    VBZ : 1     verb, 3rd person singular present</span><br><span class="line">15308085513773655218    NN  : 1     noun, singular or mass</span><br><span class="line">15794550382381185553    NNP : 2     noun, proper singular</span><br></pre></td></tr></table></figure>
+
+<div class="note  flat info"><p><strong>Why did the ID numbers get so big?</strong></p>
+<p>In spaCy, certain text values are hardcoded into <code>Doc.vocab</code> and take up the first several hundred ID numbers. Strings like ‘NOUN’ and ‘VERB’ are used frequently by internal operations. Others, like fine-grained tags, are assigned hash values as needed.</p>
+</div>
+
+<div class="note  flat info"><p><strong>Why don’t SPACE tags appear?</strong></p>
+<p>In spaCy, only strings of spaces (two or more) are assigned tokens. Single spaces are not.</p>
+</div>
+
+
+
+<h1 id="Visualizing-Parts-of-Speech"><a href="#Visualizing-Parts-of-Speech" class="headerlink" title="Visualizing Parts of Speech"></a>Visualizing Parts of Speech</h1><p>spaCy offers an outstanding visualizer called <strong>displaCy</strong>:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Perform standard imports</span></span><br><span class="line"><span class="keyword">import</span> spacy</span><br><span class="line">nlp = spacy.load(<span class="string">&#x27;en_core_web_sm&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Import the displaCy library</span></span><br><span class="line"><span class="keyword">from</span> spacy <span class="keyword">import</span> displacy</span><br><span class="line"></span><br><span class="line"><span class="comment"># Create a simple Doc object</span></span><br><span class="line">doc = nlp(<span class="string">u&quot;A quick brown fox jumps over the lazy dog.&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Render the dependency parse immediately inside Jupyter:</span></span><br><span class="line">displacy.render(doc, style=<span class="string">&#x27;dep&#x27;</span>, jupyter=<span class="literal">True</span>, options=&#123;<span class="string">&#x27;distance&#x27;</span>: <span class="number">110</span>&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/img/image-20240125110524573.png"></p>
+<p>The dependency parse shows the coarse POS tag for each token, as well as the <strong>dependency tag</strong> if given:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> token <span class="keyword">in</span> doc:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&#x27;<span class="subst">&#123;token.text:&#123;<span class="number">10</span>&#125;</span>&#125; <span class="subst">&#123;token.pos_:&#123;<span class="number">7</span>&#125;</span>&#125; <span class="subst">&#123;token.dep_:&#123;<span class="number">7</span>&#125;</span>&#125; <span class="subst">&#123;spacy.explain(token.dep_)&#125;</span>&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">A          DET     det     determiner</span><br><span class="line">quick      ADJ     amod    adjectival modifier</span><br><span class="line">brown      ADJ     amod    adjectival modifier</span><br><span class="line">fox        NOUN    nsubj   nominal subject</span><br><span class="line">jumps      VERB    ROOT    None</span><br><span class="line">over       ADP     prep    prepositional modifier</span><br><span class="line">the        DET     det     determiner</span><br><span class="line">lazy       ADJ     amod    adjectival modifier</span><br><span class="line">dog        NOUN    pobj    object of preposition</span><br><span class="line">.          PUNCT   punct   punctuation</span><br></pre></td></tr></table></figure>
+
+<h1 id="Creating-Visualizations-Outside-of-Jupyter"><a href="#Creating-Visualizations-Outside-of-Jupyter" class="headerlink" title="Creating Visualizations Outside of Jupyter"></a>Creating Visualizations Outside of Jupyter</h1><p>If you’re using another Python IDE or writing a script, you can choose to have spaCy serve up HTML separately.</p>
+<p>Instead of <code>displacy.render()</code>, use <code>displacy.serve()</code>:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">displacy.serve(doc, style=<span class="string">&#x27;dep&#x27;</span>, options=&#123;<span class="string">&#x27;distance&#x27;</span>: <span class="number">110</span>&#125;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="Handling-Large-Text"><a href="#Handling-Large-Text" class="headerlink" title="Handling Large Text"></a>Handling Large Text</h2><p><code>displacy.serve()</code> accepts a single Doc or list of Doc objects. Since large texts are difficult to view in one line, you may want to pass <strong>a list of spans</strong> instead. Each span will appear on its own line:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">doc2 = nlp(<span class="string">u&quot;This is a sentence. This is another, possibly longer sentence.&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Create spans from Doc.sents:</span></span><br><span class="line">spans = <span class="built_in">list</span>(doc2.sents)</span><br><span class="line"></span><br><span class="line">displacy.serve(spans, style=<span class="string">&#x27;dep&#x27;</span>, options=&#123;<span class="string">&#x27;distance&#x27;</span>: <span class="number">110</span>&#125;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="Customizing-the-Appearance"><a href="#Customizing-the-Appearance" class="headerlink" title="Customizing the Appearance"></a>Customizing the Appearance</h2><p>Besides setting the distance between tokens, you can pass other arguments to the <code>options</code> parameter:</p>
+<table>
+<thead>
+<tr>
+<th align="right">NAME</th>
+<th align="right">TYPE</th>
+<th align="right">DESCRIPTION</th>
+<th align="right">DEFAULT</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right"><code>compact</code></td>
+<td align="right">bool</td>
+<td align="right">“Compact mode” with square arrows that takes up less space.</td>
+<td align="right"><code>False</code></td>
+</tr>
+<tr>
+<td align="right"><code>color</code></td>
+<td align="right">unicode</td>
+<td align="right">Text color (HEX, RGB or color names).</td>
+<td align="right"><code>#000000</code></td>
+</tr>
+<tr>
+<td align="right"><code>bg</code></td>
+<td align="right">unicode</td>
+<td align="right">Background color (HEX, RGB or color names).</td>
+<td align="right"><code>#ffffff</code></td>
+</tr>
+<tr>
+<td align="right"><code>font</code></td>
+<td align="right">unicode</td>
+<td align="right">Font name or font family for all text.</td>
+<td align="right"><code>Arial</code></td>
+</tr>
+</tbody></table>
+<p>For a full list of options visit <a target="_blank" rel="noopener" href="https://spacy.io/api/top-level#displacy_options">https://spacy.io/api/top-level#displacy_options</a></p>
+<h1 id="Named-Entity-Recognition"><a href="#Named-Entity-Recognition" class="headerlink" title="Named Entity Recognition"></a>Named Entity Recognition</h1><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Perform standard imports</span></span><br><span class="line"><span class="keyword">import</span> spacy</span><br><span class="line">nlp = spacy.load(<span class="string">&#x27;en_core_web_sm&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Write a function to display basic entity info:</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">show_ents</span>(<span class="params">doc</span>):</span><br><span class="line">    <span class="keyword">if</span> doc.ents:</span><br><span class="line">        <span class="keyword">for</span> ent <span class="keyword">in</span> doc.ents:</span><br><span class="line">            <span class="built_in">print</span>(ent.text+<span class="string">&#x27; - &#x27;</span>+ent.label_+<span class="string">&#x27; - &#x27;</span>+<span class="built_in">str</span>(spacy.explain(ent.label_)))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&#x27;No named entities found.&#x27;</span>)</span><br><span class="line">        </span><br><span class="line">doc = nlp(<span class="string">&quot;I am heading to New York City and will visit Statue of Liberty tomorrow&quot;</span>)</span><br><span class="line"></span><br><span class="line">show_ents(doc)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">New York City - GPE - Countries, cities, states</span><br><span class="line">Statue of Liberty - ORG - Companies, agencies, institutions, etc.</span><br><span class="line">tomorrow - DATE - Absolute or relative dates or periods</span><br></pre></td></tr></table></figure>
+
+<h2 id="Entity-annotations"><a href="#Entity-annotations" class="headerlink" title="Entity annotations"></a>Entity annotations</h2><p><code>Doc.ents</code> are token spans with their own set of annotations.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Annotation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ent.text</code></td>
+<td>The original entity text</td>
+</tr>
+<tr>
+<td><code>ent.label</code></td>
+<td>The entity type’s hash value</td>
+</tr>
+<tr>
+<td><code>ent.label_</code></td>
+<td>The entity type’s string description</td>
+</tr>
+<tr>
+<td><code>ent.start</code></td>
+<td>The token span’s <em>start</em> index position in the Doc</td>
+</tr>
+<tr>
+<td><code>ent.end</code></td>
+<td>The token span’s <em>stop</em> index position in the Doc</td>
+</tr>
+<tr>
+<td><code>ent.start_char</code></td>
+<td>The entity text’s <em>start</em> index position in the Doc</td>
+</tr>
+<tr>
+<td><code>ent.end_char</code></td>
+<td>The entity text’s <em>stop</em> index position in the Doc</td>
+</tr>
+</tbody></table>
+<h2 id="NER-Tags"><a href="#NER-Tags" class="headerlink" title="NER Tags"></a>NER Tags</h2><p>Tags are accessible through the <code>.label_</code> property of an entity.</p>
+<table>
+<thead>
+<tr>
+<th align="right">TYPE</th>
+<th align="right">DESCRIPTION</th>
+<th align="right">EXAMPLE</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right"><code>PERSON</code></td>
+<td align="right">People, including fictional.</td>
+<td align="right"><em>Fred Flintstone</em></td>
+</tr>
+<tr>
+<td align="right"><code>NORP</code></td>
+<td align="right">Nationalities or religious or political groups.</td>
+<td align="right"><em>The Republican Party</em></td>
+</tr>
+<tr>
+<td align="right"><code>FAC</code></td>
+<td align="right">Buildings, airports, highways, bridges, etc.</td>
+<td align="right"><em>Logan International Airport, The Golden Gate</em></td>
+</tr>
+<tr>
+<td align="right"><code>ORG</code></td>
+<td align="right">Companies, agencies, institutions, etc.</td>
+<td align="right"><em>Microsoft, FBI, MIT</em></td>
+</tr>
+<tr>
+<td align="right"><code>GPE</code></td>
+<td align="right">Countries, cities, states.</td>
+<td align="right"><em>France, UAR, Chicago, Idaho</em></td>
+</tr>
+<tr>
+<td align="right"><code>LOC</code></td>
+<td align="right">Non-GPE locations, mountain ranges, bodies of water.</td>
+<td align="right"><em>Europe, Nile River, Midwest</em></td>
+</tr>
+<tr>
+<td align="right"><code>PRODUCT</code></td>
+<td align="right">Objects, vehicles, foods, etc. (Not services.)</td>
+<td align="right"><em>Formula 1</em></td>
+</tr>
+<tr>
+<td align="right"><code>EVENT</code></td>
+<td align="right">Named hurricanes, battles, wars, sports events, etc.</td>
+<td align="right"><em>Olympic Games</em></td>
+</tr>
+<tr>
+<td align="right"><code>WORK_OF_ART</code></td>
+<td align="right">Titles of books, songs, etc.</td>
+<td align="right"><em>The Mona Lisa</em></td>
+</tr>
+<tr>
+<td align="right"><code>LAW</code></td>
+<td align="right">Named documents made into laws.</td>
+<td align="right"><em>Roe v. Wade</em></td>
+</tr>
+<tr>
+<td align="right"><code>LANGUAGE</code></td>
+<td align="right">Any named language.</td>
+<td align="right"><em>English</em></td>
+</tr>
+<tr>
+<td align="right"><code>DATE</code></td>
+<td align="right">Absolute or relative dates or periods.</td>
+<td align="right"><em>20 July 1969</em></td>
+</tr>
+<tr>
+<td align="right"><code>TIME</code></td>
+<td align="right">Times smaller than a day.</td>
+<td align="right"><em>Four hours</em></td>
+</tr>
+<tr>
+<td align="right"><code>PERCENT</code></td>
+<td align="right">Percentage, including “%”.</td>
+<td align="right"><em>Eighty percent</em></td>
+</tr>
+<tr>
+<td align="right"><code>MONEY</code></td>
+<td align="right">Monetary values, including unit.</td>
+<td align="right"><em>Twenty Cents</em></td>
+</tr>
+<tr>
+<td align="right"><code>QUANTITY</code></td>
+<td align="right">Measurements, as of weight or distance.</td>
+<td align="right"><em>Several kilometers, 55kg</em></td>
+</tr>
+<tr>
+<td align="right"><code>ORDINAL</code></td>
+<td align="right">“first”, “second”, etc.</td>
+<td align="right"><em>9th, Ninth</em></td>
+</tr>
+<tr>
+<td align="right"><code>CARDINAL</code></td>
+<td align="right">Numerals that do not fall under another type.</td>
+<td align="right"><em>2, Two, Fifty-two</em></td>
+</tr>
+</tbody></table>
+<h2 id="Adding-a-Named-Entity-to-a-Span"><a href="#Adding-a-Named-Entity-to-a-Span" class="headerlink" title="Adding a Named Entity to a Span"></a>Adding a Named Entity to a Span</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">doc = nlp(<span class="string">u&#x27;Tesla is planning build a new U.K. factory for $6 million&#x27;</span>)</span><br><span class="line"></span><br><span class="line">show_ents(doc)</span><br><span class="line"><span class="comment">#U.K. - GPE - Countries, cities, states</span></span><br><span class="line"><span class="comment">#$6 million - MONEY - Monetary values, including unit</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># doc.ents returns a tuple</span></span><br><span class="line"><span class="built_in">type</span>(doc.ents)</span><br><span class="line"><span class="comment">#tuple</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># each elementin the entities tuple is of type Span</span></span><br><span class="line"><span class="built_in">type</span>(doc.ents[<span class="number">0</span>])</span><br><span class="line"><span class="comment">#spacy.tokens.span.Span</span></span><br></pre></td></tr></table></figure>
+
+<p><font color=green>Right now, spaCy does not recognize “Tesla” as a company.</font></p>
+<p>The method to add a named entity of your own is simple. Create a span in document for the phrase you are interested in with the TYPE of entity you want (i.e. PERSON, or ORG) or  and manually add it to the entities tuple.</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> spacy.tokens <span class="keyword">import</span> Span</span><br><span class="line"></span><br><span class="line"><span class="comment"># Get the hash value of the ORG entity label</span></span><br><span class="line">ORG = doc.vocab.strings[<span class="string">u&#x27;ORG&#x27;</span>]  </span><br><span class="line"><span class="comment"># ORG </span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Create a Span for the new entity</span></span><br><span class="line">new_ent = Span(doc, <span class="number">0</span>, <span class="number">1</span>, label=ORG)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Add the entity to the existing Doc object</span></span><br><span class="line">doc.ents = <span class="built_in">list</span>(doc.ents) + [new_ent]</span><br></pre></td></tr></table></figure>
+
+<p><font color=green>In the code above, the arguments passed to <code>Span()</code> are:</font></p>
+<ul>
+<li><code>doc</code> - the name of the Doc object</li>
+<li><code>0</code> - the <em>start</em> index position of the <strong>span</strong></li>
+<li><code>1</code> - the <em>stop</em> index position (exclusive)</li>
+<li><code>label=ORG</code> - the label assigned to our entity</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">show_ents(doc)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Tesla - ORG - Companies, agencies, institutions, etc.</span><br><span class="line">U.K. - GPE - Countries, cities, states</span><br><span class="line">$6 million - MONEY - Monetary values, including unit</span><br></pre></td></tr></table></figure>
+
+<h2 id="Adding-Named-Entities-to-All-Matching-Spans"><a href="#Adding-Named-Entities-to-All-Matching-Spans" class="headerlink" title="Adding Named Entities to All Matching Spans"></a>Adding Named Entities to All Matching Spans</h2><p>What if we want to tag <em>all</em> occurrences of “Tesla”? In this section we show how to use the PhraseMatcher to identify a series of spans in the Doc</p>
+<p>The process is slghtly involved. The steps are: </p>
+<p>(1) build a simple list of phrases to match, </p>
+<p>(2) Create a phrase matcher using vocab, </p>
+<p>(3) Create phrase patterns and add them to the matcher, </p>
+<p>(4) Apply matcher to the doc, which finds <strong>spans</strong> of matches, </p>
+<p>(5) use the found matches to create spans and add to the doc.ents as we did previously</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Import PhraseMatcher and create a matcher object:</span></span><br><span class="line"><span class="keyword">from</span> spacy.matcher <span class="keyword">import</span> PhraseMatcher</span><br><span class="line">matcher = PhraseMatcher(nlp.vocab)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Create the desired phrase patterns:</span></span><br><span class="line">phrase_list = [<span class="string">&#x27;vacuum cleaner&#x27;</span>, <span class="string">&#x27;vacuum-cleaner&#x27;</span>]</span><br><span class="line">phrase_patterns = [nlp(text) <span class="keyword">for</span> text <span class="keyword">in</span> phrase_list]</span><br><span class="line"></span><br><span class="line"><span class="comment"># notice the use of list comprehension above, each element is really a doc object</span></span><br><span class="line"><span class="built_in">type</span>(phrase_patterns[<span class="number">0</span>])</span><br><span class="line"><span class="comment">#spacy.tokens.doc.Doc</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Apply the patterns to our matcher object:</span></span><br><span class="line">matcher.add(<span class="string">&#x27;newproduct&#x27;</span>, <span class="literal">None</span>, *phrase_patterns)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Apply the matcher to our Doc object:</span></span><br><span class="line">matches = matcher(doc)</span><br><span class="line"></span><br><span class="line"><span class="comment"># See what matches occur:</span></span><br><span class="line">matches</span><br><span class="line"><span class="comment">#[(2689272359382549672, 7, 9), (2689272359382549672, 14, 16)]</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Here we create Spans from each match, and create named entities from them:</span></span><br><span class="line"><span class="keyword">from</span> spacy.tokens <span class="keyword">import</span> Span</span><br><span class="line"></span><br><span class="line">PROD = doc.vocab.strings[<span class="string">u&#x27;PRODUCT&#x27;</span>]</span><br><span class="line"></span><br><span class="line">new_ents = [Span(doc, <span class="keyword">match</span>[<span class="number">1</span>],<span class="keyword">match</span>[<span class="number">2</span>],label=PROD) <span class="keyword">for</span> <span class="keyword">match</span> <span class="keyword">in</span> matches]</span><br><span class="line"></span><br><span class="line">doc.ents = <span class="built_in">list</span>(doc.ents) + new_ents</span><br><span class="line"></span><br><span class="line">show_ents(doc)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vacuum cleaner - PRODUCT - Objects, vehicles, foods, etc. (not services)</span><br><span class="line">vacuum cleaner - PRODUCT - Objects, vehicles, foods, etc. (not services)</span><br><span class="line">first - ORDINAL - &quot;first&quot;, &quot;second&quot;, etc.</span><br></pre></td></tr></table></figure>
+
+<h2 id="Counting-Entities"><a href="#Counting-Entities" class="headerlink" title="Counting Entities"></a>Counting Entities</h2><p>While spaCy may <strong>not</strong> have a built-in tool for counting entities, we can pass a conditional statement into a list comprehension:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">doc = nlp(<span class="string">u&#x27;Originally priced at $29.50, the sweater was marked down to five dollars.&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">len</span>([ent <span class="keyword">for</span> ent <span class="keyword">in</span> doc.ents <span class="keyword">if</span> ent.label_==<span class="string">&#x27;MONEY&#x27;</span>])</span><br><span class="line"><span class="comment">#2</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Problem-with-Line-Breaks"><a href="#Problem-with-Line-Breaks" class="headerlink" title="Problem with Line Breaks"></a><font color=blue>Problem with Line Breaks</font></h2><div class="alert alert-info" style="margin: 20px">There's a <a target="_blank" rel="noopener" href='https://github.com/explosion/spaCy/issues/1717'>known issue</a> with <strong>spaCy v2.0.12</strong> where some linebreaks are interpreted as `GPE` entities:</div>
+
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">doc = nlp(<span class="string">u&#x27;Originally priced at $29.50,\nthe sweater was marked down to five dollars.&#x27;</span>)</span><br><span class="line"></span><br><span class="line">show_ents(doc)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">29.50 - MONEY - Monetary values, including unit</span><br><span class="line"></span><br><span class="line"> - GPE - Countries, cities, states</span><br><span class="line">five dollars - MONEY - Monetary values, including unit</span><br></pre></td></tr></table></figure>
+
+<p>However, there is a simple fix that can be added to the nlp pipeline:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Quick function to remove ents formed on whitespace:</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">remove_whitespace_entities</span>(<span class="params">doc</span>):</span><br><span class="line">    doc.ents = [e <span class="keyword">for</span> e <span class="keyword">in</span> doc.ents <span class="keyword">if</span> <span class="keyword">not</span> e.text.isspace()]</span><br><span class="line">    <span class="keyword">return</span> doc</span><br><span class="line"></span><br><span class="line"><span class="comment"># Insert this into the pipeline AFTER the ner component:</span></span><br><span class="line">nlp.add_pipe(remove_whitespace_entities, after=<span class="string">&#x27;ner&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Rerun nlp on the text above, and show ents:</span></span><br><span class="line">doc = nlp(<span class="string">u&#x27;Originally priced at $29.50,\nthe sweater was marked down to five dollars.&#x27;</span>)</span><br><span class="line"></span><br><span class="line">show_ents(doc)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">29.50 - MONEY - Monetary values, including unit</span><br><span class="line">five dollars - MONEY - Monetary values, including unit</span><br></pre></td></tr></table></figure>
+
+<h2 id="Noun-Chunks"><a href="#Noun-Chunks" class="headerlink" title="Noun Chunks"></a>Noun Chunks</h2><p><code>Doc.noun_chunks</code> are <em>base noun phrases</em>: token spans that include the noun and words describing the noun. Noun chunks cannot be nested, cannot overlap, and do not involve prepositional phrases or relative clauses.</p>
+<p>Where <code>Doc.ents</code> rely on the <strong>ner</strong> pipeline component, <code>Doc.noun_chunks</code> are provided by the <strong>parser</strong>.</p>
+<h3 id="noun-chunks-components"><a href="#noun-chunks-components" class="headerlink" title="noun_chunks components:"></a><code>noun_chunks</code> components:</h3><table>
+<thead>
+<tr>
+<th></th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>.text</code></td>
+<td>The original noun chunk text.</td>
+</tr>
+<tr>
+<td><code>.root.text</code></td>
+<td>The original text of the word connecting the noun chunk to the rest of the parse.</td>
+</tr>
+<tr>
+<td><code>.root.dep_</code></td>
+<td>Dependency relation connecting the root to its head.</td>
+</tr>
+<tr>
+<td><code>.root.head.text</code></td>
+<td>The text of the root token’s head.</td>
+</tr>
+</tbody></table>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">doc = nlp(<span class="string">u&quot;Autonomous cars shift insurance liability toward manufacturers.&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> chunk <span class="keyword">in</span> doc.noun_chunks:</span><br><span class="line">    <span class="built_in">print</span>(chunk.text+<span class="string">&#x27; - &#x27;</span>+chunk.root.text+<span class="string">&#x27; - &#x27;</span>+chunk.root.dep_+<span class="string">&#x27; - &#x27;</span>+chunk.root.head.text)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Autonomous cars - cars - nsubj - shift</span><br><span class="line">insurance liability - liability - dobj - shift</span><br><span class="line">manufacturers - manufacturers - pobj - toward</span><br></pre></td></tr></table></figure>
+
+<h3 id="Doc-noun-chunks-is-a-generator-function"><a href="#Doc-noun-chunks-is-a-generator-function" class="headerlink" title="Doc.noun_chunks is a generator function"></a><code>Doc.noun_chunks</code> is a generator function</h3><p>Previously we mentioned that <code>Doc</code> objects do not retain a list of sentences, but they’re available through the <code>Doc.sents</code> generator.</p>
+<p>It’s the same with <code>Doc.noun_chunks</code> - lists can be created if needed:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="built_in">len</span>(<span class="built_in">list</span>(doc.noun_chunks))</span><br><span class="line"><span class="comment">#3</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="Visualizing-Named-Entities"><a href="#Visualizing-Named-Entities" class="headerlink" title="Visualizing Named Entities"></a>Visualizing Named Entities</h1><p>Besides viewing Part of Speech dependencies with <code>style=&#39;dep&#39;</code>, <strong>displaCy</strong> offers a <code>style=&#39;ent&#39;</code> visualizer:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Perform standard imports</span></span><br><span class="line"><span class="keyword">import</span> spacy</span><br><span class="line">nlp = spacy.load(<span class="string">&#x27;en_core_web_sm&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Import the displaCy library</span></span><br><span class="line"><span class="keyword">from</span> spacy <span class="keyword">import</span> displacy</span><br><span class="line"></span><br><span class="line">doc = nlp(<span class="string">u&#x27;Over the last quarter Apple sold nearly 20 thousand iPods for a profit of $6 million. &#x27;</span></span><br><span class="line">         <span class="string">u&#x27;By contrast, Sony sold only 7 thousand Walkman music players.&#x27;</span>)</span><br><span class="line"></span><br><span class="line">displacy.render(doc, style=<span class="string">&#x27;ent&#x27;</span>, jupyter=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
+
+<div class="entities" style="line-height:2.5">Over 
+<mark class="entity" style="background:#bfe1d9;padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone">
+    the last quarter
+    <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">DATE</span>
+</mark>
+<mark class="entity" style="background:#7aecec;padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone">
+    Apple
+    <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">ORG</span>
+</mark>
+ sold 
+<mark class="entity" style="background:#e4e7d2;padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone">
+    nearly 20 thousand
+    <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">CARDINAL</span>
+</mark>
+<mark class="entity" style="background:#bfeeb7;padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone">
+    iPods
+    <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">PRODUCT</span>
+</mark>
+ for a profit of 
+<mark class="entity" style="background:#e4e7d2;padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone">
+    $6 million
+    <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">MONEY</span>
+</mark>
+. By contrast, 
+<mark class="entity" style="background:#7aecec;padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone">
+    Sony
+    <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">ORG</span>
+</mark>
+ sold 
+<mark class="entity" style="background:#e4e7d2;padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone">
+    only 7 thousand
+    <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">CARDINAL</span>
+</mark>
+<mark class="entity" style="background:#bfeeb7;padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone">
+    Walkman
+    <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">PRODUCT</span>
+</mark>
+ music players.</div>
+
+<h2 id="Viewing-Sentences-Line-by-Line"><a href="#Viewing-Sentences-Line-by-Line" class="headerlink" title="Viewing Sentences Line by Line"></a>Viewing Sentences Line by Line</h2><p>Unlike the <strong>displaCy</strong> dependency parse, the NER viewer has to take in a Doc object with an <code>ents</code> attribute. For this reason, we can’t just pass a list of spans to <code>.render()</code>, we have to create a new Doc from each <code>span.text</code>:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> sent <span class="keyword">in</span> doc.sents:</span><br><span class="line">    displacy.render(nlp(sent.text), style=<span class="string">&#x27;ent&#x27;</span>, jupyter=<span class="literal">True</span>)</span><br></pre></td></tr></table></figure>
+
+<div class="note  flat info"><p>If a span does not contain any entities, displaCy will issue a harmless warning</p>
+</div>
+
+<h2 id="Viewing-Specific-Entities"><a href="#Viewing-Specific-Entities" class="headerlink" title="Viewing Specific Entities"></a>Viewing Specific Entities</h2><p>You can pass a list of entity types to restrict the visualization:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">options = &#123;<span class="string">&#x27;ents&#x27;</span>: [<span class="string">&#x27;ORG&#x27;</span>, <span class="string">&#x27;PRODUCT&#x27;</span>]&#125;</span><br><span class="line"></span><br><span class="line">displacy.render(doc, style=<span class="string">&#x27;ent&#x27;</span>, jupyter=<span class="literal">True</span>, options=options)</span><br></pre></td></tr></table></figure>
+
+<div class="entities" style="line-height:2.5">Over the last quarter 
+<mark class="entity" style="background:#7aecec;padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone">
+    Apple
+    <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">ORG</span>
+</mark>
+ sold nearly 20 thousand 
+<mark class="entity" style="background:#bfeeb7;padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone">
+    iPods
+    <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">PRODUCT</span>
+</mark>
+ for a profit of $6 million. By contrast, 
+<mark class="entity" style="background:#7aecec;padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone">
+    Sony
+    <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">ORG</span>
+</mark>
+ sold only 7 thousand 
+<mark class="entity" style="background:#bfeeb7;padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone">
+    Walkman
+    <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">PRODUCT</span>
+</mark>
+ music players.</div>
+
+
+<h2 id="Customizing-Colors-and-Effects"><a href="#Customizing-Colors-and-Effects" class="headerlink" title="Customizing Colors and Effects"></a>Customizing Colors and Effects</h2><p>You can also pass background color and gradient options:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#colors = &#123;&#x27;ORG&#x27;: &#x27;orange&#x27;, &#x27;PRODUCT&#x27;:&#x27;yellow&#x27;&#125;</span></span><br><span class="line">colors = &#123;<span class="string">&#x27;ORG&#x27;</span>: <span class="string">&#x27;Linear-gradient(90deg, orange, green)&#x27;</span>, <span class="string">&#x27;PRODUCT&#x27;</span>: <span class="string">&#x27;radial-gradient(pink, purple)&#x27;</span>&#125;</span><br><span class="line"><span class="comment">#colors = &#123;&#x27;ORG&#x27;: &#x27;linear-gradient(90deg, #aa9cfc, #fc9ce7)&#x27;, &#x27;PRODUCT&#x27;: &#x27;radial-gradient(yellow, green)&#x27;&#125;</span></span><br><span class="line"></span><br><span class="line">options = &#123;<span class="string">&#x27;ents&#x27;</span>: [<span class="string">&#x27;ORG&#x27;</span>, <span class="string">&#x27;PRODUCT&#x27;</span>], <span class="string">&#x27;colors&#x27;</span>:colors&#125;</span><br><span class="line"></span><br><span class="line">displacy.render(doc, style=<span class="string">&#x27;ent&#x27;</span>, jupyter=<span class="literal">True</span>, options=options)</span><br></pre></td></tr></table></figure>
+
+<div class="entities" style="line-height:2.5">Over the last quarter 
+<mark class="entity" style="background:Linear-gradient(45deg, orange, green);padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone">
+    Apple
+    <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">ORG</span>
+</mark>
+ sold nearly 20 thousand 
+<mark class="entity" style="background:radial-gradient(pink, purple);padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone">
+    iPods
+    <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">PRODUCT</span>
+</mark>
+ for a profit of $6 million. By contrast, 
+<mark class="entity" style="background:Linear-gradient(45deg, orange, green);padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone">
+    Sony
+    <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">ORG</span>
+</mark>
+ sold only 7 thousand 
+<mark class="entity" style="background:radial-gradient(pink, purple);padding:0.45em 0.6em;margin:0 0.25em;line-height:1;border-radius:0.35em;box-decoration-break:clone;-webkit-box-decoration-break:clone">
+    Walkman
+    <span style="font-size:0.8em;font-weight:bold;line-height:1;border-radius:0.35em;text-transform:uppercase;vertical-align:middle;margin-left:0.5rem">PRODUCT</span>
+</mark>
+ music players.</div>
+
+
+
+
+<h1 id="Sentence-Segmentation"><a href="#Sentence-Segmentation" class="headerlink" title="Sentence Segmentation"></a>Sentence Segmentation</h1><p>In this section we’ll learn how sentence segmentation works, and how to set our own segmentation rules.</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Perform standard imports</span></span><br><span class="line"><span class="keyword">import</span> spacy</span><br><span class="line">nlp = spacy.load(<span class="string">&#x27;en_core_web_sm&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># From Spacy Basics:</span></span><br><span class="line">doc = nlp(<span class="string">u&#x27;This is the first sentence. This is another sentence. This is the last sentence.&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> sent <span class="keyword">in</span> doc.sents:</span><br><span class="line">    <span class="built_in">print</span>(sent)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">This is the first sentence.</span><br><span class="line">This is another sentence.</span><br><span class="line">This is the last sentence.</span><br></pre></td></tr></table></figure>
+
+<h3 id="Doc-sents-is-a-generator"><a href="#Doc-sents-is-a-generator" class="headerlink" title="Doc.sents is a generator"></a><code>Doc.sents</code> is a generator</h3><p>It is important to note that <code>doc.sents</code> is a <em>generator</em>. That is, a Doc is not segmented until <code>doc.sents</code> is called. This means that, where you could print the second Doc token with <code>print(doc[1])</code>, you can’t call the “second Doc sentence” with <code>print(doc.sents[1])</code>:</p>
+<h3 id="Convert-doc-sents-to-a-list"><a href="#Convert-doc-sents-to-a-list" class="headerlink" title="Convert doc.sents to a list"></a>Convert <code>doc.sents</code> to a list</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="built_in">list</span>(doc.sents)</span><br></pre></td></tr></table></figure>
+
+<h3 id="sents-are-spans"><a href="#sents-are-spans" class="headerlink" title="sents are spans"></a><code>sents</code> are spans</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="built_in">type</span>(<span class="built_in">list</span>(doc.sents)[<span class="number">0</span>])</span><br><span class="line"><span class="comment">#spacy.tokens.span.Span</span></span><br></pre></td></tr></table></figure>
+
+<p>You <em>can</em> build a sentence collection by running <code>doc.sents</code> and saving the result to a list.</p>
+<h2 id="Adding-Rules-for-sentence-segmentation"><a href="#Adding-Rules-for-sentence-segmentation" class="headerlink" title="Adding Rules for sentence segmentation"></a>Adding Rules for sentence segmentation</h2><p>spaCy’s built-in <code>sentencizer</code> relies on the dependency parse and end-of-sentence punctuation to determine segmentation rules. We can add rules of our own, but they have to be added <em>before</em> the creation of the Doc object, as that is where the parsing of segment start tokens happens:</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Parsing the segmentation start tokens happens during the nlp pipeline</span></span><br><span class="line">doc2 = nlp(<span class="string">u&#x27;This is a sentence. This is a sentence. This is a sentence.&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> token <span class="keyword">in</span> doc2:</span><br><span class="line">    <span class="built_in">print</span>(token.is_sent_start, <span class="string">&#x27; &#x27;</span>+token.text)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">None  This</span><br><span class="line">None  is</span><br><span class="line">None  a</span><br><span class="line">None  sentence</span><br><span class="line">None  .</span><br><span class="line">True  This</span><br><span class="line">None  is</span><br><span class="line">None  a</span><br><span class="line">None  sentence</span><br><span class="line">None  .</span><br><span class="line">True  This</span><br><span class="line">None  is</span><br><span class="line">None  a</span><br><span class="line">None  sentence</span><br><span class="line">None  .</span><br></pre></td></tr></table></figure>
+
+<p><font color=green>Notice we haven’t run <code>doc2.sents</code>, and yet <code>token.is_sent_start</code> was set to True on two tokens in the Doc.</font></p>
+<p>Let’s add a semicolon to our existing segmentation rules. That is, whenever the sentencizer encounters a <strong>semicolon</strong>(;), the next token should start a new segment.</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># SPACY&#x27;S DEFAULT BEHAVIOR</span></span><br><span class="line">doc3 = nlp(<span class="string">u&#x27;&quot;Management is doing things right; leadership is doing the right things.&quot; -Peter Drucker&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> sent <span class="keyword">in</span> doc3.sents:</span><br><span class="line">    <span class="built_in">print</span>(sent)</span><br><span class="line"><span class="comment">#&quot;Management is doing things right; leadership is doing the right things.&quot;</span></span><br><span class="line"><span class="comment">#-Peter Drucker</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># ADD A NEW RULE TO THE PIPELINE</span></span><br><span class="line"><span class="comment"># Every token in document object maintains a fixed index position, </span></span><br><span class="line"><span class="comment"># which does not change. We will take advantage of that.</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">set_custom_boundaries</span>(<span class="params">doc</span>):</span><br><span class="line">    <span class="keyword">for</span> token <span class="keyword">in</span> doc[:-<span class="number">1</span>]:</span><br><span class="line">        <span class="keyword">if</span> token.text == <span class="string">&#x27;;&#x27;</span>:</span><br><span class="line">            doc[token.i+<span class="number">1</span>].is_sent_start = <span class="literal">True</span></span><br><span class="line">    <span class="keyword">return</span> doc</span><br><span class="line"></span><br><span class="line">nlp.add_pipe(set_custom_boundaries, before=<span class="string">&#x27;parser&#x27;</span>)</span><br><span class="line"></span><br><span class="line">nlp.pipe_names</span><br><span class="line"><span class="comment">#[&#x27;tagger&#x27;, &#x27;set_custom_boundaries&#x27;, &#x27;parser&#x27;, &#x27;ner&#x27;]</span></span><br></pre></td></tr></table></figure>
+
+<p><font color=green>The new rule has to run before the document is parsed. Here we can either pass the argument <code>before=&#39;parser&#39;</code> or <code>first=True</code>.</font></p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Re-run the Doc object creation:</span></span><br><span class="line">doc4 = nlp(<span class="string">u&#x27;&quot;Management is doing things right; leadership is doing the right things.&quot; -Peter Drucker&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> sent <span class="keyword">in</span> doc4.sents:</span><br><span class="line">    <span class="built_in">print</span>(sent)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&quot;Management is doing things right;</span><br><span class="line">leadership is doing the right things.&quot;</span><br><span class="line">-Peter Drucker</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># And yet the new rule doesn&#x27;t apply to the older Doc object:</span></span><br><span class="line"><span class="keyword">for</span> sent <span class="keyword">in</span> doc3.sents:</span><br><span class="line">    <span class="built_in">print</span>(sent)</span><br><span class="line"><span class="comment">#&quot;Management is doing things right; leadership is doing the right things.&quot;</span></span><br><span class="line"><span class="comment">#-Peter Drucker</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Why-not-change-the-token-directly"><a href="#Why-not-change-the-token-directly" class="headerlink" title="Why not change the token directly?"></a>Why not change the token directly?</h3><p>Why not simply set the <code>.is_sent_start</code> value to True on existing tokens?</p>
+<div class="note  flat info"><p>Because spaCy refuses to change the tag after the document is parsed to prevent inconsistencies in the data.</p>
+</div>
+
+<h2 id="Changing-the-Rules"><a href="#Changing-the-Rules" class="headerlink" title="Changing the Rules"></a>Changing the Rules</h2><p>In some cases we want to <em>replace</em> spaCy’s default sentencizer with our own set of rules. In this section we’ll see how the default sentencizer breaks on periods. We’ll then replace this behavior with a sentencizer that breaks on linebreaks.</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">mystring = <span class="string">u&quot;This is a sentence. This is another.\n\nThis is a \nthird sentence.&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># SPACY DEFAULT BEHAVIOR:</span></span><br><span class="line">doc = nlp(mystring)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> sent <span class="keyword">in</span> doc.sents:</span><br><span class="line">    <span class="built_in">print</span>([token.text <span class="keyword">for</span> token <span class="keyword">in</span> sent])</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[&#x27;This&#x27;, &#x27;is&#x27;, &#x27;a&#x27;, &#x27;sentence&#x27;, &#x27;.&#x27;]</span><br><span class="line">[&#x27;This&#x27;, &#x27;is&#x27;, &#x27;another&#x27;, &#x27;.&#x27;, &#x27;\n\n&#x27;]</span><br><span class="line">[&#x27;This&#x27;, &#x27;is&#x27;, &#x27;a&#x27;, &#x27;\n&#x27;, &#x27;third&#x27;, &#x27;sentence&#x27;, &#x27;.&#x27;]</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># CHANGING THE RULES</span></span><br><span class="line"><span class="keyword">from</span> spacy.pipeline <span class="keyword">import</span> SentenceSegmenter</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">split_on_newlines</span>(<span class="params">doc</span>):</span><br><span class="line">    start = <span class="number">0</span></span><br><span class="line">    seen_newline = <span class="literal">False</span></span><br><span class="line">    <span class="keyword">for</span> word <span class="keyword">in</span> doc:</span><br><span class="line">        <span class="keyword">if</span> seen_newline:</span><br><span class="line">            <span class="keyword">yield</span> doc[start:word.i]</span><br><span class="line">            start = word.i</span><br><span class="line">            seen_newline = <span class="literal">False</span></span><br><span class="line">        <span class="keyword">elif</span> word.text.startswith(<span class="string">&#x27;\n&#x27;</span>): <span class="comment"># handles multiple occurrences</span></span><br><span class="line">            seen_newline = <span class="literal">True</span></span><br><span class="line">    <span class="keyword">yield</span> doc[start:]      <span class="comment"># handles the last group of tokens</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sbd = SentenceSegmenter(nlp.vocab, strategy=split_on_newlines)</span><br><span class="line">nlp.add_pipe(sbd)</span><br><span class="line">nlp.pipe_names</span><br><span class="line"><span class="comment">#[&#x27;tagger&#x27;, &#x27;parser&#x27;, &#x27;ner&#x27;, &#x27;sbd&#x27;]</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">doc = nlp(mystring)</span><br><span class="line"><span class="keyword">for</span> sent <span class="keyword">in</span> doc.sents:</span><br><span class="line">    <span class="built_in">print</span>([token.text <span class="keyword">for</span> token <span class="keyword">in</span> sent])</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[&#x27;This&#x27;, &#x27;is&#x27;, &#x27;a&#x27;, &#x27;sentence&#x27;, &#x27;.&#x27;, &#x27;This&#x27;, &#x27;is&#x27;, &#x27;another&#x27;, &#x27;.&#x27;, &#x27;\n\n&#x27;]</span><br><span class="line">[&#x27;This&#x27;, &#x27;is&#x27;, &#x27;a&#x27;, &#x27;\n&#x27;]</span><br><span class="line">[&#x27;third&#x27;, &#x27;sentence&#x27;, &#x27;.&#x27;]</span><br></pre></td></tr></table></figure>
+
+<p>Here we see that periods no longer affect segmentation, only linebreaks do. This would be appropriate when working with a long list of tweets, for instance.</p>
+</article><div class="post-copyright"><div class="post-copyright__author_group"><a class="post-copyright__author_img" href="/about/"><img class="post-copyright__author_img_front" src= "/img/spin.svg" data-lazy-src="/img/avatar.jpg"></a><div class="post-copyright__author_name">Rean's Blog</div><div class="post-copyright__author_desc">Enjoy technology and music</div></div><div class="post-tools" id="post-tools"><div class="post-tools-left"><div id="quit-box" onclick="RemoveRewardMask()"></div></div></div><div class="post-copyright__notice"><span class="post-copyright-info">本文是原创文章，采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0</a>协议，完整转载请注明来自<a href="/">Rean's Blog</a></span></div></div><div class="post-tools-right"><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/NLP/"><span class="tags-punctuation"></span>NLP<span class="tagsPageCount">6</span></a><a class="post-meta__tags" href="/tags/spaCy/"><span class="tags-punctuation"></span>spaCy<span class="tagsPageCount">4</span></a></div></div></div><nav class="needEndHide pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/p/f9bef31e/"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">【Vue】弹窗Dialog组件封装及使用</div></div></a></div><div class="next-post pull-right"><a href="/p/a4189438/"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">【Vue】Element表单中按钮的摆放（内嵌/追加）</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="solitude st-star-smile-fill"></i><span>喜欢这篇的人也看了</span><div class="relatedPosts-link"><a onclick="event.preventDefault(); toRandomPost();" href="javascript:void(0);" rel="external nofollow" data-pjax-state="">随便逛逛</a></div></div><div class="relatedPosts-list"><div><a href="/p/240e5e52/" title="【NLP】Semantic &amp; Sentiment Analysis"><img class="cover" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/235335-1549900415dcc9.jpg" alt="cover"><div class="content is-center"><div class="title">【NLP】Semantic &amp; Sentiment Analysis</div></div></a></div><div><a href="/p/66a6c396/" title="【NLP】Text Feature Extraction &amp; Classification"><img class="cover" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/cover8.JPG" alt="cover"><div class="content is-center"><div class="title">【NLP】Text Feature Extraction &amp; Classification</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-content"><div class="card-info-avatar is-center"><div class="author-info__top-group"><div class="author-info__sayhi" id="author-info__sayhi" onclick="sco.changeSayHelloText()">sayhello.morning</div></div></div><div class="avatar-img-group"><img class="avatar-img" alt="头像" src= "/img/spin.svg" data-lazy-src="/img/avatar.jpg"><div class="avatar-sticker"><img class="avatar-sticker-img" src= "/img/spin.svg" data-lazy-src="https://7.isyangs.cn/34/65f2e4e0423cc-34.png" alt="心情贴纸"></div></div><div class="author-info__description_group"><div class="author-info__description">分享自己对编程的<b>热爱</b>，对知识海洋<b>探索历程</b>，随机掉落<b>无参配布</b>以及<b>翻调</b>（主要是音综类，在B站因为版权基本过不了审（。</div><div class="author-info__description2">相信你可以在这里找到对你有用的知识和教程。</div></div><div class="author-info__bottom-group"><a class="author-info__bottom-group-left" href="/about/"><div class="author-info__name">Rean</div><div class="author-info__desc">Enjoy technology and music</div></a><div class="card-info-social-icons is-center"><a class="social-icon" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze" title="Github"><i class="solitude  st-github-line"></i></a><a class="social-icon" target="_blank" rel="noopener" href="https://space.bilibili.com/6531436" title="Bilibili"><i class="solitude  st-bilibili-line"></i></a></div></div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="solitude st-menu-line"></i><span>文章目录</span></div><div class="toc-content" id="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Part-of-Speech-Tagging"><span class="toc-text">Part of Speech Tagging</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#View-token-tags"><span class="toc-text">View token tags</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Coarse-grained-Part-of-speech-Tags"><span class="toc-text">Coarse-grained Part-of-speech Tags</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Fine-grained-Part-of-speech-Tags"><span class="toc-text">Fine-grained Part-of-speech Tags</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Working-with-POS-Tags"><span class="toc-text">Working with POS Tags</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Counting-POS-Tags"><span class="toc-text">Counting POS Tags</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Visualizing-Parts-of-Speech"><span class="toc-text">Visualizing Parts of Speech</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Creating-Visualizations-Outside-of-Jupyter"><span class="toc-text">Creating Visualizations Outside of Jupyter</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Handling-Large-Text"><span class="toc-text">Handling Large Text</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Customizing-the-Appearance"><span class="toc-text">Customizing the Appearance</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Named-Entity-Recognition"><span class="toc-text">Named Entity Recognition</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Entity-annotations"><span class="toc-text">Entity annotations</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NER-Tags"><span class="toc-text">NER Tags</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Adding-a-Named-Entity-to-a-Span"><span class="toc-text">Adding a Named Entity to a Span</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Adding-Named-Entities-to-All-Matching-Spans"><span class="toc-text">Adding Named Entities to All Matching Spans</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Counting-Entities"><span class="toc-text">Counting Entities</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Problem-with-Line-Breaks"><span class="toc-text">Problem with Line Breaks</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Noun-Chunks"><span class="toc-text">Noun Chunks</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#noun-chunks-components"><span class="toc-text">noun_chunks components:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Doc-noun-chunks-is-a-generator-function"><span class="toc-text">Doc.noun_chunks is a generator function</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Visualizing-Named-Entities"><span class="toc-text">Visualizing Named Entities</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Viewing-Sentences-Line-by-Line"><span class="toc-text">Viewing Sentences Line by Line</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Viewing-Specific-Entities"><span class="toc-text">Viewing Specific Entities</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Customizing-Colors-and-Effects"><span class="toc-text">Customizing Colors and Effects</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Sentence-Segmentation"><span class="toc-text">Sentence Segmentation</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Doc-sents-is-a-generator"><span class="toc-text">Doc.sents is a generator</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Convert-doc-sents-to-a-list"><span class="toc-text">Convert doc.sents to a list</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sents-are-spans"><span class="toc-text">sents are spans</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Adding-Rules-for-sentence-segmentation"><span class="toc-text">Adding Rules for sentence segmentation</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Why-not-change-the-token-directly"><span class="toc-text">Why not change the token directly?</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Changing-the-Rules"><span class="toc-text">Changing the Rules</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="solitude st-map-line"></i><span>最近发布</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/p/5871d67/" title="woff 字体反扒方案"><img alt="woff 字体反扒方案" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/221228-15574975489aa1.jpg"></a><div class="content"><a class="title" href="/p/5871d67/" title="woff 字体反扒方案">woff 字体反扒方案</a><a class="article-recent_post_categories" href="/p/5871d67/">研究</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/204d99f1/" title="【MyBatis】生命周期"><img alt="【MyBatis】生命周期" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/235335-1549900415dcc9.jpg"></a><div class="content"><a class="title" href="/p/204d99f1/" title="【MyBatis】生命周期">【MyBatis】生命周期</a><a class="article-recent_post_categories" href="/p/204d99f1/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/b585efd0/" title="敏感词过滤方案总结"><img alt="敏感词过滤方案总结" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture5.jpg"></a><div class="content"><a class="title" href="/p/b585efd0/" title="敏感词过滤方案总结">敏感词过滤方案总结</a><a class="article-recent_post_categories" href="/p/b585efd0/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/122902e7/" title="【并发】高并发下库存扣减如何避免超卖和少卖？"><img alt="【并发】高并发下库存扣减如何避免超卖和少卖？" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/cover8.JPG"></a><div class="content"><a class="title" href="/p/122902e7/" title="【并发】高并发下库存扣减如何避免超卖和少卖？">【并发】高并发下库存扣减如何避免超卖和少卖？</a><a class="article-recent_post_categories" href="/p/122902e7/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/683f7c8e/" title="网易云音乐歌名&amp;歌词获取方案收集"><img alt="网易云音乐歌名&amp;歌词获取方案收集" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture1.jpg"></a><div class="content"><a class="title" href="/p/683f7c8e/" title="网易云音乐歌名&amp;歌词获取方案收集">网易云音乐歌名&amp;歌词获取方案收集</a><a class="article-recent_post_categories" href="/p/683f7c8e/">教程</a></div></div></div></div></div></div></main><footer id="footer"><div id="st-footer-bar"><div class="footer-logo"><span class="solitude">Rean's Blog</span></div><div class="footer-bar-description">来自Rean's Blog - Enjoy technology and music的文章</div><a class="footer-bar-link" href="/">了解更多</a></div><div id="footer_deal"><a class="deal_link" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze" title="Github"><i class="solitude  st-github-line"></i></a><a class="deal_link" target="_blank" rel="noopener" href="https://space.bilibili.com/6531436" title="Bilibili"><i class="solitude  st-bilibili-line"></i></a></div><div id="st-footer"></div><div id="footer-bar"><div class="footer-bar-links"><div class="footer-bar-left"><div class="copyright">© 2024 By&nbsp;<a class="footer-bar-link" href="/">Rean</a></div></div><div class="footer-bar-right"><a class="footer-bar-link" target="_blank" rel="noopener" href="https://github.com/valor-x/hexo-theme-solitude" alt="主题">主题</a><a class="footer-bar-link cc" href="/null" aria-label="copyright"><i class="solitude st-copyright-line"></i><i class="solitude st-creative-commons-by-line"></i><i class="solitude st-creative-commons-nc-line"></i><i class="solitude st-creative-commons-nd-line"></i></a></div></div></div></footer></div><!-- right_menu--><div id="rightMenu"><div class="rightMenu-group rightMenu-small"><div class="rightMenu-item" id="menu-backward"><i class="solitude st-arrow-left-line"></i></div><div class="rightMenu-item" id="menu-forward"><i class="solitude st-arrow-right-line"></i></div><div class="rightMenu-item" id="menu-refresh"><i class="solitude st-restart-line"></i></div><div class="rightMenu-item" id="menu-top"><i class="solitude st-arrow-up-line"></i></div></div><div class="rightMenu-group rightMenu-line rightMenuPlugin"><div class="rightMenu-item" id="menu-copytext"><i class="solitude st-copy-fill"></i><span>复制选中文本</span></div><div class="rightMenu-item" id="menu-pastetext"><i class="solitude st-clipboard-fill"></i><span>粘贴文本</span></div><div class="rightMenu-item" id="menu-newwindow"><i class="solitude st-window-fill"></i><span>新窗口打开</span></div><div class="rightMenu-item" id="menu-copylink"><i class="solitude st-link-line"></i><span>复制链接地址</span></div><div class="rightMenu-item" id="menu-copyimg"><i class="solitude st-copy-fill"></i><span>复制此图片</span></div><div class="rightMenu-item" id="menu-downloadimg"><i class="solitude st-download-cloud-fill"></i><span>下载此图片</span></div><div class="rightMenu-item" id="menu-search"><i class="solitude st-search-line"></i><span>站内搜索</span></div><div class="rightMenu-item" id="menu-music-toggle"><i class="solitude st-play-fill"></i><span>播放音乐</span></div><div class="rightMenu-item" id="menu-music-back"><i class="solitude st-skip-back-fill"></i><span>切换到上一首</span></div><div class="rightMenu-item" id="menu-music-forward"><i class="solitude st-skip-forward-fill"></i><span>切换到下一首</span></div><div class="rightMenu-item" id="menu-music-copyMusicName"><i class="solitude st-copy-fill"></i><span>复制歌名</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><div class="rightMenu-item" id="menu-randomPost" onclick="toRandomPost()||rm.hideRightMenu()"><i class="solitude st-signal-tower-fill"></i><span>随机短文</span></div><div class="rightMenu-item" onclick="pjax.loadUrl('/categories/')||rm.hideRightMenu()"><i class="solitude st-checkbox-multiple-blank-fill"></i><span>全部分类</span></div><div class="rightMenu-item" onclick="pjax.loadUrl('/tags/')||rm.hideRightMenu()"><i class="solitude st-price-tag-fill"></i><span>全部标签</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><div class="rightMenu-item" id="menu-darkmode" onclick="sco.switchDarkMode()"><i class="solitude st-moon-clear-fill"></i><span class="menu-darkmode-text">深色模式</span></div><div class="rightMenu-item" id="menu-translate"><i class="solitude st-panben-line"></i><span>轉為繁體</span></div></div></div><div id="rightmenu-mask"></div><!-- inject body--><div><script src="/js/utils.js?v=1.8.10"></script><script src="/js/main.js?v=1.8.10"></script><script src="/js/third_party/waterfall.min.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/pjax/0.2.8/pjax.min.js"></script><script src="/js/third_party/universe.min.js?v=1.8.10"></script><script>dark()
+</script><script src="/js/tw_cn.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/vanilla-lazyload/19.1.3/lazyload.iife.min.js"></script><script src="https://cdn.staticfile.net/node-snackbar/0.1.16/snackbar.min.js"></script><script src="https://cdn.staticfile.net/fancyapps-ui/5.0.36/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.staticfile.net/Swiper/11.0.5/swiper-bundle.min.js"></script><script>var meting_api = 'https://meting.qjqq.cn/?server=:server&type=:type&id=:id&auth=:auth&r=:r';</script><script src="https://cdn.staticfile.net/aplayer/1.10.1/APlayer.min.js"></script><script src="https://cdn.staticfile.net/meting/2.0.1/Meting.min.js"></script><script>const coverColorConfig = {
+    api: 'https://api.qjqq.cn/api/Imgcolor?img=',
+    time: 43200000
+}</script><script src="/js/covercolor/api.js?v=1.8.10"></script><script src="/js/music.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/pace/1.2.4/pace.min.js"></script><script src="/js/right_menu.js?v=1.8.10"></script><div class="js-pjax"><script defer pjax src="https://cdn.staticfile.net/pearssauce-busuanzi/1.0.0/bsz.pure.min.js"></script></div></div><!-- newest comment--><!-- pjax--><script>const pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: ['title','#body-wrap','#site-config','meta[name="description"]','.js-pjax','meta[property^="og:"]','#config-diff'],
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+})
+
+document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+})
+
+document.addEventListener('pjax:complete', () => {
+    window.refreshFn()
+
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+        const newScript = document.createElement('script')
+        const content = item.text || item.textContent || item.innerHTML || ""
+        Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+        newScript.appendChild(document.createTextNode(content))
+        item.parentNode.replaceChild(newScript, item)
+    })
+
+    GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+})
+
+document.addEventListener('pjax:error', (e) => {
+    if (e.request.status === 404) {
+        pjax.loadUrl('/404.html')
+    }
+})</script><!-- theme--><script>initTheme = () => {
+    let isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const cachedMode = utils.saveToLocal.get('theme');
+    if (cachedMode === undefined) {
+        const nowMode =
+            isDarkMode ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', nowMode);
+    } else {
+        document.documentElement.setAttribute('data-theme', cachedMode);
+    }
+    is_rm && rm.mode(cachedMode === 'dark' && isDarkMode)
+}
+initTheme()</script><!-- google adsense--><!-- search--><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><button class="search-close-button"><i class="solitude st-close-fill"></i></button></nav><div class="search-wrap"><div class="search-box"><input class="search-box-input" id="search-input" type="text" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="输入关键词快速查找"></div><div id="search-results"><div id="search-hits"></div></div><div id="search-pagination"></div><div id="search-tips"></div></div></div><div id="search-mask"></div></div><script src="/js/search/local.js?v=1.8.10"></script><!-- music--><div class="needEndHide" id="nav-music" onclick="sco.musicToggle()"><div id="nav-music-hoverTips">音乐已暂停</div><meting-js id="421801417" server="netease" type="playlist" mutex="true" preload="none" data-lrctype="0" order="random" theme="var(--efu-main)"></meting-js></div></body></html><script>const posts=["p/5871d67/","p/204d99f1/","p/b585efd0/","p/122902e7/","p/683f7c8e/","p/36b252a1/","p/bbd98f0d/","p/1b320550/","p/30cd73ca/","p/332adb42/","p/4f877c1e/","p/677c7789/","p/f7f0a5f3/","p/9b5a538c/","p/37360bc0/","p/bb996d5/","p/364ea8cc/","p/a027699d/","p/21cdaec5/","p/37c37880/","p/a02febe4/","p/d1ec0e4e/","p/25d2b878/","p/8324e4bc/","p/6021f67a/","p/305331f0/","p/66be4b4/","p/de2d10bc/","p/e6628f8e/","p/4131eeff/","p/27705e17/","p/74e1a37c/","p/b5223f80/","p/9b8bc45a/","p/c9cb7159/","p/82c942ab/","p/4c19fcc6/","p/27446c6a/","p/9f38852a/","p/2516f5f2/","p/b27c77b3/","p/7a3264f/","p/7beadfaa/","p/e1d9906f/","p/a440b512/","p/a46aa116/","p/fe8dd3bd/","p/51c99199/","p/91b418a/","p/421add40/","p/9d7a18c7/","p/26345198/","p/fa30e874/","p/dea9a817/","p/59203ba6/","p/e5616c72/","p/971e9859/","p/d7f6ccff/","p/1b2ec1c2/","p/a0d1cef9/","p/a58b6af0/","p/9381aa6d/","p/38b8becb/","p/d0a26095/","p/2b3bdada/","p/ba70636/","p/374630f5/","p/a964a243/","p/a06e9899/","p/ef9a99de/","p/108f7c52/","p/a91c1846/","p/413576cf/","p/9ee60c65/","p/e74db628/","p/888c8bf3/","p/477dbe08/","p/38e8a510/","p/dfb41864/","p/b0e3506b/","p/e17fd725/","p/e1fe458c/","p/636cfdea/","p/7b854cb7/","p/b3a61240/","p/64f43fb4/","p/800f9a11/","p/4a48b34c/","p/b3641215/","p/53bc1fc9/","p/fc02f9ee/","p/25b929f6/","p/dd30b42/","p/3aa261db/","p/fc078742/","p/22c9d1d0/","p/33fc02d2/","p/70335ae0/","p/f32ef110/","p/f756486c/","p/8dd4b91f/","p/a290d941/","p/61a8a4ef/","p/c2d0bb20/","p/9770d71c/","p/41bd2aed/","p/bfebe40b/","p/6b4006e6/","p/b5696360/","p/53ab7115/","p/e6fa9b9/","p/866abf45/","p/b718b92a/","p/d26f4c21/","p/bc5d6bbe/","p/5a18917b/","p/5f2b1e2f/","p/2532a2ee/","p/4337b2c0/","p/e042d029/","p/9b4a91e5/","p/9d8ce868/","p/a69f6a48/","p/f9b9edb2/","p/cbe55d0/","p/156c59d0/","p/d4d6f818/","p/2574cf15/","p/a0efc292/","p/ec2ecf28/","p/85f11265/","p/db95e6f5/","p/a8296e6d/","p/4cc89a71/","p/d0fe2d0f/","p/ffab2f6b/","p/95d9f91e/","p/7f869365/","p/5b246b1b/","p/a9c92fa9/","p/7d49fec0/","p/a9a25fcd/","p/43bb383e/","p/b9aeb4/","p/52eaf228/","p/4be90d2f/","p/ed500d41/","p/dcfbc8e5/","p/240e5e52/","p/18cda1b3/","p/66a6c396/","p/5f33341/","p/f9bef31e/","p/acac46b/","p/a4189438/","p/ae6b0147/","p/4e982f2d/","p/403e0cac/","p/495b9f0f/","p/8e966ab9/","p/f6e1007e/","p/6f562d19/","p/10eac329/","p/cc53cf58/","p/4f2beac6/","p/73e2aa1/","p/c677e75e/","p/3f13b766/","p/cc30f00/","p/807cab5e/","p/5b5991e4/","p/e941ffc/"];function toRandomPost(){ pjax.loadUrl('/'+posts[Math.floor(Math.random()*posts.length)]); }</script>
