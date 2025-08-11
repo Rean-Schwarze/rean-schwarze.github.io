@@ -1,0 +1,1103 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><title>【Notes】前端基础知识（HTML/JavaScript/Vue） | Rean's Blog</title><noscript>开启JavaScript才能访问本站哦~</noscript><link rel="icon" href="/img/favicon.png"><!-- index.css--><link rel="stylesheet" href="/css/index.css?v=1.8.10"><!-- inject head--><link rel="stylesheet" href="https://cdn2.codesign.qq.com/icons/7pOrz0WXB5ZWJPX/latest/iconfont.css"><!-- aplayer--><link rel="stylesheet" href="https://cdn.staticfile.net/aplayer/1.10.1/APlayer.min.css"><!-- swiper--><link rel="stylesheet" href="https://cdn.staticfile.net/Swiper/11.0.5/swiper-bundle.min.css"><!-- fancybox ui--><link rel="stylesheet" href="https://cdn.staticfile.net/fancyapps-ui/5.0.36/fancybox/fancybox.min.css"><!-- katex--><!-- Open Graph--><meta name="description" content="不是零基础"><!-- pwa--><meta name="apple-mobile-web-app-capable" content="Rean's Blog"><meta name="theme-color" content="var(--efu-main)"><meta name="apple-mobile-web-app-status-bar-style" content="var(--efu-main)"><link rel="bookmark" href="/img/favicon.png"><link rel="apple-touch-icon" href="/img/favicon.png" sizes="180x180"><script>console.log(
+    "%c Program: Hexo %c Theme: Solitude %c Version: v1.8.10",
+    "border-radius:5px 0 0 5px;padding: 5px 10px;color:white;background:#ff3842;",
+    "padding: 5px 10px;color:white;background:#3e9f50;",
+    "padding: 5px 10px;color:white;background:#0084ff;",
+)
+</script><script>(()=>{
+        const saveToLocal = {
+            set: function setWithExpiry(key, value, ttl) {
+                if (ttl === 0)
+                    return
+                const now = new Date()
+                const expiryDay = ttl * 86400000
+                const item = {
+                    value: value,
+                    expiry: now.getTime() + expiryDay
+                }
+                localStorage.setItem(key, JSON.stringify(item))
+            },
+            get: function getWithExpiry(key) {
+                const itemStr = localStorage.getItem(key)
+    
+                if (!itemStr) {
+                    return undefined
+                }
+                const item = JSON.parse(itemStr)
+                const now = new Date()
+    
+                if (now.getTime() > item.expiry) {
+                    localStorage.removeItem(key)
+                    return undefined
+                }
+                return item.value
+            }
+        };
+        window.utils = {
+            saveToLocal: saveToLocal,
+            getCSS: (url, id = false) => new Promise((resolve, reject) => {
+              const link = document.createElement('link')
+              link.rel = 'stylesheet'
+              link.href = url
+              if (id) link.id = id
+              link.onerror = reject
+              link.onload = link.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                link.onload = link.onreadystatechange = null
+                resolve()
+              }
+              document.head.appendChild(link)
+            }),
+            getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+              const script = document.createElement('script')
+              script.src = url
+              script.async = true
+              script.onerror = reject
+              script.onload = script.onreadystatechange = function() {
+                const loadState = this.readyState
+                if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                script.onload = script.onreadystatechange = null
+                resolve()
+              }
+    
+              Object.keys(attr).forEach(key => {
+                script.setAttribute(key, attr[key])
+              })
+    
+              document.head.appendChild(script)
+            }),
+            addGlobalFn: (key, fn, name = false, parent = window) => {
+                const globalFn = parent.globalFn || {}
+                const keyObj = globalFn[key] || {}
+        
+                if (name && keyObj[name]) return
+        
+                name = name || Object.keys(keyObj).length
+                keyObj[name] = fn
+                globalFn[key] = keyObj
+                parent.globalFn = globalFn
+            },
+        }
+    })()</script><!-- global head--><script>const GLOBAL_CONFIG = {
+    root: '/',
+    algolia: undefined,
+    localsearch: {"preload":false,"path":"/search.xml"},
+    runtime: '2024-01-05 00:00:00',
+    lazyload: {
+        enable: true,
+        error: '/img/error_load.png'
+    },
+    copyright: {"limit":50,"author":"作者: Rean","link":"链接: ","source":"来源: Rean's Blog","info":"著作权归作者所有。 商业转载请联系作者获得授权，非商业转载请注明出处。"},
+    highlight: {
+        enable: true,
+        limit: 200,
+        expand: true,
+        copy: true,
+        syntax: 'highlight.js'
+    },
+    randomlink: false,
+    lang: {"theme":{"dark":"已切换至深色模式","light":"已切换至浅色模式"},"copy":{"success":"复制成功","error":"复制失败"},"backtop":"返回顶部","time":{"day":"天前","hour":"小时前","just":"刚刚","min":"分钟前","month":"个月前"},"f12":"开发者模式已打开，请遵循GPL协议。","totalk":"无需删除空行，直接输入评论即可","search":{"empty":"找不到你查询的内容：${query}","hit":"找到 ${hits} 条结果，用时 ${time} 毫秒","placeholder":"输入关键词快速查找","count":"共 <b>${count}</b> 条结果。"}},
+    aside: {
+        sayhello: {
+            morning: '一日之计在于晨',
+            noon: '吃饱了才有力气干活',
+            afternoon: '集中精力，攻克难关',
+            night: '不要太劳累了，早睡更健康',
+            goodnight: '睡个好觉，保证精力充沛',
+        },
+        sayhello2: ["🤖️ 数码科技爱好者","🔍 分享与热心帮助","🔨 设计开发一条龙","🎮 游戏爱好者"],
+    },
+    covercolor: {
+        enable: true
+    },
+    comment: false,
+    lightbox: 'fancybox',
+    post_ai: false,
+    right_menu: {"mode":{"dark":"深色模式","light":"浅色模式"},"img_error":"此图片无法复制与下载","music":{"start":"播放音乐","stop":"暂停音乐"},"translate":{"translateDelay":0,"defaultEncoding":2}},
+};</script><!-- page-config head--><script id="config-diff">var PAGE_CONFIG = {
+    is_post: true,
+    is_page: false,
+    is_home: false,
+    page: '',
+    toc: true,
+    comment: false,
+    ai_text: false,
+}</script><meta name="generator" content="Hexo 7.2.0"></head><body id="body"><!-- universe--><canvas id="universe"></canvas><!-- loading--><!-- console--><div id="console"><div class="close-btn" onclick="sco.hideConsole()"><i class="solitude st-close-fill"></i></div><div class="button-group"><div class="console-btn-item"><span class="darkmode_switchbutton" onclick="sco.switchDarkMode()" title="昼夜切换"><i class="solitude st-moon-clear-fill"></i></span></div><div class="console-btn-item" id="consoleHideAside"><span class="asideSwitch" onclick="sco.switchHideAside()" title="边栏显示控制"><i class="solitude st-side-bar-fill"></i></span></div><div class="console-btn-item" id="consoleMusic" onclick="sco.musicToggle()"><span class="music-switch" title="音乐开关"><i class="solitude st-disc-fill"></i></span></div></div><div class="console-mask" onclick="sco.hideConsole()"></div></div><!-- sidebar--><div id="sidebar" style="zoom: 1;"><div id="menu-mask" style="display: none;"></div><div id="sidebar-menus"><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">184</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">11</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">160</div></a></div></div></div><span class="sidebar-menu-item-title">功能</span><div class="sidebar-menu-item"><span class="darkmode_switchbutton menu-child" onclick="sco.switchDarkMode()"><i class="solitude st-moon-clear-fill"></i><span>显示模式</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文章</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  st-folder-fill"></i><span>文章列表</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  st-checkbox-multiple-blank-fill"></i><span>分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  st-price-tag-fill"></i><span>标签</span></a></li><li><a class="site-page child" href="/study/"><i class="solitude  st-gift-fill"></i><span>学习</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>我的</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="solitude  st-disc-fill"></i><span>音乐馆</span></a></li><li><a class="site-page child" href="/essay/"><span>即刻短文</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>关于本站</span></a></li></ul></div></div><span class="sidebar-menu-item-title">标签</span><div class="card-widget card-tags card-archives card-webinfo card-allinfo"><div class="card-tag-cloud"><a href="/tags/%E8%85%BE%E8%AE%AF/">腾讯<sup>1</sup></a><a href="/tags/%E5%90%8E%E5%8F%B0%E5%BC%80%E5%8F%91/">后台开发<sup>1</sup></a><a href="/tags/Markdown/">Markdown<sup>1</sup></a><a href="/tags/Butterfly/">Butterfly<sup>2</sup></a><a href="/tags/PyCharm/">PyCharm<sup>1</sup></a><a href="/tags/IDEA/">IDEA<sup>1</sup></a><a href="/tags/Git/">Git<sup>3</sup></a><a href="/tags/Halo/">Halo<sup>1</sup></a><a href="/tags/GitHub/">GitHub<sup>2</sup></a><a href="/tags/JavaFx/">JavaFx<sup>2</sup></a><a href="/tags/SpringBoot/">SpringBoot<sup>7</sup></a><a href="/tags/Java/">Java<sup>18</sup></a><a href="/tags/MyBatis/">MyBatis<sup>4</sup></a><a href="/tags/Hexo/">Hexo<sup>3</sup></a><a href="/tags/SyncTV/">SyncTV<sup>1</sup></a><a href="/tags/AList/">AList<sup>1</sup></a><a href="/tags/%E5%AE%9D%E5%A1%94/">宝塔<sup>3</sup></a><a href="/tags/Vue/">Vue<sup>19</sup></a><a href="/tags/Vite/">Vite<sup>7</sup></a><a href="/tags/JavaScript/">JavaScript<sup>5</sup></a><a href="/tags/TypeScript/">TypeScript<sup>3</sup></a><a href="/tags/Electron/">Electron<sup>4</sup></a><a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习<sup>1</sup></a><a href="/tags/scikit-learn/">scikit-learn<sup>1</sup></a><a href="/tags/vocalremover/">vocalremover<sup>1</sup></a><a href="/tags/BPM/">BPM<sup>1</sup></a><a href="/tags/%E9%BB%91%E7%A5%9E%E8%AF%9D%EF%BC%9A%E6%82%9F%E7%A9%BA/">黑神话：悟空<sup>1</sup></a><a href="/tags/HTTP/">HTTP<sup>5</sup></a><a href="/tags/HTTPS/">HTTPS<sup>2</sup></a><a href="/tags/%E7%9F%AD%E9%93%BE/">短链<sup>1</sup></a><a href="/tags/%E8%A7%86%E9%A2%91/">视频<sup>1</sup></a><a href="/tags/HTTP-1-1/">HTTP/1.1<sup>1</sup></a><a href="/tags/LaTex/">LaTex<sup>1</sup></a><a href="/tags/%E5%8A%A0%E5%AF%86/">加密<sup>1</sup></a><a href="/tags/IP/">IP<sup>2</sup></a><a href="/tags/ICMP/">ICMP<sup>1</sup></a><a href="/tags/I-O/">I/O<sup>2</sup></a><a href="/tags/JVM/">JVM<sup>2</sup></a><a href="/tags/Springboot/">Springboot<sup>1</sup></a><a href="/tags/ThreadLocal/">ThreadLocal<sup>1</sup></a><a href="/tags/UUID/">UUID<sup>1</sup></a><a href="/tags/%E5%B9%B6%E5%8F%91/">并发<sup>4</sup></a><a href="/tags/%E7%BA%A2%E9%BB%91%E6%A0%91/">红黑树<sup>2</sup></a><a href="/tags/%E9%93%BE%E8%A1%A8/">链表<sup>1</sup></a><a href="/tags/%E5%8A%9B%E6%89%A3/">力扣<sup>1</sup></a><a href="/tags/LeetCode/">LeetCode<sup>1</sup></a><a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库<sup>8</sup></a><a href="/tags/NLP/">NLP<sup>6</sup></a><a href="/tags/spaCy/">spaCy<sup>4</sup></a><a href="/tags/Python/">Python<sup>1</sup></a><a href="/tags/Redis/">Redis<sup>10</sup></a><a href="/tags/RDB/">RDB<sup>1</sup></a><a href="/tags/AOF/">AOF<sup>1</sup></a><a href="/tags/%E7%BA%BF%E7%A8%8B/">线程<sup>2</sup></a><a href="/tags/I-O%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8/">I/O多路复用<sup>2</sup></a><a href="/tags/Spring/">Spring<sup>5</sup></a><a href="/tags/TCP/">TCP<sup>7</sup></a><a href="/tags/UDP/">UDP<sup>1</sup></a><a href="/tags/Socket/">Socket<sup>1</sup></a><a href="/tags/FFMpeg/">FFMpeg<sup>1</sup></a><a href="/tags/%E6%A0%B7%E5%BC%8F/">样式<sup>1</sup></a><a href="/tags/ECMAScript/">ECMAScript<sup>2</sup></a><a href="/tags/Element/">Element<sup>3</sup></a><a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">分布式锁<sup>1</sup></a><a href="/tags/%E5%91%A8%E6%B7%B1/">周深<sup>7</sup></a><a href="/tags/%E5%BE%B5%E7%BE%BD%E6%91%A9%E6%9F%AF/">徵羽摩柯<sup>1</sup></a><a href="/tags/%E9%9F%B3%E4%B9%90%E7%BC%98%E8%AE%A1%E5%88%92/">音乐缘计划<sup>4</sup></a><a href="/tags/%E5%A5%A5%E6%96%AF%E5%8D%A1/">奥斯卡<sup>3</sup></a><a href="/tags/%E5%BC%A0%E6%9D%B0/">张杰<sup>2</sup></a><a href="/tags/%E5%A3%B0%E7%94%9F%E4%B8%8D%E6%81%AF%C2%B7%E5%AE%9D%E5%B2%9B%E5%AD%A3/">声生不息·宝岛季<sup>3</sup></a><a href="/tags/%E5%BE%90%E4%BD%B3%E8%8E%B9/">徐佳莹<sup>1</sup></a><a href="/tags/SynthV/">SynthV<sup>22</sup></a><a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统<sup>4</sup></a><a href="/tags/%E6%B0%B8%E5%A4%9CMinus/">永夜Minus<sup>6</sup></a><a href="/tags/%E9%9F%A6%E7%A4%BC%E5%AE%89/">韦礼安<sup>1</sup></a><a href="/tags/%E8%94%A1%E4%BE%9D%E6%9E%97/">蔡依林<sup>1</sup></a><a href="/tags/%E6%97%A0%E5%8F%82/">无参<sup>46</sup></a><a href="/tags/%E5%8F%A4%E9%A3%8E/">古风<sup>12</sup></a><a href="/tags/%E4%B8%89%E6%97%A0Marblue/">三无Marblue<sup>1</sup></a><a href="/tags/%E7%B4%A2%E5%BC%95/">索引<sup>1</sup></a><a href="/tags/B%E6%A0%91/">B树<sup>1</sup></a><a href="/tags/B-%E6%A0%91/">B+树<sup>1</sup></a><a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构<sup>1</sup></a><a href="/tags/%E6%A0%91/">树<sup>1</sup></a><a href="/tags/%E4%BA%8C%E5%8F%89%E6%A0%91/">二叉树<sup>1</sup></a><a href="/tags/%E8%AE%B8%E9%92%A7/">许钧<sup>1</sup></a><a href="/tags/%E6%AD%8C%E6%89%8B2024/">歌手2024<sup>37</sup></a><a href="/tags/Chante-Moore/">Chanté Moore<sup>2</sup></a><a href="/tags/%E9%BB%84%E5%AE%A3/">黄宣<sup>1</sup></a><a href="/tags/Faouzia/">Faouzia<sup>4</sup></a><a href="/tags/Lenka/">Lenka<sup>1</sup></a><a href="/tags/%E5%BC%A0%E9%92%B0%E7%90%AA/">张钰琪<sup>1</sup></a><a href="/tags/%E9%82%A3%E8%8B%B1/">那英<sup>9</sup></a><a href="/tags/%E5%B0%A4%E9%95%BF%E9%9D%96/">尤长靖<sup>2</sup></a><a href="/tags/%E5%AD%99%E6%A5%A0/">孙楠<sup>5</sup></a><a href="/tags/%E8%B0%AD%E7%BB%B4%E7%BB%B4/">谭维维<sup>3</sup></a><a href="/tags/%E5%B4%A9%E5%9D%8F%EF%BC%9A%E6%98%9F%E7%A9%B9%E9%93%81%E9%81%93/">崩坏：星穹铁道<sup>4</sup></a><a href="/tags/%E8%B5%A4%E7%BE%BD/">赤羽<sup>1</sup></a><a href="/tags/%E6%B1%AA%E8%8B%8F%E6%B3%B7/">汪苏泷<sup>4</sup></a><a href="/tags/%E5%A3%B0%E7%94%9F%E4%B8%8D%E6%81%AF%C2%B7%E5%AE%B6%E5%B9%B4%E5%8D%8E/">声生不息·家年华<sup>3</sup></a><a href="/tags/%E9%99%88%E6%A5%9A%E7%94%9F/">陈楚生<sup>3</sup></a><a href="/tags/%E9%99%88%E4%BA%A6%E6%B4%BA/">陈亦洺<sup>1</sup></a><a href="/tags/%E5%B0%9A%E8%BE%B0/">尚辰<sup>1</sup></a><a href="/tags/%E5%BF%98%E5%B7%9D%E9%A3%8E%E5%8D%8E%E5%BD%95/">忘川风华录<sup>2</sup></a><a href="/tags/%E4%B9%90%E6%AD%A3%E9%BE%99%E7%89%99/">乐正龙牙<sup>1</sup></a><a href="/tags/%E6%98%9F%E5%B0%98Infinity/">星尘Infinity<sup>4</sup></a><a href="/tags/%E6%98%8E%E6%97%A5%E6%96%B9%E8%88%9F/">明日方舟<sup>3</sup></a><a href="/tags/%E7%A5%96%E5%A8%85%E7%BA%B3%E6%83%9C/">祖娅纳惜<sup>1</sup></a><a href="/tags/%E7%94%B5%E5%AD%90/">电子<sup>1</sup></a><a href="/tags/%E6%98%9F%E5%B0%98/">星尘<sup>6</sup></a><a href="/tags/%E5%BC%A0%E4%BF%A1%E5%93%B2/">张信哲<sup>2</sup></a><a href="/tags/%E9%93%B6%E4%B8%B4/">银临<sup>1</sup></a><a href="/tags/%E6%9D%8E%E5%B8%B8%E8%B6%85/">李常超<sup>1</sup></a><a href="/tags/%E5%B1%B1%E8%89%B2%E6%9C%89%E6%97%A0%E4%B8%AD/">山色有无中<sup>1</sup></a><a href="/tags/%E5%91%A8%E6%9D%B0%E4%BC%A6/">周杰伦<sup>1</sup></a><a href="/tags/%E9%BB%84%E9%9C%84%E9%9B%B2/">黄霄雲<sup>1</sup></a><a href="/tags/%E5%AE%B9%E7%A5%96%E5%84%BF/">容祖儿<sup>1</sup></a><a href="/tags/%E6%88%91%E6%98%AF%E6%AD%8C%E6%89%8B%C2%B7%E7%AC%AC%E5%9B%9B%E5%AD%A3/">我是歌手·第四季<sup>1</sup></a><a href="/tags/%E6%9D%8E%E5%85%8B%E5%8B%A4/">李克勤<sup>1</sup></a><a href="/tags/%E7%B2%A4%E8%AF%AD/">粤语<sup>2</sup></a><a href="/tags/%E9%BB%84%E4%B8%BD%E7%8E%B2/">黄丽玲<sup>1</sup></a><a href="/tags/G-E-M-%E9%82%93%E7%B4%AB%E6%A3%8B/">G.E.M.邓紫棋<sup>7</sup></a><a href="/tags/T-I-M-E/">T.I.M.E.<sup>4</sup></a><a href="/tags/%E6%97%B6%E5%85%89%E9%9F%B3%E4%B9%90%E4%BC%9A%C2%B7%E8%80%81%E5%8F%8B%E8%AE%B0/">时光音乐会·老友记<sup>5</sup></a><a href="/tags/%E5%BC%A0%E5%AD%A6%E5%8F%8B/">张学友<sup>1</sup></a><a href="/tags/%E6%9D%A8%E4%B8%9E%E7%90%B3/">杨丞琳<sup>1</sup></a><a href="/tags/%E6%B1%AA%E5%B3%B0/">汪峰<sup>1</sup></a><a href="/tags/%E6%9C%AA%E5%AE%9A%E4%BA%8B%E4%BB%B6%E7%B0%BF/">未定事件簿<sup>1</sup></a><a href="/tags/%E5%BC%A0%E8%BF%9C/">张远<sup>1</sup></a><a href="/tags/%E5%AD%99%E7%87%95%E5%A7%BF/">孙燕姿<sup>2</sup></a><a href="/tags/%E6%B5%B7%E6%9D%A5%E9%98%BF%E6%9C%A8/">海来阿木<sup>1</sup></a><a href="/tags/%E6%9B%B9%E6%9D%A8/">曹杨<sup>3</sup></a><a href="/tags/%E4%B8%8B%E4%B8%80%E6%88%98%E6%AD%8C%E6%89%8B/">下一战歌手<sup>3</sup></a><a href="/tags/Fine%E4%B9%90%E5%9B%A2/">Fine乐团<sup>1</sup></a><a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络<sup>4</sup></a><a href="/tags/DNS/">DNS<sup>1</sup></a><a href="/tags/MAC/">MAC<sup>1</sup></a><a href="/tags/Adam-Lambert/">Adam Lambert<sup>1</sup></a><a href="/tags/%E4%BA%9A%E5%BD%93%C2%B7%E5%85%B0%E4%BC%AF%E7%89%B9/">亚当·兰伯特<sup>1</sup></a><a href="/tags/Hayden/">Hayden<sup>1</sup></a><a href="/tags/%E6%9A%AE%E5%A4%9C/">暮夜<sup>1</sup></a><a href="/tags/ACE-Studio/">ACE Studio<sup>3</sup></a><a href="/tags/%E5%B0%9A%E9%9B%AF%E5%A9%95/">尚雯婕<sup>1</sup></a><a href="/tags/%E4%B8%9C%E6%96%B9%E6%A0%80%E5%AD%90/">东方栀子<sup>2</sup></a><a href="/tags/%E9%BB%84%E7%BB%AE%E7%8F%8A/">黄绮珊<sup>1</sup></a><a href="/tags/%E5%8D%8E%E6%99%A8%E5%AE%87/">华晨宇<sup>1</sup></a><a href="/tags/JUN/">JUN<sup>1</sup></a><a href="/tags/%E6%9E%97%E5%BF%86%E8%8E%B2/">林忆莲<sup>1</sup></a><a href="/tags/UTAU/">UTAU<sup>1</sup></a><a href="/tags/Sheena/">Sheena<sup>1</sup></a><a href="/tags/%E5%89%A7%E5%A5%BD%E5%90%AC%E7%9A%84%E6%AD%8C/">剧好听的歌<sup>1</sup></a><a href="/tags/Syncthing/">Syncthing<sup>1</sup></a><a href="/tags/%E5%90%8C%E6%AD%A5/">同步<sup>1</sup></a><a href="/tags/%E6%94%AF%E4%BB%98%E5%AE%9D/">支付宝<sup>1</sup></a><a href="/tags/Apifox/">Apifox<sup>2</sup></a><a href="/tags/%E5%B2%B8%E6%99%93/">岸晓<sup>1</sup></a><a href="/tags/%E5%8D%95%E4%BE%9D%E7%BA%AF/">单依纯<sup>2</sup></a><a href="/tags/%E9%BB%84%E5%AD%90%E5%BC%98%E5%87%A1/">黄子弘凡<sup>1</sup></a><a href="/tags/%E5%A2%A8%E6%B8%85%E5%BC%A6/">墨清弦<sup>1</sup></a><a href="/tags/%E6%AD%8C%E6%89%8B2025/">歌手2025<sup>1</sup></a></div></div></div></div><!-- keyboard--><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav class="show" id="nav"><div id="nav-group"><div id="blog_name"><a id="site-name" href="/" title="返回博客主页"><span class="title">Rean's Blog</span></a></div><div id="page-name-mask"><div id="page-name"><a id="page-name-text" onclick="sco.toTop()">【Notes】前端基础知识（HTML/JavaScript/Vue）</a></div></div><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>文章</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="solitude  st-folder-fill"></i><span>文章列表</span></a></li><li><a class="site-page child" href="/categories/"><i class="solitude  st-checkbox-multiple-blank-fill"></i><span>分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="solitude  st-price-tag-fill"></i><span>标签</span></a></li><li><a class="site-page child" href="/study/"><i class="solitude  st-gift-fill"></i><span>学习</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>我的</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="solitude  st-disc-fill"></i><span>音乐馆</span></a></li><li><a class="site-page child" href="/essay/"><span>即刻短文</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><span>关于</span></a><ul class="menus_item_child"><li><a class="site-page child" href="/about/"><i class="solitude  st-contacts-fill"></i><span>关于本站</span></a></li></ul></div></div></div><div id="nav-left"></div><div id="nav-right"><div class="nav-button" id="randomPost_button"><a class="site-page" onclick="toRandomPost()" title="随机一篇文章" href="javascript:void(0);"><i class="solitude st-signal-tower-fill"></i></a></div><div class="nav-button" id="search-button"><a class="site-page social-icon search" href="javascript:void(0);" title="搜索"><i class="solitude st-search-line"></i></a></div><div class="nav-button" id="nav-console"><a class="console_switchbutton" onclick="sco.showConsole()" title="中控台" href="javascript:void(0);"><i class="solitude st-dashboard-fill"></i></a></div><div class="nav-button" id="nav-totop" onclick="sco.toTop()"><a class="totopbtn"><i class="solitude st-arrow-up-line"></i><span id="percent">0</span></a></div><div id="toggle-menu"><a class="site-page"><i class="solitude st-menu-line"></i></a></div></div></div></nav><div class="coverdiv" id="coverdiv"><img class="nolazyload" id="post-cover" src="https://npm.elemecdn.com/justlovesmile-photo/cover3.jpg" alt="【Notes】前端基础知识（HTML/JavaScript/Vue）"></div><div id="post-info"><div id="post-firstinfo"><div class="meta-firstline"><a class="post-meta-original" title="该文章为原创文章，注意版权协议">原创</a><span class="post-meta-categories"><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a></span><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Git/"><span class="tags-name tags-punctuation">Git</span></a><a class="post-meta__tags" href="/tags/GitHub/"><span class="tags-name tags-punctuation">GitHub</span></a><a class="post-meta__tags" href="/tags/Vue/"><span class="tags-name tags-punctuation">Vue</span></a><a class="post-meta__tags" href="/tags/Vite/"><span class="tags-name tags-punctuation">Vite</span></a><a class="post-meta__tags" href="/tags/JavaScript/"><span class="tags-name tags-punctuation">JavaScript</span></a></div></div></div></div><h1 class="post-title">【Notes】前端基础知识（HTML/JavaScript/Vue）</h1><div id="post-meta"><div class="meta-secondline"><span class="post-meta-date" title="发布于 2025-08-06 13:15:24"><i class="post-meta-icon solitude st-calendar-todo-fill"></i><time datetime="2025-08-06T05:15:24.000Z">2025-08-06T05:15:24.000Z</time></span><span class="post-meta-date" title="最后更新于 2025-08-08 17:35:10"><i class="post-meta-icon solitude st-refresh-line"></i><time datetime="2025-08-08T09:35:10.988Z">2025-08-08T09:35:10.988Z</time></span><span class="post-meta-wordcount"><i class="post-meta-icon solitude st-word-fill" title="文章字数"></i><span class="word-count">13.8k</span><span class="post-meta-separator"></span><i class="post-meta-icon solitude st-clock-fill" title="阅读耗时"></i><span>53 min</span></span><a class="post-meta-pv" href="/p/1c819578/" title="文章热度"><i class="post-meta-icon solitude st-fire-fill"></i><span id="busuanzi_page_pv"><i class="solitude st-loading-line"></i></span></a></div></div></div><section class="main-hero-waves-area waves-area"><svg class="waves-svg" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto"><defs><path id="gentle-wave" d="M -160 44 c 30 0 58 -18 88 -18 s 58 18 88 18 s 58 -18 88 -18 s 58 18 88 18 v 44 h -352 Z"></path></defs><g class="parallax"><use href="#gentle-wave" x="48" y="0"></use><use href="#gentle-wave" x="48" y="3"></use><use href="#gentle-wave" x="48" y="5"></use><use href="#gentle-wave" x="48" y="7"></use></g></svg></section></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="前端基础知识"><a href="#前端基础知识" class="headerlink" title="前端基础知识"></a>前端基础知识</h1><h2 id="常见浏览器内核"><a href="#常见浏览器内核" class="headerlink" title="常见浏览器内核"></a>常见浏览器内核</h2><ol>
+<li>WebKit：移动端适配及动画渲染，苹果生态深度整合，如 Safari</li>
+<li>Blink：基于 WebKit 分支演进，现代浏览器，支持最新 HTML5&#x2F;CSS3 标准，如 Chrome，Edge‌，360 浏览器</li>
+<li>Gecko：自主开源引擎，如 Firefox</li>
+<li>Trident：强化 IE 模拟能力，如 Edge 的兼容模式</li>
+</ol>
+<p>大部分国产浏览器基本上都是极速模式和兼容模式，极速模式内核为 Blink，兼容模式是 Trident。</p>
+<h2 id="怎样让-HTML-在所有浏览器版本下表现一致？"><a href="#怎样让-HTML-在所有浏览器版本下表现一致？" class="headerlink" title="怎样让 HTML 在所有浏览器版本下表现一致？"></a>怎样让 HTML 在所有浏览器版本下表现一致？</h2><h3 id="使用-CSS-重置（CSS-Reset）"><a href="#使用-CSS-重置（CSS-Reset）" class="headerlink" title="使用 CSS 重置（CSS Reset）"></a>使用 CSS 重置（CSS Reset）</h3><p>不同的浏览器有不同的默认样式，例如：不同浏览器的 <code>&lt;body&gt;</code> 标签、表格、按钮等元素的边距、字体、颜色等有所不同。使用 CSS 重置或标准化工具可以帮助消除这些默认样式差异，确保各个浏览器中的元素显示一致。</p>
+<p>常用的 CSS 重置方法包括：</p>
+<ul>
+<li><strong>Eric Meyer’s CSS Reset</strong>：<a target="_blank" rel="noopener" href="https://meyerweb.com/eric/tools/css/reset/">MeyerWeb CSS Reset</a></li>
+<li><strong>Normalize.css</strong>：<a target="_blank" rel="noopener" href="https://necolas.github.io/normalize.css/">Normalize.css</a>：比 CSS 重置更注重浏览器之间的默认样式统一。</li>
+</ul>
+<p>在 HTML 文件中引入重置或标准化样式：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">&quot;stylesheet&quot;</span> <span class="attr">href</span>=<span class="string">&quot;https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="使用浏览器兼容性前缀"><a href="#使用浏览器兼容性前缀" class="headerlink" title="使用浏览器兼容性前缀"></a>使用浏览器兼容性前缀</h3><p>一些 CSS 属性（如 <code>flexbox</code>、<code>grid</code>、<code>box-shadow</code> 等）在不同浏览器中可能需要加上浏览器厂商前缀，尤其是旧版浏览器。常见的前缀包括 <code>-webkit-</code>、<code>-moz-</code>、<code>-ms-</code> 和 <code>-o-</code>。</p>
+<p><strong>自动添加前缀</strong>：可以使用 CSS 自动前缀工具，例如：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://autoprefixer.github.io/">Autoprefixer</a>: 自动添加必要的浏览器前缀。</li>
+<li><strong>Sass&#x2F;SCSS</strong>、<strong>PostCSS</strong> 等工具集成自动添加前缀。</li>
+</ul>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line">/* Flexbox */</span><br><span class="line">.container &#123;</span><br><span class="line">  display: -webkit-flex; /* Safari */</span><br><span class="line">  display: -moz-flex; /* Firefox */</span><br><span class="line">  display: flex; /* Standard */</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="测试并调整在不同浏览器上的表现"><a href="#测试并调整在不同浏览器上的表现" class="headerlink" title="测试并调整在不同浏览器上的表现"></a>测试并调整在不同浏览器上的表现</h3><p>使用跨浏览器测试工具：</p>
+<ul>
+<li><strong>BrowserStack</strong>：<a target="_blank" rel="noopener" href="https://www.browserstack.com/">BrowserStack</a> 提供真实设备和浏览器的在线测试环境。</li>
+<li><strong>CrossBrowserTesting</strong>：<a target="_blank" rel="noopener" href="https://www.crossbrowsertesting.com/">CrossBrowserTesting</a> 允许你在多个浏览器和操作系统上进行测试。</li>
+<li><strong>Sauce Labs</strong>：<a target="_blank" rel="noopener" href="https://saucelabs.com/">Sauce Labs</a> 提供跨浏览器自动化测试。</li>
+</ul>
+<h2 id="CSS-如何与-HTML-协同工作的？"><a href="#CSS-如何与-HTML-协同工作的？" class="headerlink" title="CSS 如何与 HTML 协同工作的？"></a>CSS 如何与 HTML 协同工作的？</h2><p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/20250807102728.png" alt="HTML 引入 CSS 的三种方法"></p>
+<h3 id="内联样式-Inline-Style"><a href="#内联样式-Inline-Style" class="headerlink" title="内联样式 (Inline Style)"></a>内联样式 (Inline Style)</h3><p>行内样式直接在 HTML 元素的 style 属性中定义 CSS 规则。这种方式优先级最高，适用于单个元素的快速样式设置。</p>
+<ul>
+<li><strong>语法</strong>：在元素标签内添加 style 属性，属性值为 CSS 声明（多个声明用分号分隔）。</li>
+<li><strong>优点</strong>：简单快捷，优先级最高（覆盖其他样式）。</li>
+<li><strong>缺点</strong>：不易维护（样式与内容混杂），不适用于多元素复用。</li>
+<li><strong>适用场景</strong>：临时修改或测试单个元素样式。</li>
+</ul>
+<h3 id="内部样式-Internal-Style-Sheet-Embedded-Style"><a href="#内部样式-Internal-Style-Sheet-Embedded-Style" class="headerlink" title="内部样式 (Internal Style Sheet &#x2F; Embedded Style)"></a>内部样式 (Internal Style Sheet &#x2F; Embedded Style)</h3><p>内部样式在 HTML 文档的 <code>&lt;head&gt;</code> 部分使用 <code>&lt;style&gt;</code> 标签定义 CSS 规则。这种方式适用于单个网页的样式定制。</p>
+<ul>
+<li><strong>语法</strong>：在 <code>&lt;head&gt;</code> 中添加 <code>&lt;style&gt;</code> 标签，内容为 CSS 规则（选择器 + 声明）。</li>
+<li><strong>优点</strong>：集中管理单个页面的样式，易于维护（与内容分离）。</li>
+<li><strong>缺点</strong>：不能跨页面复用，优先级低于行内样式。</li>
+<li><strong>适用场景</strong>：小型网站或单页应用。</li>
+</ul>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>内部样式示例<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="language-css"></span></span><br><span class="line"><span class="language-css">        <span class="selector-tag">body</span> &#123;</span></span><br><span class="line"><span class="language-css">            <span class="attribute">background-color</span>: linen; <span class="comment">/* 背景颜色 */</span></span></span><br><span class="line"><span class="language-css">        &#125;</span></span><br><span class="line"><span class="language-css">        <span class="selector-tag">h1</span> &#123;</span></span><br><span class="line"><span class="language-css">            <span class="attribute">color</span>: maroon; <span class="comment">/* 标题颜色 */</span></span></span><br><span class="line"><span class="language-css">            <span class="attribute">margin-left</span>: <span class="number">40px</span>; <span class="comment">/* 左边距 */</span></span></span><br><span class="line"><span class="language-css">        &#125;</span></span><br><span class="line"><span class="language-css">        <span class="selector-tag">p</span> &#123;</span></span><br><span class="line"><span class="language-css">            <span class="attribute">font-family</span>: Arial, sans-serif; <span class="comment">/* 字体 */</span></span></span><br><span class="line"><span class="language-css">        &#125;</span></span><br><span class="line"><span class="language-css">    </span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">h1</span>&gt;</span>欢迎使用内部样式<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>这是一个使用内部样式的段落。<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="外部样式-External-Style-Sheet"><a href="#外部样式-External-Style-Sheet" class="headerlink" title="外部样式 (External Style Sheet)"></a>外部样式 (External Style Sheet)</h3><p>外部样式通过 <code>&lt;link&gt;</code> 标签链接到独立的 CSS 文件（扩展名为 <code>.css</code>）。这种方式最适合大型项目，实现样式复用。<em>推荐使用</em></p>
+<ul>
+<li><strong>语法</strong>：在 <code>&lt;head&gt;</code> 中添加 <code>&lt;link&gt;</code> 标签，指定 <code>href</code> 属性为 CSS 文件路径。</li>
+<li><strong>优点</strong>：最佳可维护性（样式与内容完全分离），支持多页面复用，优先级最低（便于全局覆盖）。</li>
+<li><strong>缺点</strong>：需要额外文件，加载速度略慢（需 HTTP 请求）。</li>
+<li><strong>适用场景</strong>：多页网站或团队协作项目。</li>
+</ul>
+<p><code>index.html</code>：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>外部样式示例<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">&quot;stylesheet&quot;</span> <span class="attr">type</span>=<span class="string">&quot;text/css&quot;</span> <span class="attr">href</span>=<span class="string">&quot;styles.css&quot;</span>&gt;</span> <span class="comment">&lt;!-- 链接外部CSS文件 --&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">h1</span>&gt;</span>外部样式标题<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>这是一个使用外部样式的段落。<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>style.css</code>：</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">body</span> &#123;</span><br><span class="line">    <span class="attribute">background-color</span>: <span class="number">#ffffff</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-tag">h1</span> &#123;</span><br><span class="line">    <span class="attribute">color</span>: green;</span><br><span class="line">    <span class="attribute">text-align</span>: center;</span><br><span class="line">&#125;</span><br><span class="line"><span class="selector-tag">p</span> &#123;</span><br><span class="line">    <span class="attribute">padding</span>: <span class="number">15px</span>;</span><br><span class="line">    <span class="attribute">border</span>: <span class="number">1px</span> solid <span class="number">#ccc</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="CSS-选择器优先级"><a href="#CSS-选择器优先级" class="headerlink" title="CSS 选择器优先级"></a>CSS 选择器优先级</h2><ol>
+<li><strong>CSS Hack</strong>：CSS hack 是通过在 CSS 样式中加入一些特殊的符号，让不同的浏览器识别不同的符号，以达到应用不同的 CSS 样式的目的。比如 <code>hack1&#123;width:300px;_width:200px;&#125;</code>，一般浏览器会先给元素使用 <code>width:300px;</code> 的样式，紧接着后面还有个 <code>_width:200px;</code> 由于下划线 <code>_width</code> 只有 IE6 可以识别，所以此样式在 IE6 中实际设置对象的宽度为 200px，而其他浏览器不识别 <code>_width</code> 不会执行 <code>_width:200px;</code> 这句样式。</li>
+<li><strong>内嵌 CSS</strong></li>
+<li><strong>id 选择器</strong></li>
+<li><strong>class 选择器</strong></li>
+<li><strong>标签选择器</strong></li>
+</ol>
+<h2 id="CSS-常用长度单位"><a href="#CSS-常用长度单位" class="headerlink" title="CSS 常用长度单位"></a>CSS 常用长度单位</h2><p>CSS 中有两种类型的长度——相对长度和绝对长度。</p>
+<h3 id="绝对长度单位"><a href="#绝对长度单位" class="headerlink" title="绝对长度单位"></a>绝对长度单位</h3><table>
+<thead>
+<tr>
+<th align="left">单位</th>
+<th align="left">名称</th>
+<th align="left">等价换算</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>cm</code></td>
+<td align="left">厘米</td>
+<td align="left">1cm &#x3D; 37.8px</td>
+</tr>
+<tr>
+<td align="left"><code>mm</code></td>
+<td align="left">毫米</td>
+<td align="left">1mm &#x3D; 3.78px</td>
+</tr>
+<tr>
+<td align="left"><code>Q</code></td>
+<td align="left">四分之一毫米</td>
+<td align="left">1Q &#x3D; 0.945px &#x3D; 0.25mm</td>
+</tr>
+<tr>
+<td align="left"><code>in</code></td>
+<td align="left">英寸</td>
+<td align="left">1in &#x3D; 96px &#x3D; 2.54cm</td>
+</tr>
+<tr>
+<td align="left"><code>pc</code></td>
+<td align="left">派卡</td>
+<td align="left">1pc &#x3D; 16px ≈ 0.4233cm</td>
+</tr>
+<tr>
+<td align="left"><code>pt</code></td>
+<td align="left">磅</td>
+<td align="left">1pt &#x3D; 4&#x2F;3 px ≈ 0.3527mm</td>
+</tr>
+<tr>
+<td align="left"><code>px</code></td>
+<td align="left">像素</td>
+<td align="left">1px &#x3D; 1&#x2F;96in ≈ 0.2646mm</td>
+</tr>
+</tbody></table>
+<p>这些单位大多在用于印刷而非屏幕输出时更有用。例如，我们通常不在屏幕上使用 <code>cm</code>（厘米），唯一应该常用的值是 <code>px</code>（像素） ，1px 被定义为 <strong>1&#x2F;96 英寸</strong>，也就是说，在标准的 96 DPI（点每英寸）的显示设备上，1px 应该精确对应屏幕上的一个物理像素点。</p>
+<p><code>px</code> 实际渲染中存在着相对性：</p>
+<ul>
+<li><strong>设备像素密度 (PPI&#x2F;DPI):</strong> 这是关键点。现代设备（尤其是智能手机、平板电脑、高清&#x2F;视网膜显示器）的像素密度 <strong>远高于</strong> 96 PPI。在 iPhone 的 Retina 显示屏上，PPI 可能高达 400 多。</li>
+<li><strong>CSS 像素 vs 设备像素:</strong> 为了保持网页元素在不同设备上视觉尺寸的相对一致性（避免在高 PPI 屏幕上元素变得极小），浏览器会进行 <strong>映射</strong>。在高 PPI 屏幕上：<ul>
+<li>1 个 <code>px</code>（CSS 像素）不再对应 1 个物理设备像素。</li>
+<li>1 个 <code>px</code> 会被放大显示，占据多个物理设备像素的位置。</li>
+</ul>
+</li>
+<li><strong>用户缩放:</strong> 当用户在浏览器中放大或缩小时，浏览器会重新计算 <code>px</code> 的实际显示大小。放大页面时，1px 会占据更多的屏幕空间（更多的物理像素），使其看起来更大；缩小则反之。</li>
+<li><strong>操作系统缩放 (Windows&#x2F;Mac 缩放设置):</strong> 如果用户在操作系统层面设置了显示缩放（例如放大到 125%, 150%），浏览器会将 <code>px</code> 值按比例放大或缩小，以匹配用户的系统偏好。</li>
+</ul>
+<h3 id="相对长度单位"><a href="#相对长度单位" class="headerlink" title="相对长度单位"></a>相对长度单位</h3><p>相对长度单位是相对于其他某些东西的。例如：</p>
+<ul>
+<li><code>em</code> 相对于本元素的字体大小，或者在用于 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/font-size"><code>font-size</code></a> 时相对于父元素的字体大小。<code>rem</code> 相对于根元素的字体大小。</li>
+<li><code>vh</code> 和 <code>vw</code> 分别相对于视口的高度和宽度。如果你更改浏览器窗口的宽度，那么框的大小应该会更改。示例：<a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/length">https://developer.mozilla.org/zh-CN/docs/Web/CSS/length</a></li>
+</ul>
+<p>使用相对单位的好处是，通过一些精心的规划，你可以使文本或其他元素的大小相对于页面上的任何指定的东西进行缩放。要获取可用的相对单位的完整列表，请参阅 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/length"><code>&lt;length&gt;</code></a> 类型的参考页面。</p>
+<h4 id="em-与-rem"><a href="#em-与-rem" class="headerlink" title="em 与 rem"></a>em 与 rem</h4><p><strong><code>em</code> 单位在用于 <code>font-size</code> 时表示“父元素的字体大小”</strong>（而在用于其他属性时则表示“自身的字体大小”）。类为 <code>ems</code> 的 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Reference/Elements/ul"><code>&lt;ul&gt;</code></a> 元素内部的 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Reference/Elements/li"><code>&lt;li&gt;</code></a> 元素的尺寸是从它们的父元素继承的。因此，每一层嵌套都会逐渐变大，因为每个元素的字体大小都被设置为 <code>1.3em</code> —— 即其父元素字体大小的 1.3 倍。</p>
+<p><strong><code>rem</code> 单位的意思是“根元素的字体大小”</strong>（rem 代表“root em”）。类为 <code>rems</code> 的 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Reference/Elements/ul"><code>&lt;ul&gt;</code></a> 内部的 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Reference/Elements/li"><code>&lt;li&gt;</code></a>，其字体大小取决于根元素（<code>&lt;html&gt;</code>）。这意味着每层嵌套不会让字体越变越大。低于 IE8（含 IE8）不支持。</p>
+<h2 id="Flex-布局"><a href="#Flex-布局" class="headerlink" title="Flex 布局"></a>Flex 布局</h2><p><strong>Flex 布局</strong>，即 <strong>Flex Box</strong>（弹性布局），是一种较为灵活、强大的页面 CSS 布局方式。在深入学习 Flex 布局前，我们需要了解一些 Flex 相关的概念和术语。</p>
+<p>Flex 布局的优点：</p>
+<ul>
+<li>简便、完整、响应式</li>
+<li>浏览器支持良好</li>
+<li>传统盒状模型中，难以实现的垂直等布局等 ，Flex 布局可以完美解决。</li>
+</ul>
+<p>注意，设为 Flex 布局以后，子元素的 float、clear 和 vertical-align 属性将失效。</p>
+<h3 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h3><ul>
+<li>flex 容器（flex container）</li>
+<li>flex 项目（flex item）</li>
+<li>主轴（main axis)</li>
+<li>交叉轴（cross axis）</li>
+<li>占用主轴空间（main size）</li>
+<li>占用交叉轴空间（cross size）</li>
+<li>线轴起止点（main start、main end、cross start、cross end）</li>
+</ul>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/3791e575c48b3698be6a94ae1dbff79d.png"></p>
+<h4 id="容器与项目"><a href="#容器与项目" class="headerlink" title="容器与项目"></a>容器与项目</h4><p>使用 Flex 布局的元素（display: flex），称之为 <strong>Flex 容器（Flex Container）</strong>，简称 “容器”。Flex 的布局发生在父容器和子容器之间，因此，<strong>元素一旦被申明为 Flex 布局后，它的所有子元素自动成为容器成员。</strong> 通常，我们将容器内的成员统称为 <strong>Flex 项目（Flex item）</strong>，简称 “项目”。</p>
+<p>容器属性：</p>
+<table>
+<thead>
+<tr>
+<th align="left">属性</th>
+<th align="left">取值</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">display</td>
+<td align="left">flex、inline-flex</td>
+<td align="left">flex：定义一个 Flex 容器，弹性盒子 inline-flex：定义一个内联元素为 Flex 容器</td>
+</tr>
+<tr>
+<td align="left">flex-direction</td>
+<td align="left">row （默认）、row-reverse、column、column-reverse</td>
+<td align="left">定义主轴的方向，分别是从左到右、从右到左、从上到下、从下到上 <br/> <img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/0cbe5f8268121114e87d0546e53cda6e.png"></td>
+</tr>
+<tr>
+<td align="left">flex-wrap</td>
+<td align="left">nowrap（默认，不换行）、wrap（换行）、wrap-reverse（反向换行）</td>
+<td align="left">默认情况下，项目都排在一条线（又称”轴线”）上。flex-wrap 属性定义，如果一条轴线排不下，如何换行。<br/> <img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/e4277f3b18e6aad0639d4032fc0ddb47.png"></td>
+</tr>
+<tr>
+<td align="left">flex-flow</td>
+<td align="left"><code>&lt;flex-direction&gt;</code> <code>&lt;flex-wrap&gt;</code></td>
+<td align="left">flex-direction 与 flex-wrap 的缩写形式。</td>
+</tr>
+<tr>
+<td align="left">justify-content</td>
+<td align="left">flex-start（默认，左对齐）、flex-end（右对齐）、center（居中）、space-between、space-around</td>
+<td align="left">flex 项目在主轴上的对齐方式。<br/> <img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/e7e052cc3cd5974f29d7d447b1de71bd.png"></td>
+</tr>
+<tr>
+<td align="left">align-items</td>
+<td align="left">flex-start、flex-end、center、stretch、baseline</td>
+<td align="left">定义项目在交叉轴上对齐方式 <br/> <img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/2b0c39c7e7a80d5a784c8c2ca63cde17.png"></td>
+</tr>
+<tr>
+<td align="left">align-content</td>
+<td align="left">flex-start、flex-end、center、space-between、space-around、stetch</td>
+<td align="left">定义多条线轴对齐方式，若只有一条线轴。若仅有一条线轴，该属性无效。<br> <img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/f10918ccb8a13247c9d47715a2bd2c33.png"></td>
+</tr>
+</tbody></table>
+<h4 id="主轴与交叉轴"><a href="#主轴与交叉轴" class="headerlink" title="主轴与交叉轴"></a>主轴与交叉轴</h4><p>主轴由 <code>flex-direction</code> 定义，交叉轴垂直于主轴，所以如果 <code>flex-direction</code>（主轴）设成了 <code>row</code> 或者 <code>row-reverse</code> 的话，交叉轴的方向就是沿着上下方向延伸的。</p>
+<h2 id="Grid-布局"><a href="#Grid-布局" class="headerlink" title="Grid 布局"></a>Grid 布局</h2><p>栅格布局（Grid Layout）是一种基于网格系统的布局方式，将页面划分为多个网格单元，通过对网格单元的组合和排列，实现各种复杂的页面布局。栅格布局具有良好的灵活性和可扩展性，可以帮助我们快速地实现响应式设计。</p>
+<p>示例：</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/DE5DE2B3-1C7A-42B4-AD5F-07211CC54D75.jpeg" alt="Grid 布局示例图"></p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;utf-8&quot;</span>&gt;</span> </span><br><span class="line"><span class="tag">&lt;<span class="name">title</span>&gt;</span>菜鸟教程(runoob.com)<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="language-css"></span></span><br><span class="line"><span class="language-css"><span class="selector-class">.item1</span> &#123; <span class="attribute">grid-area</span>: header; &#125;</span></span><br><span class="line"><span class="language-css"><span class="selector-class">.item2</span> &#123; <span class="attribute">grid-area</span>: menu; &#125;</span></span><br><span class="line"><span class="language-css"><span class="selector-class">.item3</span> &#123; <span class="attribute">grid-area</span>: main; &#125;</span></span><br><span class="line"><span class="language-css"><span class="selector-class">.item4</span> &#123; <span class="attribute">grid-area</span>: right; &#125;</span></span><br><span class="line"><span class="language-css"><span class="selector-class">.item5</span> &#123; <span class="attribute">grid-area</span>: footer; &#125;</span></span><br><span class="line"><span class="language-css"></span></span><br><span class="line"><span class="language-css"><span class="selector-class">.grid-container</span> &#123;</span></span><br><span class="line"><span class="language-css">  <span class="attribute">display</span>: grid;</span></span><br><span class="line"><span class="language-css">  <span class="attribute">grid</span>:</span></span><br><span class="line"><span class="language-css">  <span class="string">&#x27;header header header header header header&#x27;</span></span></span><br><span class="line"><span class="language-css">  <span class="string">&#x27;menu main main main right right&#x27;</span></span></span><br><span class="line"><span class="language-css">  <span class="string">&#x27;menu footer footer footer footer footer&#x27;</span>;</span></span><br><span class="line"><span class="language-css">  <span class="attribute">grid-gap</span>: <span class="number">10px</span>;</span></span><br><span class="line"><span class="language-css">  <span class="attribute">background-color</span>: <span class="number">#2196F3</span>;</span></span><br><span class="line"><span class="language-css">  <span class="attribute">padding</span>: <span class="number">10px</span>;</span></span><br><span class="line"><span class="language-css">&#125;</span></span><br><span class="line"><span class="language-css"></span></span><br><span class="line"><span class="language-css"><span class="selector-class">.grid-container</span> &gt; <span class="selector-tag">div</span> &#123;</span></span><br><span class="line"><span class="language-css">  <span class="attribute">background-color</span>: <span class="built_in">rgba</span>(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">0.8</span>);</span></span><br><span class="line"><span class="language-css">  <span class="attribute">text-align</span>: center;</span></span><br><span class="line"><span class="language-css">  <span class="attribute">padding</span>: <span class="number">20px</span> <span class="number">0</span>;</span></span><br><span class="line"><span class="language-css">  <span class="attribute">font-size</span>: <span class="number">30px</span>;</span></span><br><span class="line"><span class="language-css">&#125;</span></span><br><span class="line"><span class="language-css"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span>&gt;</span>网页模版<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>您可以使用 grid-area 属性来命名网格项。<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>通过使用网格容器上的 grid 属性，您可以在设置网格布局时引用该名称。<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>以下网格布局包含六列和三行：<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;grid-container&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;item1&quot;</span>&gt;</span>头部<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;item2&quot;</span>&gt;</span>菜单<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;item3&quot;</span>&gt;</span>主要内容区域<span class="tag">&lt;/<span class="name">div</span>&gt;</span>  </span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;item4&quot;</span>&gt;</span>右侧<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;item5&quot;</span>&gt;</span>底部<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="与-Flex-布局的区别"><a href="#与-Flex-布局的区别" class="headerlink" title="与 Flex 布局的区别"></a>与 Flex 布局的区别</h3><table>
+<thead>
+<tr>
+<th></th>
+<th>Flex 布局</th>
+<th>Grid 布局</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>布局维度</td>
+<td>一维布局（单行或单列），只处理水平或垂直方向的排列</td>
+<td>二维布局（同时处理行和列），可以精确定义行和列的结构</td>
+</tr>
+<tr>
+<td>响应式设计</td>
+<td>通过 flex-wrap 和 flex-basis 实现简单的换行和自适应宽度</td>
+<td>通过 repeat()、auto-fit、auto-fill 和 minmax()) 实现更复杂的响应式网络</td>
+</tr>
+<tr>
+<td>使用场景</td>
+<td>导航栏、面包屑、按钮组 <br> 垂直居中某个元素 <br> 等分布局（如等分宽度的卡片）</td>
+<td>网页整体布局（页眉、侧边栏、内容区、页脚）<br> 图片网格、产品展示 <br> 需要精确控制行列的复杂排版</td>
+</tr>
+</tbody></table>
+<h2 id="JavaScript-简介"><a href="#JavaScript-简介" class="headerlink" title="JavaScript 简介"></a>JavaScript 简介</h2><h3 id="JavaScript-和-Java-的区别"><a href="#JavaScript-和-Java-的区别" class="headerlink" title="JavaScript 和 Java 的区别"></a>JavaScript 和 Java 的区别</h3><table>
+<thead>
+<tr>
+<th>分类</th>
+<th>JavaScript</th>
+<th>Java</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>起源</td>
+<td>Netscape 公司的产品，其目的是为了扩展 Netscape Navigator 功能而开发的一种可以嵌入 Web 页面中的基于对象和事件驱动的解释性语言，最初的名字并不是 JavaScript，而是 LiveScript，名字中的“Java”是经过 SUN Microsystems 公司授权的。</td>
+<td>SUN Microsystems 公司推出的新一代面向对象的程序设计语言，特别适合于 Internet 应用程序开发。</td>
+</tr>
+<tr>
+<td>对象模型&#x2F;范式</td>
+<td>基于对象，是一种基于对象和事件驱动的编程语言，自身具有已创建完毕的对象。</td>
+<td>面向对象，对象必须从类中创建。</td>
+</tr>
+<tr>
+<td>代码嵌入方式</td>
+<td>JavaScript 的代码以字符的形式嵌入在 HTML 文档中，使用 <code>&lt;script&gt;&lt;/script&gt;</code> 来标识</td>
+<td>Java Applets 则是由文档引用，其代码以字节代码的形式保存在另一个独立的文件中，用标识 <code>&lt;applet&gt;</code> 来标明</td>
+</tr>
+<tr>
+<td>编译&#x2F;执行方式</td>
+<td>源代码在发往客户端执行之前不需经过编译，而是将文本格式的字符代码发送给客户，即 JavaScript 语句本身随 Web 页面一起下载下来，由浏览器解释执行</td>
+<td>代码在传递到客户端执行之前，必须经过编译，因而客户端上必须具有相应平台上的仿真器或解释器，它可以通过编译器或解释器实现独立于某个特定的平台编译代码</td>
+</tr>
+<tr>
+<td>变量声明</td>
+<td>采用弱类型，即变量在使用前不需作声明，而是解释器在运行时检查其数据类型</td>
+<td>采用强类型变量检查，即所有变量在编译之前必须作声明</td>
+</tr>
+<tr>
+<td>联编方式</td>
+<td>采用动态联编，即 JavaScript 的对象引用在运行时进行检查</td>
+<td>采用静态联编，即 Java 的对象引用必须在编译时进行，以使编译器能够实现强类型检查</td>
+</tr>
+</tbody></table>
+<h3 id="核心"><a href="#核心" class="headerlink" title="核心"></a>核心</h3><p>JavaScript 是一种在浏览器中运行的脚本语言，用于增强网页交互性。它由三个核心部分组成：ECMAScript、DOM（文档对象模型）和 BOM（浏览器对象模型）。</p>
+<h4 id="ECMAScript"><a href="#ECMAScript" class="headerlink" title="ECMAScript"></a>ECMAScript</h4><p>ECMAScript 是 JavaScript 的核心语言规范，定义了 JavaScript 的语法、类型、语句、关键字、保留字、运算符、对象等基本构成部分，规定了 JavaScript 运行的基础环境，使得 JavaScript 可以在各种浏览器和平台（Node.js 等环境）上运行。</p>
+<p>ECMAScript 6（ES6）是 JavaScript 语言的新一代标准，在 2015 年 6 月正式发布。2015 年后，ECMAScript 改为每年发布一个新版本，命名规则为 ES + 年份（如 ES2020、ES2021），都是增量更新。</p>
+<h5 id="变量定义"><a href="#变量定义" class="headerlink" title="变量定义"></a>变量定义</h5><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>var</th>
+<th>let</th>
+<th>const</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>重新赋值</td>
+<td>✅</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>必须初始化</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>作用域</td>
+<td>函数&#x2F;全局</td>
+<td>块级</td>
+<td>块级</td>
+</tr>
+<tr>
+<td>变量提升</td>
+<td>是（值为 undefined）</td>
+<td>是（存在 TDZ）</td>
+<td>是（存在 TDZ）</td>
+</tr>
+<tr>
+<td>重复声明</td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+</tbody></table>
+<p>TDZ 是 Temporal Dead Zone（暂时性死区）的缩写，是 JavaScript 中 let 和 const 变量的一个概念。在 ES6 中，let 和 const 引入了块级作用域（block scope），而它们声明的变量在声明之前的作用域中是不可访问的，这段不可访问的区域就是 <strong>暂时性死区</strong>。</p>
+<h5 id="对象"><a href="#对象" class="headerlink" title="对象"></a>对象</h5><p><strong>（1）扩展运算符</strong></p>
+<p>拓展运算符（…）用于取出参数对象所有可遍历属性然后拷贝到当前对象。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> age = &#123;<span class="attr">age</span>: <span class="number">15</span>&#125;;</span><br><span class="line"><span class="keyword">let</span> name = &#123;<span class="attr">name</span>: <span class="string">&quot;Amy&quot;</span>&#125;;</span><br><span class="line"><span class="keyword">let</span> person = &#123;...age, ...name&#125;;</span><br><span class="line">person;  <span class="comment">//&#123;age: 15, name: &quot;Amy&quot;&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>注意：自定义的属性和拓展运算符对象里面属性的相同的时候，<strong>自定义的属性在拓展运算符后面，则拓展运算符对象内部同名的属性将被覆盖掉；</strong> 自定义的属性在拓展运算度前面，则变成设置新对象默认属性值。</p>
+<p><strong>（2）复制对象</strong></p>
+<p>使用：Object.assign(target, source_1, ···)，可以将源对象的所有可枚举属性复制到目标对象中。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> target = &#123;<span class="attr">a</span>: <span class="number">1</span>&#125;;</span><br><span class="line"><span class="keyword">let</span> object2 = &#123;<span class="attr">b</span>: <span class="number">2</span>&#125;;</span><br><span class="line"><span class="keyword">let</span> object3 = &#123;<span class="attr">c</span>: <span class="number">3</span>&#125;;</span><br><span class="line"><span class="title class_">Object</span>.<span class="title function_">assign</span>(target,object2,object3);  </span><br><span class="line"><span class="comment">// 第一个参数是目标对象，后面的参数是源对象</span></span><br><span class="line">target;  <span class="comment">// &#123;a: 1, b: 2, c: 3&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>如果该函数只有一个参数，当参数为对象时，直接返回该对象；当参数不是对象时，会先将参数转为对象然后返回。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="title class_">Object</span>.<span class="title function_">assign</span>(<span class="number">3</span>);         <span class="comment">// Number &#123;3&#125;</span></span><br><span class="line"><span class="keyword">typeof</span> <span class="title class_">Object</span>.<span class="title function_">assign</span>(<span class="number">3</span>);  <span class="comment">// &quot;object&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>因为 null 和 undefined 不能转化为对象，所以会报错：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="title class_">Object</span>.<span class="title function_">assign</span>(<span class="literal">null</span>);       <span class="comment">// TypeError: Cannot convert undefined or null to object</span></span><br><span class="line"><span class="title class_">Object</span>.<span class="title function_">assign</span>(<span class="literal">undefined</span>);  <span class="comment">// TypeError: Cannot convert undefined or null to object</span></span><br></pre></td></tr></table></figure>
+
+<p>当参数不止一个时，null 和 undefined 不放第一个，即不为目标对象时，会跳过 null 和 undefined ，不报错</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="title class_">Object</span>.<span class="title function_">assign</span>(<span class="number">1</span>,<span class="literal">undefined</span>);  <span class="comment">// Number &#123;1&#125;</span></span><br><span class="line"><span class="title class_">Object</span>.<span class="title function_">assign</span>(&#123;<span class="attr">a</span>: <span class="number">1</span>&#125;,<span class="literal">null</span>);  <span class="comment">// &#123;a: 1&#125;</span></span><br><span class="line"> </span><br><span class="line"><span class="title class_">Object</span>.<span class="title function_">assign</span>(<span class="literal">undefined</span>,&#123;<span class="attr">a</span>: <span class="number">1</span>&#125;);  <span class="comment">// TypeError: Cannot convert undefined or null to object</span></span><br></pre></td></tr></table></figure>
+
+<p>注意：<strong>assign 的属性拷贝是浅拷贝</strong></p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> sourceObj = &#123; <span class="attr">a</span>: &#123; <span class="attr">b</span>: <span class="number">1</span>&#125;&#125;;</span><br><span class="line"><span class="keyword">let</span> targetObj = &#123;<span class="attr">c</span>: <span class="number">3</span>&#125;;</span><br><span class="line"><span class="title class_">Object</span>.<span class="title function_">assign</span>(targetObj, sourceObj);</span><br><span class="line">targetObj.<span class="property">a</span>.<span class="property">b</span> = <span class="number">2</span>;</span><br><span class="line">sourceObj.<span class="property">a</span>.<span class="property">b</span>;  <span class="comment">// 2</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>（3）解构</strong></p>
+<p>解构是 ES6 新加的 <strong>解构</strong> 功能，可以使得我们获取数据更方便，从而提高日常编码效率。解构可以用于对象，也可以用于数组。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> node = &#123;</span><br><span class="line">    <span class="attr">name</span>: <span class="string">&#x27;mike&#x27;</span>,</span><br><span class="line">    <span class="attr">age</span>: <span class="number">25</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">let</span> &#123;name, age&#125; = node;</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(name); <span class="comment">// mike</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(age); <span class="comment">// 25</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>（4）箭头函数</strong></p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>普通函数</th>
+<th>箭头函数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>声明语法</td>
+<td>function sum(a, b) {return a+b;}</td>
+<td>const sum &#x3D;(a, b)&#x3D;&gt; a+b;</td>
+</tr>
+<tr>
+<td>简写形式</td>
+<td>无</td>
+<td>单参数可省略括号：const func &#x3D; x &#x3D;&gt; x*2;</td>
+</tr>
+<tr>
+<td>多行体</td>
+<td>function(){…}</td>
+<td>()&#x3D;&gt;{const x &#x3D; 1; return x;}</td>
+</tr>
+<tr>
+<td>this 绑定</td>
+<td>动态（调用者）</td>
+<td>静态（继承父级）</td>
+</tr>
+<tr>
+<td>arguments 对象</td>
+<td>有</td>
+<td>无（需用…args）</td>
+</tr>
+<tr>
+<td>构造函数</td>
+<td>可使用 new</td>
+<td>不可使用 new</td>
+</tr>
+<tr>
+<td>隐式返回</td>
+<td>不支持</td>
+<td>支持（单行表达式）</td>
+</tr>
+<tr>
+<td>yield 关键字</td>
+<td>支持（生成器）</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>方法定义</td>
+<td>可作为对象方法</td>
+<td>不推荐（this 问题）</td>
+</tr>
+</tbody></table>
+<h4 id="DOM"><a href="#DOM" class="headerlink" title="DOM"></a>DOM</h4><p>DOM（Document Object Model，文档对象模型）是 JavaScript 的一部分，提供了一种程序访问和操作 HTML 和 XML 文档的方式。DOM 将文档结构化为一个对象树，开发者可以通过 JavaScript 动态地访问和更新文档的内容、结构和样式。通过 DOM，开发者可以创建、修改、删除页面元素，改变页面样式，实现页面的动态交互效果。<strong>依赖浏览器环境，操作会触发页面重排（reflow）和重绘（repaint）</strong>。 核心功能：</p>
+<ul>
+<li>访问元素：document.getElementByld()、querySelector()</li>
+<li>修改内容：element.textContent、innerHTML</li>
+<li>变更样式：element.style.color &#x3D; ‘red’</li>
+<li>事件监听：element.addEventListener(‘click’, callback)</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 获取元素</span></span><br><span class="line"><span class="keyword">var</span> element = <span class="variable language_">document</span>.<span class="title function_">getElementById</span>(<span class="string">&#x27;myElement&#x27;</span>);</span><br><span class="line"><span class="comment">// 改变元素内容</span></span><br><span class="line">element.<span class="property">textContent</span> = <span class="string">&#x27;新的内容&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="BOM"><a href="#BOM" class="headerlink" title="BOM"></a>BOM</h4><p>BOM（Browser Object Model，浏览器对象模型）也是 JavaScript 的重要组成部分，提供了与浏览器交互的对象和方法。BOM 主要用于处理浏览器窗口和框架，控制导航、窗口大小和位置、弹出窗口等操作。通过 BOM，开发者可以编写 JavaScript 代码来控制浏览器行为，实现更加丰富的交互效果。</p>
+<p>没有标准化规范（由 W3C 和 WHATWG 逐步统一），不同浏览器可能存在兼容性问题。核心对象：</p>
+<ul>
+<li>window：全局对象，包含 DOM 和 BOM 的其他对象</li>
+<li>navigator：浏览器信息（如 navigator.userAgent）</li>
+<li>location：URL 控制（如 location.href）</li>
+<li>history：浏览历史（如 history.back()）</li>
+<li>screen：屏幕信息（如 screen.width）</li>
+<li>setTimeout、setInterval：定时器</li>
+</ul>
+<h4 id="关联"><a href="#关联" class="headerlink" title="关联"></a>关联</h4><ol>
+<li>ECMAScript 是基础：DOM 和 BOM 的 API 基于 ECMAScript 实现。</li>
+<li>DOM 和 BOM 依赖浏览器环境：离开浏览器，ECMAScript 仍可运行（如 Node.js），但 DOM 和 BOM 会报错。</li>
+<li>DOM 和 BOM 通过 window 关联：window 是 BOM 的顶层对象，也是全局变量的宿主。</li>
+<li>事件处理贯穿三者：ECMAScript 提供函数作为事件回调。DOM 提供事件绑定 API（如 addEventListener）。BOM 提供窗口级事件（如 window.onload）</li>
+</ol>
+<h3 id="宏任务与微任务"><a href="#宏任务与微任务" class="headerlink" title="宏任务与微任务"></a>宏任务与微任务</h3><p>JavaScript 是单线程语言，这意味着它一次只能执行一个任务。为了处理耗时操作（如网络请求、定时器），JavaScript 引入了 <strong>异步机制</strong>，允许任务在后台执行，而主线程继续执行后续代码。异步任务分为两类：宏任务（MacroTask） 和 微任务（MicroTask），它们的执行顺序由 JavaScript 的事件循环（Event Loop）机制控制。</p>
+<h4 id="宏任务"><a href="#宏任务" class="headerlink" title="宏任务"></a>宏任务</h4><p>宏任务是事件循环的基本执行单元，每次循环从宏任务队列中取出一个任务执行。</p>
+<p>特点：每个宏任务执行时会形成完整的执行栈；宏任务执行完毕后，会立即执行所有微任务队列中的任务。</p>
+<h4 id="微任务"><a href="#微任务" class="headerlink" title="微任务"></a>微任务</h4><p>微任务是在当前宏任务执行过程中产生的异步任务，会在当前宏任务结束后、下一个宏任务开始前立即执行。</p>
+<p>特点：微任务队列在每个宏任务结束后清空。微任务可以在执行过程中添加新的微任务，形成链式执行常见微任务。</p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>宏任务</th>
+<th>微任务</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>执行时机</td>
+<td>每个事件循环周期开始时执行</td>
+<td>在当前宏任务结束后立即执行</td>
+</tr>
+<tr>
+<td>队列数量</td>
+<td>多个队列（如定时器队列、I&#x2F;O 队列）</td>
+<td>单个队列</td>
+</tr>
+<tr>
+<td>优先级</td>
+<td>&lt;微任务</td>
+<td>&gt; 下一个宏任务</td>
+</tr>
+<tr>
+<td>执行栈状态</td>
+<td>执行前执行栈为空</td>
+<td>执行前执行栈已清空当前宏任务的同步代码</td>
+</tr>
+<tr>
+<td>应用场景</td>
+<td>定时任务、I&#x2F;O 操作、UI 渲染</td>
+<td>Promise 链式调用、DOM 变化监听</td>
+</tr>
+</tbody></table>
+<h3 id="事件绑定方法"><a href="#事件绑定方法" class="headerlink" title="事件绑定方法"></a>事件绑定方法</h3><p>EventTarget.addEventListener() 方法将指定的监听器注册到 EventTarget 上，当该对象触发指定的事件时，指定的回调函数就会被执行。 事件目标可以是一个文档上的元素 Document 本身，或者任何其他支持事件的对象 (比如 XMLHttpRequest)。它允许 <strong>为一个事件添加多个监听器</strong>。</p>
+<h4 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h4><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="title function_">addEventListener</span>(type, listener);</span><br><span class="line"><span class="title function_">addEventListener</span>(type, listener, options);</span><br><span class="line"><span class="title function_">addEventListener</span>(type, listener, useCapture);</span><br></pre></td></tr></table></figure>
+
+<p>参数：</p>
+<ul>
+<li><code>type</code>：表示监听 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/API/Document_Object_Model/Events">事件类型</a> 的大小写敏感的字符串。</li>
+<li><code>listener</code>：当所监听的事件类型触发时，会接收到一个事件通知（实现了 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/API/Event"><code>Event</code></a> 接口的对象）对象。<code>listener</code> 必须是一个实现了 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/API/EventTarget/addEventListener"><code>EventListener</code></a> 接口的对象，或者是一个 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Functions">函数</a>。有关回调本身的详细信息，请参阅 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/API/EventTarget/addEventListener#%E4%BA%8B%E4%BB%B6%E7%9B%91%E5%90%AC%E5%9B%9E%E8%B0%83">事件监听回调</a>。</li>
+<li><code>options</code>（可选）：<code>capture</code> | <code>once</code> | <code>passive</code> | <code>single</code></li>
+<li><code>useCapture</code>（可选）：一个布尔值，表示在 DOM 树中注册了 <code>listener</code> 的元素，是否要先于它下面的 <code>EventTarget</code> 调用该 <code>listener</code>。当 useCapture（设为 true）时，沿着 DOM 树向上冒泡的事件不会触发 listener。当一个元素嵌套了另一个元素，并且两个元素都对同一事件注册了一个处理函数时，所发生的事件冒泡和事件捕获是两种不同的事件传播方式。事件传播模式决定了元素以哪个顺序接收事件。进一步的解释可以查看 <a target="_blank" rel="noopener" href="https://www.w3.org/TR/DOM-Level-3-Events/#event-flow">DOM Level 3 事件</a> 及 <a target="_blank" rel="noopener" href="https://www.quirksmode.org/js/events_order.html#link4">JavaScript 事件顺序</a> 文档。如果没有指定，<code>useCapture</code> 默认为 <code>false</code>。</li>
+</ul>
+<h4 id="直接绑定"><a href="#直接绑定" class="headerlink" title="直接绑定"></a>直接绑定</h4><p>在目标元素上就不会遵守先发生捕获后发生冒泡这一规则，而是先绑定的事件先发生。</p>
+<ol>
+<li>el.onclick &#x3D; function(e){}；优：简单稳定，兼容性好；缺：冒泡阶段，一次只能绑定一个处理事件</li>
+<li><code>&lt;div onclick=&quot;clickEventHandler&quot;&gt;&lt;/div&gt;</code></li>
+</ol>
+<p>在 JavaScript 中，添加到页面上的事件处理程序数量将直接关系到页面的整体运行性能。导致这一问题的原因是多方面的。首先，每个函数都是对象，都会占用内存；内存中的对象越多，性能就越差。其次，必须事先指定所有事件处理程序而导致的 DOM 访问次数，会延迟整个页面的交互就绪时间。</p>
+<p>对“事件处理程序过多”问题的解决方案就是事件委托。事件委托利用了事件冒泡，只指定一个事件处理程序，就可以管理某一类型的所有事件。例如，click 事件会一直冒泡到 document 层次。也就是说，我们可以为整个页面指定一个 onclick 事件处理程序，而不必给每个可单击的元素分别添加事件处理程序。</p>
+<h3 id="事件流的三个阶段"><a href="#事件流的三个阶段" class="headerlink" title="事件流的三个阶段"></a>事件流的三个阶段</h3><p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/20250808131008.png"></p>
+<p>事件流描述了事件在 DOM（文档对象模型）中传播的顺序，包括三个阶段：</p>
+<ol>
+<li><strong>事件捕获（Capturing Phase）</strong>：事件从文档的根节点开始，向目标元素传播。在这个阶段，事件沿着从外到内的路径传播。</li>
+<li><strong>目标阶段（Target Phase）</strong>：事件到达目标元素。这个阶段是事件处理的关键部分，因为事件已经捕获到目标。</li>
+<li><strong>事件冒泡（Bubbling Phase）</strong>：事件从目标元素开始，向文档的根节点传播。在这个阶段，事件沿着从内到外的路径传播。</li>
+</ol>
+<h3 id="JavaScript-代理与反射"><a href="#JavaScript-代理与反射" class="headerlink" title="JavaScript 代理与反射"></a>JavaScript 代理与反射</h3><p>JavaScript 中的 Proxy 与 Reflect 是 ES6 中引入的新特性，它们可以帮助我们更高效地控制对象。</p>
+<p><strong>代理</strong>（Proxy）是一种设计模式，它允许我们在访问对象的同时，添加一些额外的操作。代理对象与被代理对象实现相同的接口，代理对象会接受并处理所有对被代理对象的访问请求。</p>
+<p>代理是对象通过一个代理对象来控制对原对象的读取、设置、调用及其他操作，并对这些操作进行预处理或附加操作，主要用于拦截对象</p>
+<p><strong>反射</strong>（Reflection）是指程序可以在运行时获取、操作、修改它本身的状态或行为。反射是一种动态获取类型信息和操作类型的能力，可以在运行时动态调用类中的方法或属性。</p>
+<p>反射可以使我们获取对象详情，操控对象的成员（属性），在调用对象的方法时加入额外的逻辑，主要用于操作对象</p>
+<div class="note  info flat"><p>详细可看：<a target="_blank" rel="noopener" href="https://developer.aliyun.com/article/1557157">精读 JavaScript 中的代理（Proxy）与反射（Reflect）-阿里云开发者社区</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/imagine_tion/article/details/113537000">Javascript 基础：代理器（proxy）_javascript proxy-CSDN 博客</a></p>
+</div>
+
+<h3 id="JavaScript-原型与原型链"><a href="#JavaScript-原型与原型链" class="headerlink" title="JavaScript 原型与原型链"></a>JavaScript 原型与原型链</h3><p>为其他对象提供共享属性的对象。每个对象都有一个 __proto__（又名：[[Prototype]]）属性，该属性指向原型对象，并从中继承数据、结构和行为。每个函数（函数也是对象）都有一个 prototype 属性，它指向的也是一个原型对象。</p>
+<p>先看一个示例：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> obj=&#123;&#125;</span><br><span class="line">obj.<span class="property">sayHello</span>=<span class="keyword">function</span>(<span class="params"></span>)&#123;<span class="title function_">alert</span>(<span class="string">&#x27;Hello&#x27;</span>)&#125;</span><br><span class="line"><span class="comment">// 然后检查一下 obj 是否有一个 sayHello 的属性</span></span><br><span class="line">obj.<span class="title function_">hasOwnProperty</span>(<span class="string">&#x27;sayHello&#x27;</span>) <span class="comment">// 返回 true</span></span><br></pre></td></tr></table></figure>
+
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/image-20250808134430777.png"></p>
+<p>可以看到 <code>obj</code> 上确实多了一个 <code>sayHello</code> 的属性，值为一个函数，但是问题来了，<code>obj</code> 上面并没有 <code>hasOwnProperty</code> 这个方法，为什么我们可以调用呢？这就引出了 <strong>原型</strong>。</p>
+<p>每一个对象从被创建开始就和另一个对象关联，从另一个对象上继承其属性，这个 <code>另一个对象</code> 就是 <strong>原型</strong>。</p>
+<p>当访问一个对象的属性时，先在对象的本身找，找不到就去对象的原型上找，如果还是找不到，就去对象的原型（原型也是对象，也有它自己的原型）的原型上找，如此继续，直到找到为止，或者查找到最顶层的原型对象中也没有找到，就结束查找，返回 <code>undefined</code>。<strong>这条由对象及其原型组成的链就叫做原型链。</strong></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/20250808134701.png" alt="原型链"></p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/20250808134959.png" alt="原型链简化版"></p>
+<p><code>__proto__</code> 属性虽然在 ECMAScript 6 语言规范中标准化，但是不推荐被使用，现在更推荐使用 <code>Object.getPrototypeOf</code>，<code>Object.getPrototypeOf(obj)</code> 也可以获取到 <code>obj</code> 对象的原型。本文中使用 <code>__proto__</code> 只是为了便于理解。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="title class_">Object</span>.<span class="title function_">getPrototypeOf</span>(person) === person.<span class="property">__proto__</span> <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="javascript-void-0"><a href="#javascript-void-0" class="headerlink" title="javascript: void(0)"></a>javascript: void(0)</h3><p><code>javascript:void(0)</code>; 是一个 JavaScript 表达式，用于防止链接在被点击时执行其默认行为（即 <strong>导航到一个新页面</strong> 或 <strong>刷新当前页面</strong> 或 <strong>丢失当前滚动位置</strong>）。由于有些浏览器对 undefined 不支持，或者会被默认修改成其他值，可以使用 <code>javascript:void(0)</code> 代替。</p>
+<ul>
+<li><code>javascript</code>：是一个伪 URL。一种将 JavaScript 代码直接嵌入 HTML 文档的方法。它可以用作超链接的 href 属性的值或用作事件处理程序（如 onclick）的值。例如，如果有一个链接需要在单击时执行特定的 JavaScript 功能，而不是导航到不同的页面，可以使用 <code>javascript</code>：</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">&lt;a href=<span class="string">&quot;javascript:myFunction()&quot;</span>&gt;<span class="title class_">Click</span> here&lt;/a&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>void(0)</code>：void 运算符是 JavaScript 中一个很有价值的工具，它计算表达式并返回未定义的值。它经常用于通过使用 <code>void(0)</code> 或 <code>void 0</code> 来简单地获取 undefined 原始值。</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">&lt;a href=<span class="string">&quot;JavaScript:void(0)&quot;</span>&gt;<span class="title class_">Click</span> me, nothing will happen&lt;/a&gt;</span><br></pre></td></tr></table></figure>
+
+<p>点击时执行 JavaScript 函数 void，返回 undefined，对页面没有影响。使用 <code>javascript:void(0)</code> 作为 href 值的目的是防止页面在点击链接时刷新和更改 URL。它通常在需要链接但不需要执行任何操作时使用。</p>
+<h2 id="JavsScript-常用对象"><a href="#JavsScript-常用对象" class="headerlink" title="JavsScript 常用对象"></a>JavsScript 常用对象</h2><h3 id="Date"><a href="#Date" class="headerlink" title="Date"></a>Date</h3><h4 id="创建日期"><a href="#创建日期" class="headerlink" title="创建日期"></a>创建日期</h4><p>有四种方式初始化日期：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="title class_">Date</span>();</span><br><span class="line"><span class="keyword">new</span> <span class="title class_">Date</span>(value);</span><br><span class="line"><span class="keyword">new</span> <span class="title class_">Date</span>(dateString);</span><br><span class="line"><span class="keyword">new</span> <span class="title class_">Date</span>(year, monthIndex [, day [, hours [, minutes [, seconds [, milliseconds]]]]]);</span><br></pre></td></tr></table></figure>
+
+<h4 id="设置日期"><a href="#设置日期" class="headerlink" title="设置日期"></a>设置日期</h4><p>在下面的例子中，我们将日期对象设置为 5 天后的日期：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> myDate=<span class="keyword">new</span> <span class="title class_">Date</span>();</span><br><span class="line">myDate.<span class="title function_">setDate</span>(myDate.<span class="title function_">getDate</span>()+<span class="number">5</span>);</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意:</strong> 如果增加天数会改变月份或者年份，那么日期对象会自动完成这种转换。</p>
+<h4 id="日期比较"><a href="#日期比较" class="headerlink" title="日期比较"></a>日期比较</h4><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> x=<span class="keyword">new</span> <span class="title class_">Date</span>();</span><br><span class="line">x.<span class="title function_">setFullYear</span>(<span class="number">2100</span>,<span class="number">0</span>,<span class="number">14</span>);</span><br><span class="line"><span class="keyword">var</span> today = <span class="keyword">new</span> <span class="title class_">Date</span>();</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (x&gt;today)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="title function_">alert</span>(<span class="string">&quot;今天是2100年1月14日之前&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="title function_">alert</span>(<span class="string">&quot;今天是2100年1月14日之后&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Array"><a href="#Array" class="headerlink" title="Array"></a>Array</h3><p>**JavaScript <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array#%E5%A4%8D%E5%88%B6%E6%95%B0%E7%BB%84">数组复制操作</a> 创建 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Glossary/Shallow_copy">浅拷贝</a>*<em>。（</em>所有* JavaScript 对象的标准内置复制操作都会创建浅拷贝，而不是 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Glossary/Deep_copy">深拷贝</a>）。</p>
+<p>常用方法：</p>
+<ul>
+<li><p>concat()：连接两个或更多的数组，并返回结果</p>
+</li>
+<li><p>join()：把数组的所有元素放入一个字符串。元素通过指定的分隔符进行分隔</p>
+</li>
+<li><p>pop()：删除并返回数组的最后一个元素</p>
+</li>
+<li><p>push()：向数组的末尾添加一个或更多元素，并返回新的长度</p>
+</li>
+<li><p>reverse()：颠倒数组中元素的顺序</p>
+</li>
+<li><p>shift()：删除并返回数组的第一个元素</p>
+</li>
+<li><p>slice(start, end)：从某个已有的数组返回选定的元素，start 必须有，如果参数为负数则从末尾开始选取</p>
+</li>
+<li><p>sort()：对数组的元素进行排序</p>
+</li>
+<li><p>splice()：删除元素，并向数组添加新元素，可用于插入、删除、替换元素。</p>
+</li>
+<li><p>unshift()：向数组的开头添加一个或更多元素，并返回新的长度</p>
+</li>
+<li><p>indexOf(element)：在数组中查找 element，返回值为索引，如果没有该元素返回-1</p>
+</li>
+<li><p>sort(function)：排序，function 为一个函数（字符串对象（String）的方法与 Array 的方法类似）</p>
+</li>
+</ul>
+<h3 id="Window"><a href="#Window" class="headerlink" title="Window"></a>Window</h3><p>浏览器对象模型（<strong>B</strong> rowser <strong>O</strong> bject <strong>M</strong> odel，BOM），是 BOM 中所有对象的核心，除了是 BOM 中所有对象的父对象外，还包含一些窗口控制函数。</p>
+<p>所有 JavaScript 全局对象、函数以及变量均自动成为 window 对象的成员。全局变量是 window 对象的属性，全局函数是 window 对象的方法，甚至 HTML DOM 的 document 也是 window 对象的属性之一。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="variable language_">window</span>.<span class="property">document</span>.<span class="title function_">getElementById</span>(<span class="string">&quot;header&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>常用方法：</p>
+<ul>
+<li>alert()：显示带有一段消息和一个确认按钮的警告框</li>
+<li>close()：关闭浏览器窗口</li>
+<li>clearInterval()&#x2F;setInterval()：按照指定的周期（以毫秒计）来调用函数或计算表达式</li>
+<li>clearTimeout()&#x2F;setTimeout()：在指定的毫秒数后调用函数或计算表达式</li>
+<li>confirm()：显示带有一段消息以及确认按钮和取消按钮的对话框</li>
+<li>moveBy()：可相对窗口的当前坐标把它移动指定的像素</li>
+<li>moveTo()：把窗口的左上角移动到一个指定的坐标</li>
+<li>open()：打开一个新的浏览器窗口或查找一个已命名的窗口</li>
+<li>print()：打印当前窗口的内容</li>
+<li>prompt()；显示可提示用户输入的对话框</li>
+<li>resizeBy()：按照指定的像素调整窗口的大小</li>
+<li>resizeTo()：把窗口的大小调整到指定的宽度和高度</li>
+<li>scrollBy()：按照指定的像素值来滚动内容</li>
+<li>scrollTo()：把内容滚动到指定的坐标</li>
+</ul>
+<h3 id="RegExp"><a href="#RegExp" class="headerlink" title="RegExp"></a>RegExp</h3><p><strong><code>RegExp</code></strong> 对象用于将文本与一个模式匹配。</p>
+<h4 id="构建正则表达式"><a href="#构建正则表达式" class="headerlink" title="构建正则表达式"></a>构建正则表达式</h4><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> = <span class="regexp">/ab+c/i</span>; <span class="comment">//字面量形式</span></span><br><span class="line"><span class="keyword">var</span> = <span class="keyword">new</span> <span class="title class_">RegExp</span>(<span class="string">&quot;ab+c&quot;</span>, <span class="string">&quot;i&quot;</span>); <span class="comment">// 首个参数为字符串模式的构造函数</span></span><br><span class="line"><span class="keyword">var</span> = <span class="keyword">new</span> <span class="title class_">RegExp</span>(<span class="regexp">/ab+c/</span>, <span class="string">&quot;i&quot;</span>); <span class="comment">// 首个参数为常规字面量的构造函数</span></span><br></pre></td></tr></table></figure>
+
+<p>后面的 <code>i</code> 是修饰符，下面是几个修饰符的作用：</p>
+<ul>
+<li><code>i</code>：执行对大小写不敏感的匹配</li>
+<li><code>g</code>：执行全局匹配（查找 <strong>所有</strong> 匹配）</li>
+<li><code>m</code>：执行多行匹配</li>
+</ul>
+<h4 id="正则表达式对象元字符"><a href="#正则表达式对象元字符" class="headerlink" title="正则表达式对象元字符"></a>正则表达式对象元字符</h4><table>
+<thead>
+<tr>
+<th align="left">字符</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-word-boundary"><code>\b</code></a></td>
+<td align="left">匹配一个词的边界。一个词的边界就是一个词不被另外一个“字”字符跟随的位置或者前面跟其他“字”字符的位置，例如在字母和空格之间。注意，匹配中不包括匹配的字边界。换句话说，一个匹配的词的边界的内容的长度是 0。（不要和 [\b] 混淆了）<br> 使用 “moon” 举例：<br> <code> /\bm/</code> 匹配“moon”中的‘m’；<br> <code>/oo\b/</code> 并不匹配 “moon” 中的’oo’，因为’oo’被一个“字”字符’n’紧跟着。<br> <code>/oon\b/</code> 匹配 “moon” 中的’oon’，因为’oon’是这个字符串的结束部分。这样他没有被一个“字”字符紧跟着。<br> <code>/\w\b\w/</code> 将不能匹配任何字符串，因为在一个单词中间的字符永远也不可能同时满足没有“字”字符跟随和有“字”字符跟随两种情况。<br> <strong>备注：</strong> JavaScript 的正则表达式引擎将 <a target="_blank" rel="noopener" href="http://www.ecma-international.org/ecma-262/5.1/#sec-15.10.2.6">特定的字符集</a> 定义为“字”字符。不在该集合中的任何字符都被认为是一个断词。这组字符相当有限：它只包括大写和小写的罗马字母，十进制数字和下划线字符。不幸的是，重要的字符，例如“é”或“ü”，被视为断词。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-non-word-boundary"><code>\B</code></a></td>
+<td align="left">匹配一个非单词边界。匹配如下几种情况：<br> 字符串第一个字符为非“字”字符 <br> 字符串最后一个字符为非“字”字符 <br> 两个单词字符之间 <br> 两个非单词字符之间 <br> 空字符串 <br> 例如，<code>/\B../</code> 匹配 “noonday” 中的’oo’, 而 <code>/y\B../</code> 匹配 “possibly yesterday” 中的’yes‘</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-control"><code>\cX</code></a></td>
+<td align="left">当 X 是处于 A 到 Z 之间的字符的时候，匹配字符串中的一个控制符。<br> 例如，<code>/\cM/</code> 匹配字符串中的 control-M (U+000D)。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-digit"><code>\d</code></a></td>
+<td align="left">匹配一个数字。等价于 <code>[0-9]</code>。<br> 例如， <code>/\d/</code> 或者 <code>/[0-9]/</code> 匹配 “B2 is the suite number.” 中的’2’。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-non-digit"><code>\D</code></a></td>
+<td align="left">匹配一个非数字字符。等价于 <code>[^0-9]</code>。<br> 例如， <code>/\D/</code> 或者 <code>/[^0-9]/</code> 匹配 “B2 is the suite number.” 中的’B’ 。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-form-feed"><code>\f</code></a></td>
+<td align="left">匹配一个换页符 (U+000C)。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-line-feed"><code>\n</code></a></td>
+<td align="left">匹配一个换行符 (U+000A)。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-carriage-return"><code>\r</code></a></td>
+<td align="left">匹配一个回车符 (U+000D)。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-white-space"><code>\s</code></a></td>
+<td align="left">匹配一个空白字符，包括空格、制表符、换页符和换行符。等价于 <code>[\f\n\r\t\v\u0020\u00a0\u1680\u180e\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]</code>。<br> 例如，<code>/\s\w*/</code> 匹配 “foo bar.” 中的’ bar’。<br> 经测试，\s 不匹配 “<a target="_blank" rel="noopener" href="https://symbl.cc/cn/180E/">\u180e</a>“，在当前版本 Chrome(v80.0.3987.122) 和 Firefox(76.0.1) 控制台输入&#x2F;\s&#x2F;.test(“\u180e”) 均返回 false。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-non-white-space"><code>\S</code></a></td>
+<td align="left">匹配一个非空白字符。等价于 <code>[^\f\n\r\t\v\u0020\u00a0\u1680\u180e\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]</code>。<br> 例如，<code>/\S\w*/</code> 匹配 “foo bar.” 中的’foo’。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-tab"><code>\t</code></a></td>
+<td align="left">匹配一个水平制表符 (U+0009)。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-vertical-tab"><code>\v</code></a></td>
+<td align="left">匹配一个垂直制表符 (U+000B)。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-word"><code>\w</code></a></td>
+<td align="left">匹配一个单字字符（字母、数字或者下划线）。等价于 <code>[A-Za-z0-9_]</code>。<br> 例如，<code>/\w/</code> 匹配 “apple,” 中的 ‘a’，”$5.28,” 中的 ‘5’ 和 “ 3D.” 中的 ‘3’。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-non-word"><code>\W</code></a></td>
+<td align="left">匹配一个非单字字符。等价于 <code>[^A-Za-z0-9_]</code>。<br> 例如，<code>/\W/</code> 或者 <code>/[^A-Za-z0-9_]/</code> 匹配 “50%.” 中的 ‘%’。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-backreference"><code>\n（数字）</code></a></td>
+<td align="left">在正则表达式中，它返回最后的第 n 个子捕获匹配的子字符串 (捕获的数目以左括号计数)。<br> 比如 <code>/apple(,)\sorange\1/</code> 匹配 “apple, orange, cherry, peach.” 中的’apple, orange,’ 。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-null"><code>\0</code></a></td>
+<td align="left">匹配 NULL（U+0000）字符，不要在这后面跟其他小数，因为 <code>\0&lt;digits&gt;</code> 是一个八进制转义序列。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-hex-escape"><code>\xhh</code></a></td>
+<td align="left">匹配一个两位十六进制数（\x00-\xFF）表示的字符。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-unicode-escape"><code>\uhhhh</code></a></td>
+<td align="left">匹配一个四位十六进制数表示的 UTF-16 代码单元。</td>
+</tr>
+<tr>
+<td align="left"><code>\u&#123;hhhh&#125;或\u&#123;hhhhh&#125;</code></td>
+<td align="left">（仅当设置了 u 标志时）匹配一个十六进制数表示的 Unicode 字符。</td>
+</tr>
+</tbody></table>
+<h4 id="正则表达式对象量词"><a href="#正则表达式对象量词" class="headerlink" title="正则表达式对象量词"></a>正则表达式对象量词</h4><table>
+<thead>
+<tr>
+<th align="left">字符</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-backslash"><code>\</code></a></td>
+<td align="left">依照下列规则匹配：<br> 在非特殊字符之前的反斜杠表示下一个字符是特殊字符，不能按照字面理解。例如，前面没有 “\“ 的 “ b “ 通常匹配小写字母 “ b “，即字符会被作为字面理解，无论它出现在哪里。但如果前面加了 “\“，它将不再匹配任何字符，而是表示一个 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#note">字符边界</a>。<br> 在特殊字符之前的反斜杠表示下一个字符不是特殊字符，应该按照字面理解。详情请参阅下文中的 “转义（Escaping）” 部分。<br> 如果你想将字符串传递给 RegExp 构造函数，不要忘记在字符串字面量中反斜杠是转义字符。所以为了在模式中添加一个反斜杠，你需要在字符串字面量中转义它。<code>/[a-z]\s/i</code> 和 <code>new RegExp(&quot;[a-z]\\s&quot;, &quot;i&quot;)</code> 创建了相同的正则表达式：一个用于搜索后面紧跟着空白字符（<code>\s</code> 可看后文）并且在 a-z 范围内的任意字符的表达式。为了通过字符串字面量给 RegExp 构造函数创建包含反斜杠的表达式，你需要在字符串级别和正则表达式级别都对它进行转义。例如 <code>/[a-z]:\\/i</code> 和 <code>new RegExp(&quot;[a-z]:\\\\&quot;,&quot;i&quot;)</code> 会创建相同的表达式，即匹配类似 “ C:&quot; 字符串。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-caret"><code>^</code></a></td>
+<td align="left">匹配输入的开始。如果多行标志被设置为 true，那么也匹配换行符后紧跟的位置。<br> 例如，<code>/^A/</code> 并不会匹配 “an A” 中的 ‘A’，但是会匹配 “An E” 中的 ‘A’。<br> 当 ‘<code>^</code>‘ 作为第一个字符出现在一个字符集合模式时，它将会有不同的含义。<a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-negated-character-set">反向字符集合</a> 一节有详细介绍和示例。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-dollar"><code>$</code></a></td>
+<td align="left">匹配输入的结束。如果多行标志被设置为 true，那么也匹配换行符前的位置。<br> 例如，<code>/t$/</code> 并不会匹配 “eater” 中的 ‘t’，但是会匹配 “eat” 中的 ‘t’。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-asterisk"><code>*</code></a></td>
+<td align="left">匹配前一个表达式 0 次或多次。等价于 <code>&#123;0,&#125;</code>。<br> 例如，<code>/bo*/</code> 会匹配 “A ghost boooooed” 中的 ‘booooo’ 和 “A bird warbled” 中的 ‘b’，但是在 “A goat grunted” 中不会匹配任何内容。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-plus"><code>+</code></a></td>
+<td align="left">匹配前面一个表达式 1 次或者多次。等价于 <code>&#123;1,&#125;</code>。<br> 例如，<code>/a+/</code> 会匹配 “candy” 中的 ‘a’ 和 “caaaaaaandy” 中所有的 ‘a’，但是在 “cndy” 中不会匹配任何内容。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-questionmark"><code>?</code></a></td>
+<td align="left">匹配前面一个表达式 0 次或者 1 次。等价于 <code>&#123;0,1&#125;</code>。<br> 例如，<code>/e?le?/</code> 匹配 “angel” 中的 ‘el’、”angle” 中的 ‘le’ 以及 “oslo’ 中的 ‘l’。如果 <strong>紧跟在任何量词 *、 +、? 或 {} 的后面</strong>，将会使量词变为 <strong>非贪婪</strong>（匹配尽量少的字符），和缺省使用的 <strong>贪婪模式</strong>（匹配尽可能多的字符）正好相反。例如，对 “ 123abc “ 使用 <code>/\d+/</code> 将会匹配 “ 123 “，而使用 <code>/\d+?/</code> 则只会匹配到 “ 1 “。<br> 还用于先行断言中，如本表的 <code>x(?=y)</code> 和 <code>x(?!y)</code> 条目所述。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-dot"><code>.</code></a></td>
+<td align="left">（小数点）默认匹配除换行符之外的任何单个字符。<br> 例如，<code>/.n/</code> 将会匹配 “nay, an apple is on the tree” 中的 ‘an’ 和 ‘on’，但是不会匹配 ‘nay’。<br> 如果 <code>s</code> (“dotAll”) 标志位被设为 true，它也会匹配换行符。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-capturing-parentheses"><code>(x)</code></a></td>
+<td align="left">像下面的例子展示的那样，它会匹配 ‘x’ 并且记住匹配项。其中括号被称为 <em>捕获括号</em>。<br> 模式 <code>/(foo) (bar) \1 \2/</code> 中的 ‘<code>(foo)</code>‘ 和 ‘<code>(bar)</code>‘ 匹配并记住字符串 “foo bar foo bar” 中前两个单词。模式中的 <code>\1</code> 和 <code>\2</code> 表示第一个和第二个被捕获括号匹配的子字符串，即 <code>foo</code> 和 <code>bar</code>，匹配了原字符串中的后两个单词。注意 <code>\1</code>、<code>\2</code>、…、<code>\n</code> 是用在正则表达式的匹配环节，详情可以参阅后文的 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-backreference">\n</a> 条目。而在正则表达式的替换环节，则要使用像 <code>$1</code>、<code>$2</code>、…、<code>$n</code> 这样的语法，例如，<code>&#39;bar foo&#39;.replace(/(...) (...)/, &#39;$2 $1&#39;)</code>。<code>$&amp;</code> 表示整个用于匹配的原字符串。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-non-capturing-parentheses"><code>(?:x)</code></a></td>
+<td align="left">匹配 ‘x’ 但是不记住匹配项。这种括号叫作 <em>非捕获括号</em>，使得你能够定义与正则表达式运算符一起使用的子表达式。<br> 看看这个例子 <code>/(?:foo)&#123;1,2&#125;/</code>。如果表达式是 <code>/foo&#123;1,2&#125;/</code>，<code>&#123;1,2&#125;</code> 将只应用于 ‘foo’ 的最后一个字符 ‘o’。如果使用非捕获括号，则 <code>&#123;1,2&#125;</code> 会应用于整个 ‘foo’ 单词。更多信息，可以参阅下文的 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#%E4%BD%BF%E7%94%A8%E6%8B%AC%E5%8F%B7%E7%9A%84%E5%AD%90%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D">使用括号的子字符串匹配</a> 条目。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-lookahead"><code>x(?=y)</code></a></td>
+<td align="left">匹配’x’仅仅当’x’后面跟着’y’.这种叫做先行断言。<br> 例如，&#x2F;Jack(?&#x3D; Sprat)&#x2F;会匹配到’Jack’仅当它后面跟着’Sprat’。&#x2F;Jack(?&#x3D; Sprat|Frost)&#x2F;匹配‘Jack’仅当它后面跟着’Sprat’或者是‘Frost’。但是‘Sprat’和‘Frost’都不是匹配结果的一部分。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-lookahead"><code>(?&lt;=y)</code></a> x</td>
+<td align="left">匹配’x’仅当’x’前面是’y’.这种叫做后行断言。<br> 例如，&#x2F;(?&lt;&#x3D; Jack)Sprat&#x2F;会匹配到’ Sprat ‘仅仅当它前面是’ Jack ‘。&#x2F;(?&lt;&#x3D; Jack|Tom)Sprat&#x2F;匹配‘Sprat ’仅仅当它前面是’Jack’或者是‘Tom’。但是‘Jack’和‘Tom’都不是匹配结果的一部分。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-negated-look-ahead"><code>x(?!y)</code></a></td>
+<td align="left">仅仅当’x’后面不跟着’y’时匹配’x’，这被称为正向否定查找。<br> 例如，仅仅当这个数字后面没有跟小数点的时候，&#x2F;\d+(?!.)&#x2F; 匹配一个数字。正则表达式&#x2F;\d+(?!.)&#x2F;.exec(“3.141”) 匹配‘141’而不是‘3.141’</td>
+</tr>
+<tr>
+<td align="left"><code>(?&lt;!*y*)*x*</code></td>
+<td align="left">仅仅当’x’前面不是’y’时匹配’x’，这被称为反向否定查找。<br> 例如，仅仅当这个数字前面没有负号的时候，<code>/(?&lt;!-)\d+/</code> 匹配一个数字。 <code>/(?&lt;!-)\d+/.exec(&#39;3&#39;)</code> 匹配到 “3”. <code>/(?&lt;!-)\d+/.exec(&#39;-3&#39;)</code> 因为这个数字前有负号，所以没有匹配到。</td>
+</tr>
+<tr>
+<td align="left">[&#96;x</td>
+<td align="left">y&#96;](<a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-or">https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-or</a>)</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-quantifier"><code>&#123;n&#125;</code></a></td>
+<td align="left">n 是一个正整数，匹配了前面一个字符刚好出现了 n 次。<br> 比如， &#x2F;a{2}&#x2F; 不会匹配“candy”中的’a’, 但是会匹配“caandy”中所有的 a，以及“caaandy”中的前两个’a’。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-quantifier"><code>&#123;n,&#125;</code></a></td>
+<td align="left">n 是一个正整数，匹配前一个字符至少出现了 n 次。<br> 例如，&#x2F;a{2,}&#x2F; 匹配 “aa”, “aaaa” 和 “aaaaa” 但是不匹配 “a”。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-quantifier-range"><code>&#123;n,m&#125;</code></a></td>
+<td align="left">n 和 m 都是整数。匹配前面的字符至少 n 次，最多 m 次。如果 n 或者 m 的值是 0，这个值被忽略。<br> 例如，&#x2F;a{1, 3}&#x2F; 并不匹配“cndy”中的任意字符，匹配“candy”中的 a，匹配“caandy”中的前两个 a，也匹配“caaaaaaandy”中的前三个 a。注意，当匹配”caaaaaaandy“时，匹配的值是“aaa”，即使原始的字符串中有更多的 a。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-character-set"><code>[xyz]</code></a></td>
+<td align="left">一个字符集合。匹配方括号中的任意字符，包括 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Grammar_and_types">转义序列</a>。你可以使用破折号（-）来指定一个字符范围。对于点（.）和星号（*）这样的特殊符号在一个字符集中没有特殊的意义。他们不必进行转义，不过转义也是起作用的。<br> 例如，[abcd] 和 [a-d] 是一样的。他们都匹配 “brisket” 中的‘b’, 也都匹配“city”中的‘c’。&#x2F;[a-z.]+&#x2F; 和&#x2F;[\w.]+&#x2F;与字符串“test.i.ng”匹配。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-negated-character-set"><code>[^xyz]</code></a></td>
+<td align="left">一个反向字符集。也就是说， 它匹配任何没有包含在方括号中的字符。你可以使用破折号（-）来指定一个字符范围。任何普通字符在这里都是起作用的。<br> 例如，<code>[^abc]</code> 和 <code>[^a-c] </code> 是一样的。他们匹配 “brisket” 中的‘r’，也匹配“chop”中的‘h’。</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions#special-backspace"><code>[\b]</code></a></td>
+<td align="left">匹配一个退格 (U+0008)。（不要和\b 混淆了。）</td>
+</tr>
+</tbody></table>
+<h3 id="Location"><a href="#Location" class="headerlink" title="Location"></a>Location</h3><p>window.location 对象用于获得当前页面的地址 (URL)，并把浏览器重定向到新的页面。</p>
+<p>方法：</p>
+<ul>
+<li>reload()：重新加载当前文档</li>
+</ul>
+<p>属性：</p>
+<ul>
+<li>hash：设置或返回从井号 (#) 开始的 URL（锚）。</li>
+<li>host：设置或返回主机名和当前 URL 的端口号。</li>
+<li>hostname：设置或返回当前 URL 的主机名。</li>
+<li>href：设置或返回完整的 URL。</li>
+<li>pathname：设置或返回当前 URL 的路径部分。</li>
+<li>port：设置或返回当前 URL 的端口号。</li>
+<li>protocol：设置或返回当前 URL 的协议。</li>
+<li>search：设置或返回从问号 (?) 开始的 URL（查询部分）</li>
+</ul>
+<h3 id="Function"><a href="#Function" class="headerlink" title="Function"></a>Function</h3><h4 id="回调函数"><a href="#回调函数" class="headerlink" title="回调函数"></a>回调函数</h4><p>在一个函数当中，另一个函数作为参数传入该函数中，另一个的这个函数即为回调函数。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">atack</span>(<span class="params">callback</span>)&#123;</span><br><span class="line">	<span class="keyword">return</span> callback;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="自执行函数（IIFE）"><a href="#自执行函数（IIFE）" class="headerlink" title="自执行函数（IIFE）"></a>自执行函数（IIFE）</h4><p>IIFE（Imdiately Invoked Function Expression，立即执行的函数表达式）在函数定义的结束最后写入一个（），该函数定义完成后直接被调用执行。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">(<span class="keyword">function</span> <span class="title function_">func2</span>(<span class="params"></span>)&#123;</span><br><span class="line"></span><br><span class="line">&#125;)()</span><br></pre></td></tr></table></figure>
+
+<h4 id="短路运算"><a href="#短路运算" class="headerlink" title="短路运算"></a>短路运算</h4><p>防止传入函数的数据不足，造成无法运行。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"># 通常使用逻辑与的短路来决定是否执行回调函数</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getResult</span>(<span class="params">a,b,fn</span>) &#123;</span><br><span class="line">	fn &amp;&amp; <span class="title function_">fn</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 通常用逻辑或的短路来防止实参不足的情况，强行赋值</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getResult_2</span>(<span class="params">a,b</span>)&#123;</span><br><span class="line">	a || <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="本地缓存"><a href="#本地缓存" class="headerlink" title="本地缓存"></a>本地缓存</h2><table>
+<thead>
+<tr>
+<th></th>
+<th>Cookie</th>
+<th>localStorage</th>
+<th>sessionStorage</th>
+<th>IndexedDB</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>存储大小</strong></td>
+<td>4KB</td>
+<td>5-10MB</td>
+<td>5-10MB</td>
+<td>无明确上限</td>
+</tr>
+<tr>
+<td><strong>数据有效期</strong></td>
+<td>可设置过期时间</td>
+<td>永久</td>
+<td>会话结束</td>
+<td>永久</td>
+</tr>
+<tr>
+<td><strong>自动发送至服务器</strong></td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><strong>数据类型</strong></td>
+<td>字符串</td>
+<td>字符串</td>
+<td>字符串</td>
+<td>结构化数据</td>
+</tr>
+<tr>
+<td><strong>访问方式</strong></td>
+<td>同步</td>
+<td>同步</td>
+<td>同步</td>
+<td>异步</td>
+</tr>
+<tr>
+<td><strong>API 复杂度</strong></td>
+<td>简单</td>
+<td>简单</td>
+<td>简单</td>
+<td>复杂</td>
+</tr>
+<tr>
+<td><strong>使用场景</strong></td>
+<td>身份验证（如会话 ID）、用户偏好设置</td>
+<td>长期保存不敏感数据（如用户浏览历史、离线缓存）</td>
+<td>临时保存表单数据、多页面会话状态（如购物车）</td>
+<td>大量结构化数据存储（如图像、离线数据库）</td>
+</tr>
+</tbody></table>
+<h2 id="闭包（closure）"><a href="#闭包（closure）" class="headerlink" title="闭包（closure）"></a>闭包（closure）</h2><p><strong>闭包</strong>（closure）是 JavaScript 中一个重要的概念，它允许函数访问并操作函数外部的变量。闭包在函数创建时就会形成，使得内部函数即使在其外部作用域执行时，仍能访问到定义时的词法作用域。</p>
+<p>示例：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">init</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">var</span> name = <span class="string">&quot;Mozilla&quot;</span>; <span class="comment">// name 是 init 创建的局部变量</span></span><br><span class="line">  <span class="keyword">function</span> <span class="title function_">displayName</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="comment">// displayName() 是内部函数，它创建了一个闭包</span></span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(name); <span class="comment">// 使用在父函数中声明的变量</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="title function_">displayName</span>();</span><br><span class="line">&#125;</span><br><span class="line"><span class="title function_">init</span>();</span><br></pre></td></tr></table></figure>
+
+<p><code>init()</code> 创建了一个名为 <code>name</code> 的局部变量和一个名为 <code>displayName()</code> 的函数。<code>displayName()</code> 是在 <code>init()</code> 内定义的内部函数，并且仅在 <code>init()</code> 函数的函数体内可用。请注意，<code>displayName()</code> <strong>没有自己的局部变量</strong>。然而，因为内部函数能访问外部作用域的变量，所以 <code>displayName()</code> 能访问在 <code>init()</code> 父函数中声明的 <code>name</code> 变量。</p>
+<h3 id="用途"><a href="#用途" class="headerlink" title="用途"></a>用途</h3><p><strong>（1）匿名自执行函数</strong></p>
+<p>我们知道所有的变量，如果不加上 var 关键字，则默认的会添加到全局对象的属性上去，这样的临时变量加入全局对象有很多坏处，比如：别的函数可能误用这些变量；造成全局对象过于庞大，影响访问速度（因为变量的取值是需要从原型链上遍历的）。除了每次使用变量都是用 var 关键字外，我们在实际情况下经常遇到这样一种情况，即有的函数只需要执行一次，其内部变量无需维护。</p>
+<p><strong>（2）结果缓存</strong></p>
+<p>我们开发中会碰到很多情况，设想我们有一个处理过程很耗时的函数对象，每次调用都会花费很长时间，那么我们就需要将计算出来的值存储起来，当调用这个函数的时候，首先在缓存中查找，如果找不到，则进行计算，然后更新缓存并返回值，如果找到了，直接返回查找到的值即可。闭包正是可以做到这一点，因为它不会释放外部的引用，从而函数内部的值可以得以保留。</p>
+<h2 id="跨域（CORS）"><a href="#跨域（CORS）" class="headerlink" title="跨域（CORS）"></a>跨域（CORS）</h2><p>跨域报错关键字：‘Access-Control-Allow-Origin’ 是一种解决资源跨域的策略，如果请求跨域访问，那么浏览器将报错。跨域是因为浏览器的‘同源策略’所导致的，那么，“同源策略”如何理解呢？所谓同源是指：访问地址的协议、域名&#x2F;IP、端口三者都相同，浏览器则判定访问为同源访问，否则就是“不同源”，就会产生我们常说的跨域现象。</p>
+<p>例如：相对于 <a target="_blank" rel="noopener" href="http://localhost/">http://localhost</a>: 8102 的同源检测结果如下：</p>
+<table>
+<thead>
+<tr>
+<th>地址</th>
+<th>差异点</th>
+<th>是否同源</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a target="_blank" rel="noopener" href="http://localhost/">http://localhost</a>: 8102&#x2F;index.html</td>
+<td>域名、协议、端口均相同</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://localhost/">https://localhost</a>: 8102</td>
+<td>协议不同</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="http://10.51.83.173:8102/">http://10.51.83.173:8102</a></td>
+<td>域名&#x2F;IP 不同</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="http://10.51.83.173:8103/">http://10.51.83.173:8103</a></td>
+<td>域名、端口不同</td>
+<td>❌</td>
+</tr>
+</tbody></table>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><h4 id="后端支持跨域"><a href="#后端支持跨域" class="headerlink" title="后端支持跨域"></a>后端支持跨域</h4><p>适用于本地开发调试，连接后端开发机。</p>
+<p>Access-Control-Allow-Origin:  这个头部信息由服务器返回，用来明确指定那些客户端的域名允许访问这个资源。它的值可以是： <code>*</code> （允许任意域名）；<code>-</code> （一个完整的域名名字，比如：<a target="_blank" rel="noopener" href="https://example.com)/">https://example.com）</a></p>
+<p>Access-Control-Allow-Headers：提供一个逗号分隔的列表表示服务器支持的请求数据类型。假如你使用自定义头部（比如：x-authentication-token 服务器需要在返回 OPTIONS 请求时，要把这个值放到这个头部里，否则请求会被阻止）</p>
+<p>Access-Control-Allow-Methods：一个逗号分隔的列表，表明服务器支持的请求类型（比如：GET, POST）</p>
+<h4 id="反向代理"><a href="#反向代理" class="headerlink" title="反向代理"></a>反向代理</h4><p>通过配置 dev-service 或者 nginx 反向代理服务。涉及文件：</p>
+<ol>
+<li>src\config\constant\app.data.service.js	请求服务配置</li>
+<li>src\config\micro.js					微前端相对路径</li>
+</ol>
+<h2 id="Vue"><a href="#Vue" class="headerlink" title="Vue"></a>Vue</h2><h3 id="生命周期"><a href="#生命周期" class="headerlink" title="生命周期"></a>生命周期</h3><p>每个 Vue 组件实例在创建时都需要经历一系列的初始化步骤，比如设置好数据侦听，编译模板，挂载实例到 DOM，以及在数据改变时更新 DOM。在此过程中，它也会运行被称为生命周期钩子的函数，让开发者有机会在特定阶段运行自己的代码。</p>
+<p><img src= "/img/spin.svg" data-lazy-src="https://rean-blog-bucket.oss-cn-guangzhou.aliyuncs.com/assets/essay/lifecycle_zh-CN.W0MNXI0C.png" alt="组件生命周期图示"></p>
+<p>常用的钩子：</p>
+<ol>
+<li><code>onCreated</code>：vue 实例创建完成后被立即调用</li>
+<li><code>onMounted</code>：组件完成初始渲染并创建 DOM 节点后运行</li>
+<li><code>onActivated</code>：被 keep-alive 缓存的组件激活时调用</li>
+<li><code>onDestoryed</code>：实例销毁后调用</li>
+</ol>
+<h3 id="自定义指令"><a href="#自定义指令" class="headerlink" title="自定义指令"></a>自定义指令</h3><p>除了 Vue 内置的一系列指令 (比如 <code>v-model</code> 或 <code>v-show</code>) 之外，Vue 还允许你注册自定义的指令 (Custom Directives)。</p>
+<p>一个自定义指令由一个包含类似组件生命周期钩子的对象来定义。钩子函数会接收到指令所绑定元素作为其参数。下面是一个自定义指令的例子，当 Vue 将元素插入到 DOM 中后，该指令会将一个 class 添加到元素中：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;script setup&gt;</span><br><span class="line">// 在模板中启用 v-highlight</span><br><span class="line">const vHighlight = &#123;</span><br><span class="line">  mounted: (el) =&gt; &#123;</span><br><span class="line">    el.classList.add(&#x27;is-highlight&#x27;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;p v-highlight&gt;This sentence is important!&lt;/p&gt;</span><br><span class="line">&lt;/template&gt;</span><br></pre></td></tr></table></figure>
+
+<p>在 <code>&lt;script setup&gt;</code> 中，任何以 <code>v</code> 开头的驼峰式命名的变量都可以当作自定义指令使用。在上述例子中，<code>vHighlight</code> 可以在模板中以 <code>v-highlight</code> 的形式使用。</p>
+<p>在不使用 <code>&lt;script setup&gt;</code> 的情况下，自定义指令需要通过 <code>directives</code> 选项注册：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">export default &#123;</span><br><span class="line">  setup() &#123;</span><br><span class="line">    /*...*/</span><br><span class="line">  &#125;,</span><br><span class="line">  directives: &#123;</span><br><span class="line">    // 在模板中启用 v-highlight</span><br><span class="line">    highlight: &#123;</span><br><span class="line">      /* ... */</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>将一个自定义指令全局注册到应用层级也是一种常见的做法：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">const app = createApp(&#123;&#125;)</span><br><span class="line"></span><br><span class="line">// 使 v-highlight 在所有组件中都可用</span><br><span class="line">app.directive(&#x27;highlight&#x27;, &#123;</span><br><span class="line">  /* ... */</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><p><a target="_blank" rel="noopener" href="https://www.laixuexila.com/index.php/2025/01/03/%E5%A6%82%E4%BD%95%E7%A1%AE%E4%BF%9D-html-%E6%96%87%E4%BB%B6%E5%9C%A8%E4%B8%8D%E5%90%8C%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%AD%E6%98%BE%E7%A4%BA%E7%9A%84%E6%95%88%E6%9E%9C%E4%B8%80%E8%87%B4%EF%BC%9F/">如何确保 HTML 文件在不同浏览器中显示的效果一致？ – 来学习啦 – 编程乐园，实战驱动的编程学习平台</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_36595013/article/details/82352387">（史上最详细易懂）CSS hack 大全&amp;详解（什么是 Css Hack？各个浏览器的 Hack 分析）-CSDN 博客</a></p>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Learn_web_development/Core/Styling_basics/Values_and_units#%E6%95%B0%E5%80%BC%E3%80%81%E9%95%BF%E5%BA%A6%E5%92%8C%E7%99%BE%E5%88%86%E6%AF%94">CSS 值和单位 - 学习 Web 开发 | MDN</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/niezhilang/article/details/119181163">Flex 布局图文详解与示例代码-CSDN 博客</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.runoob.com/w3cnote/flex-grammar.html">Flex 布局语法教程 | 菜鸟教程</a></p>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_flexible_box_layout/Basic_concepts_of_flexbox#flex_%E5%AE%B9%E5%99%A8">flex 布局的基本概念 - CSS：层叠样式表 | MDN</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.runoob.com/css3/css-grid.html">CSS 网格布局 | 菜鸟教程</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.runoob.com/js/js-obj-date.html">JavaScript Date（日期）对象 | 菜鸟教程</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.runoob.com/js/js-window.html">JavaScript Window | 菜鸟教程</a></p>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/RegExp">RegExp - JavaScript | MDN</a></p>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_expressions">正则表达式 - JavaScript | MDN</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/30327269">三分钟读懂 Java 与 JavaScript 的区别，让小白摘帽 - 知乎</a></p>
+<p><a target="_blank" rel="noopener" href="https://developer.baidu.com/article/detail.html?id=2876002">JavaScript 的三大核心组成部分：ECMAScript、DOM 和 BOM-百度开发者中心</a></p>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/API/EventTarget/addEventListener#%E7%A4%BA%E4%BE%8B">EventTarget.addEventListener() - Web API | MDN</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_64974617/article/details/142916279">深入理解 JavaScript 中的事件冒泡与事件捕获_js 事件捕获-CSDN 博客</a> v</p>
+<p><a target="_blank" rel="noopener" href="https://developer.aliyun.com/article/1557157">精读 JavaScript 中的代理（Proxy）与反射（Reflect）-阿里云开发者社区</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/imagine_tion/article/details/113537000">Javascript 基础：代理器（proxy）_javascript proxy-CSDN 博客</a></p>
+<p><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000042725370">javascript - 彻底搞懂 JS 原型与原型链 - 个人文章 - SegmentFault 思否</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_55018264/article/details/142896836">什么是 TDZ？在 JavaScript 当中怎么避免？_js tdz-CSDN 博客</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.runoob.com/w3cnote/es6-object.html">3.2.3 ES6 对象 | 菜鸟教程</a></p>
+<p><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000019923707">javascript - ES6 解构 - 对象解构 - 前端 - SegmentFault 思否</a></p>
+<p><a target="_blank" rel="noopener" href="https://cn.vuejs.org/guide/reusability/custom-directives">自定义指令 | Vue.js</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author_group"><a class="post-copyright__author_img" href="/about/"><img class="post-copyright__author_img_front" src= "/img/spin.svg" data-lazy-src="/img/avatar.jpg"></a><div class="post-copyright__author_name">Rean's Blog</div><div class="post-copyright__author_desc">Enjoy technology and music</div></div><div class="post-tools" id="post-tools"><div class="post-tools-left"><div id="quit-box" onclick="RemoveRewardMask()"></div></div></div><div class="post-copyright__notice"><span class="post-copyright-info">本文是原创文章，采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0</a>协议，完整转载请注明来自<a href="/">Rean's Blog</a></span></div></div><div class="post-tools-right"><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Git/"><span class="tags-punctuation"></span>Git<span class="tagsPageCount">3</span></a><a class="post-meta__tags" href="/tags/GitHub/"><span class="tags-punctuation"></span>GitHub<span class="tagsPageCount">2</span></a><a class="post-meta__tags" href="/tags/Vue/"><span class="tags-punctuation"></span>Vue<span class="tagsPageCount">19</span></a><a class="post-meta__tags" href="/tags/Vite/"><span class="tags-punctuation"></span>Vite<span class="tagsPageCount">7</span></a><a class="post-meta__tags" href="/tags/JavaScript/"><span class="tags-punctuation"></span>JavaScript<span class="tagsPageCount">5</span></a></div></div></div><nav class="needEndHide pagination-post" id="pagination"><div class="next-post pull-full"><a href="/p/68ff0fae/"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">【Notes】RAG</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="solitude st-star-smile-fill"></i><span>喜欢这篇的人也看了</span><div class="relatedPosts-link"><a onclick="event.preventDefault(); toRandomPost();" href="javascript:void(0);" rel="external nofollow" data-pjax-state="">随便逛逛</a></div></div><div class="relatedPosts-list"><div><a href="/p/c677e75e/" title="Vue.js(Vite)项目部署云服务器"><img class="cover" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/darkmodepicture1.jpg" alt="cover"><div class="content is-center"><div class="title">Vue.js(Vite)项目部署云服务器</div></div></a></div><div><a href="/p/fc02f9ee/" title="Vue+Vite+TypeScript+Electron 项目打包"><img class="cover" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/cover3.jpg" alt="cover"><div class="content is-center"><div class="title">Vue+Vite+TypeScript+Electron 项目打包</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-content"><div class="card-info-avatar is-center"><div class="author-info__top-group"><div class="author-info__sayhi" id="author-info__sayhi" onclick="sco.changeSayHelloText()">sayhello.morning</div></div></div><div class="avatar-img-group"><img class="avatar-img" alt="头像" src= "/img/spin.svg" data-lazy-src="/img/avatar.jpg"><div class="avatar-sticker"><img class="avatar-sticker-img" src= "/img/spin.svg" data-lazy-src="https://7.isyangs.cn/34/65f2e4e0423cc-34.png" alt="心情贴纸"></div></div><div class="author-info__description_group"><div class="author-info__description">分享自己对编程的<b>热爱</b>，对知识海洋<b>探索历程</b>，随机掉落<b>无参配布</b>以及<b>翻调</b>（主要是音综类，在B站因为版权基本过不了审（。</div><div class="author-info__description2">相信你可以在这里找到对你有用的知识和教程。</div></div><div class="author-info__bottom-group"><a class="author-info__bottom-group-left" href="/about/"><div class="author-info__name">Rean</div><div class="author-info__desc">Enjoy technology and music</div></a><div class="card-info-social-icons is-center"><a class="social-icon" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze" title="Github"><i class="solitude  st-github-line"></i></a><a class="social-icon" target="_blank" rel="noopener" href="https://space.bilibili.com/6531436" title="Bilibili"><i class="solitude  st-bilibili-line"></i></a></div></div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="solitude st-menu-line"></i><span>文章目录</span></div><div class="toc-content" id="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86"><span class="toc-text">前端基础知识</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E6%B5%8F%E8%A7%88%E5%99%A8%E5%86%85%E6%A0%B8"><span class="toc-text">常见浏览器内核</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%8E%E6%A0%B7%E8%AE%A9-HTML-%E5%9C%A8%E6%89%80%E6%9C%89%E6%B5%8F%E8%A7%88%E5%99%A8%E7%89%88%E6%9C%AC%E4%B8%8B%E8%A1%A8%E7%8E%B0%E4%B8%80%E8%87%B4%EF%BC%9F"><span class="toc-text">怎样让 HTML 在所有浏览器版本下表现一致？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8-CSS-%E9%87%8D%E7%BD%AE%EF%BC%88CSS-Reset%EF%BC%89"><span class="toc-text">使用 CSS 重置（CSS Reset）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E6%B5%8F%E8%A7%88%E5%99%A8%E5%85%BC%E5%AE%B9%E6%80%A7%E5%89%8D%E7%BC%80"><span class="toc-text">使用浏览器兼容性前缀</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E5%B9%B6%E8%B0%83%E6%95%B4%E5%9C%A8%E4%B8%8D%E5%90%8C%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%8A%E7%9A%84%E8%A1%A8%E7%8E%B0"><span class="toc-text">测试并调整在不同浏览器上的表现</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CSS-%E5%A6%82%E4%BD%95%E4%B8%8E-HTML-%E5%8D%8F%E5%90%8C%E5%B7%A5%E4%BD%9C%E7%9A%84%EF%BC%9F"><span class="toc-text">CSS 如何与 HTML 协同工作的？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E8%81%94%E6%A0%B7%E5%BC%8F-Inline-Style"><span class="toc-text">内联样式 (Inline Style)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E9%83%A8%E6%A0%B7%E5%BC%8F-Internal-Style-Sheet-Embedded-Style"><span class="toc-text">内部样式 (Internal Style Sheet &#x2F; Embedded Style)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%96%E9%83%A8%E6%A0%B7%E5%BC%8F-External-Style-Sheet"><span class="toc-text">外部样式 (External Style Sheet)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CSS-%E9%80%89%E6%8B%A9%E5%99%A8%E4%BC%98%E5%85%88%E7%BA%A7"><span class="toc-text">CSS 选择器优先级</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CSS-%E5%B8%B8%E7%94%A8%E9%95%BF%E5%BA%A6%E5%8D%95%E4%BD%8D"><span class="toc-text">CSS 常用长度单位</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%9D%E5%AF%B9%E9%95%BF%E5%BA%A6%E5%8D%95%E4%BD%8D"><span class="toc-text">绝对长度单位</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%B8%E5%AF%B9%E9%95%BF%E5%BA%A6%E5%8D%95%E4%BD%8D"><span class="toc-text">相对长度单位</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#em-%E4%B8%8E-rem"><span class="toc-text">em 与 rem</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Flex-%E5%B8%83%E5%B1%80"><span class="toc-text">Flex 布局</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5"><span class="toc-text">基础概念</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%B9%E5%99%A8%E4%B8%8E%E9%A1%B9%E7%9B%AE"><span class="toc-text">容器与项目</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BB%E8%BD%B4%E4%B8%8E%E4%BA%A4%E5%8F%89%E8%BD%B4"><span class="toc-text">主轴与交叉轴</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Grid-%E5%B8%83%E5%B1%80"><span class="toc-text">Grid 布局</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8E-Flex-%E5%B8%83%E5%B1%80%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text">与 Flex 布局的区别</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JavaScript-%E7%AE%80%E4%BB%8B"><span class="toc-text">JavaScript 简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#JavaScript-%E5%92%8C-Java-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text">JavaScript 和 Java 的区别</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83"><span class="toc-text">核心</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ECMAScript"><span class="toc-text">ECMAScript</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%8F%98%E9%87%8F%E5%AE%9A%E4%B9%89"><span class="toc-text">变量定义</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1"><span class="toc-text">对象</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#DOM"><span class="toc-text">DOM</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#BOM"><span class="toc-text">BOM</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B3%E8%81%94"><span class="toc-text">关联</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%8F%E4%BB%BB%E5%8A%A1%E4%B8%8E%E5%BE%AE%E4%BB%BB%E5%8A%A1"><span class="toc-text">宏任务与微任务</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%8F%E4%BB%BB%E5%8A%A1"><span class="toc-text">宏任务</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BE%AE%E4%BB%BB%E5%8A%A1"><span class="toc-text">微任务</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8B%E4%BB%B6%E7%BB%91%E5%AE%9A%E6%96%B9%E6%B3%95"><span class="toc-text">事件绑定方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AF%AD%E6%B3%95"><span class="toc-text">语法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%9B%B4%E6%8E%A5%E7%BB%91%E5%AE%9A"><span class="toc-text">直接绑定</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8B%E4%BB%B6%E6%B5%81%E7%9A%84%E4%B8%89%E4%B8%AA%E9%98%B6%E6%AE%B5"><span class="toc-text">事件流的三个阶段</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JavaScript-%E4%BB%A3%E7%90%86%E4%B8%8E%E5%8F%8D%E5%B0%84"><span class="toc-text">JavaScript 代理与反射</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JavaScript-%E5%8E%9F%E5%9E%8B%E4%B8%8E%E5%8E%9F%E5%9E%8B%E9%93%BE"><span class="toc-text">JavaScript 原型与原型链</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#javascript-void-0"><span class="toc-text">javascript: void(0)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#JavsScript-%E5%B8%B8%E7%94%A8%E5%AF%B9%E8%B1%A1"><span class="toc-text">JavsScript 常用对象</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Date"><span class="toc-text">Date</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E6%97%A5%E6%9C%9F"><span class="toc-text">创建日期</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E6%97%A5%E6%9C%9F"><span class="toc-text">设置日期</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%A5%E6%9C%9F%E6%AF%94%E8%BE%83"><span class="toc-text">日期比较</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Array"><span class="toc-text">Array</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Window"><span class="toc-text">Window</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RegExp"><span class="toc-text">RegExp</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E5%BB%BA%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="toc-text">构建正则表达式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AF%B9%E8%B1%A1%E5%85%83%E5%AD%97%E7%AC%A6"><span class="toc-text">正则表达式对象元字符</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%AF%B9%E8%B1%A1%E9%87%8F%E8%AF%8D"><span class="toc-text">正则表达式对象量词</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Location"><span class="toc-text">Location</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Function"><span class="toc-text">Function</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0"><span class="toc-text">回调函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%87%AA%E6%89%A7%E8%A1%8C%E5%87%BD%E6%95%B0%EF%BC%88IIFE%EF%BC%89"><span class="toc-text">自执行函数（IIFE）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%9F%AD%E8%B7%AF%E8%BF%90%E7%AE%97"><span class="toc-text">短路运算</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%AC%E5%9C%B0%E7%BC%93%E5%AD%98"><span class="toc-text">本地缓存</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%97%AD%E5%8C%85%EF%BC%88closure%EF%BC%89"><span class="toc-text">闭包（closure）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E9%80%94"><span class="toc-text">用途</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B7%A8%E5%9F%9F%EF%BC%88CORS%EF%BC%89"><span class="toc-text">跨域（CORS）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="toc-text">解决方案</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%8E%E7%AB%AF%E6%94%AF%E6%8C%81%E8%B7%A8%E5%9F%9F"><span class="toc-text">后端支持跨域</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86"><span class="toc-text">反向代理</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Vue"><span class="toc-text">Vue</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="toc-text">生命周期</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4"><span class="toc-text">自定义指令</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="toc-text">参考链接</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="solitude st-map-line"></i><span>最近发布</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/p/1c819578/" title="【Notes】前端基础知识（HTML/JavaScript/Vue）"><img alt="【Notes】前端基础知识（HTML/JavaScript/Vue）" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/cover3.jpg"></a><div class="content"><a class="title" href="/p/1c819578/" title="【Notes】前端基础知识（HTML/JavaScript/Vue）">【Notes】前端基础知识（HTML/JavaScript/Vue）</a><a class="article-recent_post_categories" href="/p/1c819578/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/68ff0fae/" title="【Notes】RAG"><img alt="【Notes】RAG" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/cover1.JPG"></a><div class="content"><a class="title" href="/p/68ff0fae/" title="【Notes】RAG">【Notes】RAG</a><a class="article-recent_post_categories" href="/p/68ff0fae/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/f2766b22/" title="【综述】LLM - Large Language Model"><img alt="【综述】LLM - Large Language Model" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/221228-15574975489aa1.jpg"></a><div class="content"><a class="title" href="/p/f2766b22/" title="【综述】LLM - Large Language Model">【综述】LLM - Large Language Model</a><a class="article-recent_post_categories" href="/p/f2766b22/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/694e526e/" title="【Notes】LLM API+Agent+FastAPI+SSE+Docker"><img alt="【Notes】LLM API+Agent+FastAPI+SSE+Docker" src= "/img/spin.svg" data-lazy-src="https://npm.elemecdn.com/justlovesmile-photo/cover8.JPG"></a><div class="content"><a class="title" href="/p/694e526e/" title="【Notes】LLM API+Agent+FastAPI+SSE+Docker">【Notes】LLM API+Agent+FastAPI+SSE+Docker</a><a class="article-recent_post_categories" href="/p/694e526e/">学习</a></div></div><div class="aside-list-item"><a class="thumbnail" href="/p/d2c104ef/" title="【星尘Infinity/未抒】逆光（Cover：周深/陈楚生）【Synthesizer V Cover】"><img alt="【星尘Infinity/未抒】逆光（Cover：周深/陈楚生）【Synthesizer V Cover】" src= "/img/spin.svg" data-lazy-src="https://rean-song-bucket.oss-cn-guangzhou.aliyuncs.com/assets/cover/逆光_cover.png"></a><div class="content"><a class="title" href="/p/d2c104ef/" title="【星尘Infinity/未抒】逆光（Cover：周深/陈楚生）【Synthesizer V Cover】">【星尘Infinity/未抒】逆光（Cover：周深/陈楚生）【Synthesizer V Cover】</a><a class="article-recent_post_categories" href="/p/d2c104ef/">VOCALOID·UTAU</a></div></div></div></div></div></div></main><footer id="footer"><div id="st-footer-bar"><div class="footer-logo"><span class="solitude">Rean's Blog</span></div><div class="footer-bar-description">来自Rean's Blog - Enjoy technology and music的文章</div><a class="footer-bar-link" href="/">了解更多</a></div><div id="footer_deal"><a class="deal_link" target="_blank" rel="noopener" href="https://github.com/Rean-Schwarze" title="Github"><i class="solitude  st-github-line"></i></a><a class="deal_link" target="_blank" rel="noopener" href="https://space.bilibili.com/6531436" title="Bilibili"><i class="solitude  st-bilibili-line"></i></a></div><div id="st-footer"></div><div id="footer-bar"><div class="footer-bar-links"><div class="footer-bar-left"><div class="copyright">© 2024 - 2025 By&nbsp;<a class="footer-bar-link" href="/">Rean</a></div></div><div class="footer-bar-right"><a class="footer-bar-link" target="_blank" rel="noopener" href="https://github.com/valor-x/hexo-theme-solitude" alt="主题">主题</a><a class="footer-bar-link cc" href="/null" aria-label="copyright"><i class="solitude st-copyright-line"></i><i class="solitude st-creative-commons-by-line"></i><i class="solitude st-creative-commons-nc-line"></i><i class="solitude st-creative-commons-nd-line"></i></a></div></div></div></footer></div><!-- right_menu--><div id="rightMenu"><div class="rightMenu-group rightMenu-small"><div class="rightMenu-item" id="menu-backward"><i class="solitude st-arrow-left-line"></i></div><div class="rightMenu-item" id="menu-forward"><i class="solitude st-arrow-right-line"></i></div><div class="rightMenu-item" id="menu-refresh"><i class="solitude st-restart-line"></i></div><div class="rightMenu-item" id="menu-top"><i class="solitude st-arrow-up-line"></i></div></div><div class="rightMenu-group rightMenu-line rightMenuPlugin"><div class="rightMenu-item" id="menu-copytext"><i class="solitude st-copy-fill"></i><span>复制选中文本</span></div><div class="rightMenu-item" id="menu-pastetext"><i class="solitude st-clipboard-fill"></i><span>粘贴文本</span></div><div class="rightMenu-item" id="menu-newwindow"><i class="solitude st-window-fill"></i><span>新窗口打开</span></div><div class="rightMenu-item" id="menu-copylink"><i class="solitude st-link-line"></i><span>复制链接地址</span></div><div class="rightMenu-item" id="menu-copyimg"><i class="solitude st-copy-fill"></i><span>复制此图片</span></div><div class="rightMenu-item" id="menu-downloadimg"><i class="solitude st-download-cloud-fill"></i><span>下载此图片</span></div><div class="rightMenu-item" id="menu-search"><i class="solitude st-search-line"></i><span>站内搜索</span></div><div class="rightMenu-item" id="menu-music-toggle"><i class="solitude st-play-fill"></i><span>播放音乐</span></div><div class="rightMenu-item" id="menu-music-back"><i class="solitude st-skip-back-fill"></i><span>切换到上一首</span></div><div class="rightMenu-item" id="menu-music-forward"><i class="solitude st-skip-forward-fill"></i><span>切换到下一首</span></div><div class="rightMenu-item" id="menu-music-copyMusicName"><i class="solitude st-copy-fill"></i><span>复制歌名</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><div class="rightMenu-item" id="menu-randomPost" onclick="toRandomPost()||rm.hideRightMenu()"><i class="solitude st-signal-tower-fill"></i><span>随机短文</span></div><div class="rightMenu-item" onclick="pjax.loadUrl('/categories/')||rm.hideRightMenu()"><i class="solitude st-checkbox-multiple-blank-fill"></i><span>全部分类</span></div><div class="rightMenu-item" onclick="pjax.loadUrl('/tags/')||rm.hideRightMenu()"><i class="solitude st-price-tag-fill"></i><span>全部标签</span></div></div><div class="rightMenu-group rightMenu-line rightMenuOther"><div class="rightMenu-item" id="menu-darkmode" onclick="sco.switchDarkMode()"><i class="solitude st-moon-clear-fill"></i><span class="menu-darkmode-text">深色模式</span></div><div class="rightMenu-item" id="menu-translate"><i class="solitude st-panben-line"></i><span>轉為繁體</span></div></div></div><div id="rightmenu-mask"></div><!-- inject body--><div><script src="/js/utils.js?v=1.8.10"></script><script src="/js/main.js?v=1.8.10"></script><script src="/js/third_party/waterfall.min.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/pjax/0.2.8/pjax.min.js"></script><script src="/js/third_party/universe.min.js?v=1.8.10"></script><script>dark()
+</script><script src="/js/tw_cn.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/vanilla-lazyload/19.1.3/lazyload.iife.min.js"></script><script src="https://cdn.staticfile.net/node-snackbar/0.1.16/snackbar.min.js"></script><script src="https://cdn.staticfile.net/fancyapps-ui/5.0.36/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.staticfile.net/Swiper/11.0.5/swiper-bundle.min.js"></script><script>var meting_api = 'https://meting.qjqq.cn/?server=:server&type=:type&id=:id&auth=:auth&r=:r';</script><script src="https://cdn.staticfile.net/aplayer/1.10.1/APlayer.min.js"></script><script src="https://cdn.staticfile.net/meting/2.0.1/Meting.min.js"></script><script>const coverColorConfig = {
+    api: 'https://api.qjqq.cn/api/Imgcolor?img=',
+    time: 43200000
+}</script><script src="/js/covercolor/api.js?v=1.8.10"></script><script src="/js/music.js?v=1.8.10"></script><script src="https://cdn.staticfile.net/pace/1.2.4/pace.min.js"></script><script src="/js/right_menu.js?v=1.8.10"></script><div class="js-pjax"><script defer pjax src="https://cdn.staticfile.net/pearssauce-busuanzi/1.0.0/bsz.pure.min.js"></script></div></div><!-- newest comment--><!-- pjax--><script>const pjax = new Pjax({
+    elements: 'a:not([target="_blank"])',
+    selectors: ['title','#body-wrap','#site-config','meta[name="description"]','.js-pjax','meta[property^="og:"]','#config-diff'],
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+})
+
+document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+})
+
+document.addEventListener('pjax:complete', () => {
+    window.refreshFn()
+
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+        const newScript = document.createElement('script')
+        const content = item.text || item.textContent || item.innerHTML || ""
+        Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+        newScript.appendChild(document.createTextNode(content))
+        item.parentNode.replaceChild(newScript, item)
+    })
+
+    GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+})
+
+document.addEventListener('pjax:error', (e) => {
+    if (e.request.status === 404) {
+        pjax.loadUrl('/404.html')
+    }
+})</script><!-- theme--><script>initTheme = () => {
+    let isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const cachedMode = utils.saveToLocal.get('theme');
+    if (cachedMode === undefined) {
+        const nowMode =
+            isDarkMode ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', nowMode);
+    } else {
+        document.documentElement.setAttribute('data-theme', cachedMode);
+    }
+    is_rm && rm.mode(cachedMode === 'dark' && isDarkMode)
+}
+initTheme()</script><!-- google adsense--><!-- search--><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><button class="search-close-button"><i class="solitude st-close-fill"></i></button></nav><div class="search-wrap"><div class="search-box"><input class="search-box-input" id="search-input" type="text" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="输入关键词快速查找"></div><div id="search-results"><div id="search-hits"></div></div><div id="search-pagination"></div><div id="search-tips"></div></div></div><div id="search-mask"></div></div><script src="/js/search/local.js?v=1.8.10"></script><!-- music--><div class="needEndHide" id="nav-music" onclick="sco.musicToggle()"><div id="nav-music-hoverTips">音乐已暂停</div><meting-js id="421801417" server="netease" type="playlist" mutex="true" preload="none" data-lrctype="0" order="random" theme="var(--efu-main)"></meting-js></div></body></html><script>const posts=["p/1c819578/","p/68ff0fae/","p/f2766b22/","p/694e526e/","p/d2c104ef/","p/401d6e5a/","p/197094e3/","p/867e546a/","p/9d906c2f/","p/8e8e2cc6/","p/2b6e13f/","p/e7845a78/","p/5871d67/","p/204d99f1/","p/b585efd0/","p/122902e7/","p/683f7c8e/","p/36b252a1/","p/bbd98f0d/","p/1b320550/","p/30cd73ca/","p/332adb42/","p/4f877c1e/","p/677c7789/","p/f7f0a5f3/","p/9b5a538c/","p/37360bc0/","p/bb996d5/","p/364ea8cc/","p/a027699d/","p/21cdaec5/","p/37c37880/","p/a02febe4/","p/d1ec0e4e/","p/25d2b878/","p/8324e4bc/","p/6021f67a/","p/305331f0/","p/66be4b4/","p/de2d10bc/","p/e6628f8e/","p/4131eeff/","p/27705e17/","p/74e1a37c/","p/b5223f80/","p/9b8bc45a/","p/c9cb7159/","p/82c942ab/","p/4c19fcc6/","p/27446c6a/","p/9f38852a/","p/2516f5f2/","p/b27c77b3/","p/7a3264f/","p/7beadfaa/","p/e1d9906f/","p/a440b512/","p/a46aa116/","p/fe8dd3bd/","p/51c99199/","p/91b418a/","p/421add40/","p/9d7a18c7/","p/26345198/","p/fa30e874/","p/dea9a817/","p/59203ba6/","p/e5616c72/","p/971e9859/","p/d7f6ccff/","p/1b2ec1c2/","p/a0d1cef9/","p/a58b6af0/","p/9381aa6d/","p/38b8becb/","p/d0a26095/","p/2b3bdada/","p/ba70636/","p/374630f5/","p/a964a243/","p/a06e9899/","p/ef9a99de/","p/108f7c52/","p/a91c1846/","p/413576cf/","p/9ee60c65/","p/e74db628/","p/888c8bf3/","p/477dbe08/","p/38e8a510/","p/dfb41864/","p/b0e3506b/","p/e17fd725/","p/e1fe458c/","p/636cfdea/","p/7b854cb7/","p/b3a61240/","p/64f43fb4/","p/800f9a11/","p/4a48b34c/","p/b3641215/","p/53bc1fc9/","p/fc02f9ee/","p/25b929f6/","p/dd30b42/","p/3aa261db/","p/fc078742/","p/22c9d1d0/","p/33fc02d2/","p/70335ae0/","p/f32ef110/","p/f756486c/","p/8dd4b91f/","p/a290d941/","p/61a8a4ef/","p/c2d0bb20/","p/9770d71c/","p/41bd2aed/","p/bfebe40b/","p/6b4006e6/","p/b5696360/","p/53ab7115/","p/e6fa9b9/","p/866abf45/","p/b718b92a/","p/d26f4c21/","p/bc5d6bbe/","p/5a18917b/","p/5f2b1e2f/","p/2532a2ee/","p/4337b2c0/","p/e042d029/","p/9b4a91e5/","p/9d8ce868/","p/a69f6a48/","p/f9b9edb2/","p/cbe55d0/","p/156c59d0/","p/d4d6f818/","p/2574cf15/","p/a0efc292/","p/ec2ecf28/","p/85f11265/","p/db95e6f5/","p/a8296e6d/","p/4cc89a71/","p/d0fe2d0f/","p/ffab2f6b/","p/95d9f91e/","p/7f869365/","p/5b246b1b/","p/a9c92fa9/","p/7d49fec0/","p/a9a25fcd/","p/43bb383e/","p/b9aeb4/","p/52eaf228/","p/4be90d2f/","p/ed500d41/","p/dcfbc8e5/","p/240e5e52/","p/18cda1b3/","p/66a6c396/","p/5f33341/","p/f9bef31e/","p/acac46b/","p/a4189438/","p/ae6b0147/","p/4e982f2d/","p/403e0cac/","p/495b9f0f/","p/8e966ab9/","p/f6e1007e/","p/6f562d19/","p/10eac329/","p/cc53cf58/","p/4f2beac6/","p/73e2aa1/","p/c677e75e/","p/3f13b766/","p/cc30f00/","p/807cab5e/","p/5b5991e4/","p/e941ffc/"];function toRandomPost(){ pjax.loadUrl('/'+posts[Math.floor(Math.random()*posts.length)]); }</script>
